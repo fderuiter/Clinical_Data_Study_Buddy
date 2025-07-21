@@ -5,11 +5,14 @@ description = "Generate CRFs from CDISC Library"
 authors = ["You <you@example.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-packages = [{ include = "src" }]
+packages = [
+    { from = "src", include = "cdisc_library_client" },
+    { from = "src", include = "crfgen" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"
-openapi-python-client = "^0.21.7"
+openapi-python-client = "^0.25"
 jinja2 = "^3.1"
 pydantic = "^2.7"
 requests = "^2.32"
