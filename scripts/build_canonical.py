@@ -1,19 +1,20 @@
+#!/usr/bin/env python
 import argparse
 import os
+import sys
 
 from crfgen.crawl import harvest, write_json
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Build canonical CRF JSON")
-    parser.add_argument("--filter", dest="filter", help="Substring to match IG version", default=None)
-    parser.add_argument("--output", dest="output", help="Output JSON path", default="crf.json")
-    args = parser.parse_args()
+p = argparse.ArgumentParser()
+p.add_argument("-o", "--out", default="crf.json")
+p.add_argument("-v", "--version", help="IG version substring (optional)")
+args = p.parse_args()
 
-    token = os.environ["CDISC_PRIMARY_KEY"]
-    forms = harvest(token, ig_filter=args.filter)
-    write_json(forms, args.output)
+token = os.getenv("CDISC_PRIMARY_KEY")
+if not token:
+    sys.exit("ERROR: set CDISC_PRIMARY_KEY environment variable")
 
-
-if __name__ == "__main__":
-    main()
+forms = harvest(token, ig_filter=args.version)
+write_json(forms, args.out)
+print(f"✅  Saved {len(forms)} forms -> {args.out}")
