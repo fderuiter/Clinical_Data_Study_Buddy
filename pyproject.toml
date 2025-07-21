@@ -20,7 +20,6 @@ pandas = "^2.2"
 openpyxl = "^3.1"
 python-docx = "^1.1"
 odmlib = "^0.1"
-setuptools = "^80.9.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0"
