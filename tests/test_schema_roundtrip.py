@@ -1,6 +1,5 @@
 from crfgen.schema import Form, FieldDef, dump_forms, load_forms
 import pathlib
-import tempfile
 
 
 def test_roundtrip(tmp_path: pathlib.Path):
