@@ -6,4 +6,5 @@ build/
 .venv/
 .cache/
 artefacts/
+!artefacts/.gitkeep
 .env

@@ -10,6 +10,9 @@ packages = [
     { from = "src", include = "crfgen" }
 ]
 
+[tool.poetry.package]
+include = ["src/crfgen/templates/*.j2", "src/crfgen/style/*"]
+
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"
 openapi-python-client = "^0.25"
