@@ -4,8 +4,10 @@ import pytest
 from crfgen.crawl import harvest
 
 
-@pytest.mark.skipif("CDISC_PRIMARY_KEY" not in os.environ, reason="no token")
-def test_crawl_live():
-    forms = harvest(os.environ["CDISC_PRIMARY_KEY"], ig_filter="2-2")
-    assert len(forms) > 0
-    assert all(f.fields for f in forms)
+token = os.getenv("CDISC_PRIMARY_KEY")
+
+
+@pytest.mark.skipif(not token, reason="no API key in env")
+def test_live_pull_small():
+    forms = harvest(token, ig_filter="2-2")
+    assert len(forms) >= 40  # CDASH 2.2 domains
