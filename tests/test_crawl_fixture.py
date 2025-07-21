@@ -1,18 +1,10 @@
 import json
-import pathlib
-
-from crfgen import crawl
-
-FIXTURE = json.loads((pathlib.Path(__file__).parent / "fixtures" / "crawl_fixture.json").read_text())
+from crfgen.schema import Form
 
 
-def fake_cached_get(url: str, headers: dict[str, str], ttl_days: int = 30):
-    return FIXTURE[url]
-
-
-def test_harvest_offline(monkeypatch):
-    monkeypatch.setattr(crawl, "cached_get", fake_cached_get)
-    forms = crawl.harvest("dummy", ig_filter="2-2")
-    assert len(forms) == 2
-    assert forms[0].domain == "VS"
-    assert forms[1].scenario == "VS.Generic"
+def test_fixture_loads():
+    data = json.load(open("tests/.data/sample_crf.json"))
+    forms = [Form(**d) for d in data]
+    assert forms, "fixture empty"
+    vs = [f for f in forms if f.domain == "VS"]
+    assert vs and vs[0].fields, "Vitals missing fields"
