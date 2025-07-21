@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "cdisc-crf-generator"
+version = "0.1.0"
+description = "Generate CRFs from CDISC Library"
+authors = ["You <you@example.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+openapi-python-client = "^0.21.7"
+jinja2 = "^3.1"
+pydantic = "^2.7"
+requests = "^2.32"
+pandas = "^2.2"
+openpyxl = "^3.1"
+python-docx = "^1.1"
+odmlib = "^0.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.0"
+ruff = "^0.5.0"
+pytest = "^8.0"
+pytest-cov = "^5.0"
+pre-commit = "^4.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
