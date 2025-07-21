@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Vital Signs",
+    "domain": "VS",
+    "scenario": null,
+    "fields": [
+      {
+        "oid": "VSORRES",
+        "prompt": "Result",
+        "datatype": "text",
+        "cdash_var": "VSORRES",
+        "codelist": null,
+        "control": null
+      }
+    ]
+  },
+  {
+    "title": "VS Generic Scenario",
+    "domain": "VS",
+    "scenario": "VS.Generic",
+    "fields": [
+      {
+        "oid": "VSDTC",
+        "prompt": "Date/Time",
+        "datatype": "datetime",
+        "cdash_var": "VSDTC",
+        "codelist": null,
+        "control": null
+      }
+    ]
+  }
+]
