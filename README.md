@@ -10,7 +10,13 @@ Use the `scripts/build.py` helper to generate files in various formats. For exam
 python scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats md
 ```
 
-The command will create one Markdown file per form in the given output directory.
+To create LaTeX output instead, use `tex` as the format:
+
+```bash
+python scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats tex
+```
+
+The command will create one file per form in the given output directory.
 
 Additional documentation is available in the [docs](docs/) directory, including an [FAQ](docs/FAQ.md) about accessing and using the CDISC Library.
 

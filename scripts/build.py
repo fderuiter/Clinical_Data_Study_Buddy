@@ -9,6 +9,7 @@ from crfgen.exporter import EXPORTERS
 
 MODULE_MAP = {
     "md": "markdown",
+    "tex": "latex",
 }
 
 
