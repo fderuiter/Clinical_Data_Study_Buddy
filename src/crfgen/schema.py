@@ -45,3 +45,13 @@ class FieldDef(BaseModel):
         if value.lower() not in ALLOWED_DT:
             raise ValueError(f"Datatype {value} not in {ALLOWED_DT}")
         return value.lower()
+
+
+class Form(BaseModel):
+    title: str
+    domain: str
+    scenario: Optional[str] = None
+    fields: list[FieldDef]
+
+    def field_oids(self) -> list[str]:
+        return [f.oid for f in self.fields]
