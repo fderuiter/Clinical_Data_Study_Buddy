@@ -55,3 +55,18 @@ class Form(BaseModel):
 
     def field_oids(self) -> list[str]:
         return [f.oid for f in self.fields]
+
+
+import json
+import pathlib
+from typing import Iterable
+
+
+def dump_forms(forms: Iterable[Form], path: str | pathlib.Path):
+    data = [f.model_dump() for f in forms]
+    pathlib.Path(path).write_text(json.dumps(data, indent=2))
+
+
+def load_forms(path: str | pathlib.Path) -> list[Form]:
+    raw = json.loads(pathlib.Path(path).read_text())
+    return [Form(**d) for d in raw]
