@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from typing import Optional, Literal
+from typing import Optional, Literal, Iterable
+
+import json
+import pathlib
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic.config import ConfigDict
@@ -55,11 +58,6 @@ class Form(BaseModel):
 
     def field_oids(self) -> list[str]:
         return [f.oid for f in self.fields]
-
-
-import json
-import pathlib
-from typing import Iterable
 
 
 def dump_forms(forms: Iterable[Form], path: str | pathlib.Path):
