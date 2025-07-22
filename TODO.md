@@ -301,6 +301,148 @@ git push
 * Manual and automated tests verify the CLI correctly writes selected formats.
 * CI pipeline updated to invoke one command to generate all artifacts.
 
+## **Phase 7 – Linting, Formatting, and CI Quality Gates**
+
+*Objective: enforce consistent code style, catch errors early, and surface lint/test failures in CI.*
+
+---
+
+### **7.0  Confirm dev dependencies**
+
+Ensure the following are in your `pyproject.toml` under `[tool.poetry.group.dev.dependencies]`:
+
+```toml
+black = "^24.0"
+ruff = "^0.5.0"
+isort = "^5.12.0"
+pre-commit = "^4.0"
+pytest = "^8.0"
+pytest-cov = "^5.0"
+```
+
+**Checkpoint 7-0**
+
+```bash
+poetry show black ruff isort pre-commit pytest
+```
+
+You should see each package listed with its version.
+
+---
+
+### **7.1  Create Pre-commit configuration**
+
+Add **`.pre-commit-config.yaml`** at the repo root:
+
+```yaml
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile=black"]
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.5.3
+    hooks:
+      - id: ruff
+        args: ["--max-line-length=88"]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+```
+
+**Checkpoint 7-1**
+
+```bash
+git add .pre-commit-config.yaml
+pre-commit run --all-files
+```
+
+No errors or failures (it may auto-fix some files).
+
+---
+
+### **7.2  Install and validate hooks locally**
+
+```bash
+poetry run pre-commit install
+```
+
+Now, every `git commit` will run Black, isort, Ruff, and the basic hooks.
+
+**Checkpoint 7-2**
+
+```bash
+# Make a trivial change that violates style, e.g. add "x=1" to README.md, then:
+git add README.md
+git commit -m "style test"
+```
+
+You should see Black/isort/Ruff run and either pass or auto-fix (blocking commit if errors remain).
+
+---
+
+### **7.3  Enforce in CI**
+
+Update **`.github/workflows/ci.yml`**, adding a **“Lint & Format”** step before tests:
+
+```yaml
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Poetry install (dev deps)
+        run: poetry install
+
+      - name: Pre-commit checks
+        run: poetry run pre-commit run --all-files --show-diff-on-failure
+
+      - name: Run tests
+        run: poetry run pytest -q --cov=crfgen
+```
+
+> **Tip:** if you prefer separate lint + format steps, replace the “Pre-commit” step with:
+>
+> ```yaml
+> - name: Lint (Ruff)
+>   run: poetry run ruff src tests
+> - name: Format check (Black & isort)
+>   run: |
+>     poetry run black --check src tests
+>     poetry run isort --check-only src tests
+> ```
+
+**Checkpoint 7-3**
+Push a trivial style violation commit (e.g. remove a space) to trigger CI.
+
+* The **pre-commit** step should fail, blocking the merge until style is fixed.
+* Fix locally, commit, and see CI green.
+
+---
+
+## **Phase 7 complete**
+
+* **Local**: Pre-commit hooks enforce Black, isort, Ruff, and basic checks on every commit.
+* **CI**: The same checks run on all branches & PRs, preventing style or lint regressions.
+* **Tests**: `pytest` continues to validate functionality immediately after lint/format checks.
+
 ## Phase 7 – Exporters
 
 * [ ] Markdown: `src/crfgen/exporter/markdown.py`
