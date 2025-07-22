@@ -29,8 +29,10 @@ def _json(url: str, token: str | bytes):
     return data
 
 
-def harvest(token: str, ig_filter: Optional[str] = None) -> List[Form]:
+def harvest(token: str | bytes, ig_filter: Optional[str] = None) -> List[Form]:
     """Pull CDASH IG -> domains -> scenarios and convert to Form objects."""
+    if isinstance(token, (bytes, bytearray)):
+        token = token.decode()
     root = _json(f"{BASE}/mdr/cdashig", token)
     forms: list[Form] = []
     for ver in root["_links"]["versions"]:

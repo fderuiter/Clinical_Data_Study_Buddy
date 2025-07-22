@@ -165,7 +165,7 @@ class AuthenticatedClient:
         raise_on_unexpected_status: Whether or not to raise an errors.UnexpectedStatus if the API returns a
             status code that was not documented in the source OpenAPI document. Can also be provided as a keyword
             argument to the constructor.
-        token: The token to use for authentication
+        token: The token to use for authentication (may be ``str`` or ``bytes``)
         prefix: The prefix to use for the Authorization header
         auth_header_name: The name of the Authorization header
     """
