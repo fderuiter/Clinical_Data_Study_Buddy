@@ -4,12 +4,23 @@ import argparse
 import importlib
 from pathlib import Path
 
+import crfgen.exporter.markdown   # noqa
+import crfgen.exporter.latex      # noqa
+import crfgen.exporter.docx       # noqa
+import crfgen.exporter.csv        # noqa
+import crfgen.exporter.xlsx       # noqa
+import crfgen.exporter.odm        # noqa
+
 from crfgen.schema import load_forms
 from crfgen.exporter import EXPORTERS
 
 MODULE_MAP = {
     "md": "markdown",
     "tex": "latex",
+    "docx": "docx",
+    "csv": "csv",
+    "xlsx": "xlsx",
+    "odm": "odm",
 }
 
 

@@ -23,6 +23,12 @@ exporter:
 python scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats docx
 ```
 
+CSV and Excel exports are also available:
+
+```bash
+python scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats csv xlsx
+```
+
 The command will create one file per form in the given output directory.
 
 Additional documentation is available in the [docs](docs/) directory, including an [FAQ](docs/FAQ.md) about accessing and using the CDISC Library.
