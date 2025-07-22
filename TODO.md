@@ -1907,11 +1907,47 @@ By default, each run creates a new branch. You may:
 * Secrets and permissions are configured to let the bot create PRs.
 * You’ve manually tested both “no diff” and “diff” scenarios.
 
-## Phase 10 – Pre-commit hooks
+## Phase 10 – Documentation & Developer Onboarding
 
-* [ ] Create `.pre-commit-config.yaml` (Black, isort, Ruff, EOF fixer)
-* [ ] Run `poetry run pre-commit install`
-* [ ] Commit and verify hooks fire
+### 10.1  Write a “Getting Started” guide in the README
+
+Add a **Quickstart** section showing how to clone the repo, set up a Python 3.11
+virtual environment or dev container, configure the `CDISC_API_KEY`, fetch the
+latest `crf.json` and generate all artefacts. Include a command to open one of
+the generated documents. Verify the block renders correctly on GitHub.
+
+### 10.2  Create a Makefile for common tasks
+
+Add a `Makefile` with targets:
+
+- `init` – create a venv and install dependencies with Poetry
+- `clean` – remove build artefacts
+- `build-json` – run `scripts/build_canonical.py`
+- `build-all` – run `scripts/build.py`
+- `test` – run `pytest`
+- `fmt` – run Black, isort and Ruff
+- `docs` – serve the MkDocs site locally
+
+Run `make build-json build-all test fmt` to ensure each target succeeds.
+
+### 10.3  Add a VS Code Dev Container
+
+Create `.devcontainer/Dockerfile` installing system dependencies, Poetry and the
+project itself. Add a matching `devcontainer.json` that builds the image and
+runs `make build-json` after creation. Open the project in VS Code using
+“Reopen in Container” and run `make build-all` to verify it works.
+
+### 10.4  Generate & publish project docs with MkDocs
+
+Add `mkdocs` and `mkdocs-material` as development dependencies. Create a
+`mkdocs.yml` with navigation and pages under `docs/`. Add a GitHub Actions
+workflow `.github/workflows/docs.yml` that deploys the site on pushes to `main`.
+Run `make docs` locally to preview.
+
+### 10.5  Add badges to the README
+
+Include CI, pre‑commit, weekly sync and docs badges at the top of the README.
+Push the change and verify the badges display correctly.
 
 ## Phase 11 – GitHub Actions CI
 
