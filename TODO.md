@@ -72,15 +72,243 @@ This file tracks progress across all phases of the project. Tick off each task a
   ```
 * [ ] Run `poetry install` and verify `import cdisc_library_client`
 
-## Phase 3 – Core domain models
+## **Phase 3 – Domain-model layer (Pydantic)**
 
-* [ ] Create `src/crfgen/schema.py` with Pydantic models:
+*The goal of this phase is to design, implement, and verify typed Python classes that will serve as the in-memory “schema” for everything downstream (crawler, exporters, tests).*
 
-  * `Codelist`
-  * `Field`
-  * `Form`
-* [ ] *(Optional)* Add serialization helpers (`dump_forms` / `load_forms`)
-* [ ] Verify via `poetry run python -c "from crfgen.schema import Form; …"`
+> **Prerequisite** – Phase 2 is complete and `poetry install` works.
+
+### **3.0  Create the module scaffold**
+
+```bash
+mkdir -p src/crfgen
+touch src/crfgen/__init__.py
+```
+
+**Checkpoint 3-0**
+
+```bash
+poetry run python - <<'PY'
+import importlib, pathlib, sys, pkg_resources, inspect
+print("crfgen import OK")
+PY
+```
+
+Expected: `crfgen import OK`
+
+### **3.1  Define atomic helper models**
+
+Create **`src/crfgen/schema.py`**
+
+```python
+from __future__ import annotations
+from typing import List, Optional, Literal
+from pydantic import BaseModel, Field
+
+class Codelist(BaseModel):
+    """Reference to an external controlled-terminology list."""
+    nci_code: str = Field(..., pattern=r"^C\d+$")
+    href: str
+
+class DataType(str):
+    """CDASH datatype subset we care about."""
+    # Not using Enum to keep it open; we validate later
+    pass
+
+ALLOWED_DT = {"text", "integer", "float", "date", "datetime", "boolean"}
+
+class FieldDef(BaseModel):
+    oid: str
+    prompt: str
+    datatype: DataType
+    cdash_var: str
+    codelist: Optional[Codelist] = None
+    control: Optional[Literal["radio", "checkbox"]] = None
+
+    # Extra validation step
+    @classmethod
+    def validate_datatype(cls, value: str) -> str:
+        if value.lower() not in ALLOWED_DT:
+            raise ValueError(f"Datatype {value} not in {ALLOWED_DT}")
+        return value.lower()
+
+    _normalise_dt = Field(alias="datatype", pre=True)(validate_datatype)
+```
+
+**Checkpoint 3-1**
+
+```bash
+poetry run python - <<'PY'
+from crfgen.schema import FieldDef, Codelist
+fd = FieldDef(
+    oid="VSORRES",
+    prompt="Result",
+    datatype="text",
+    cdash_var="VSORRES",
+    codelist=Codelist(nci_code="C85491", href="http://example.com")
+)
+print(fd.model_dump()["datatype"])
+PY
+```
+
+Expected: `text`
+
+### **3.2  Form-level model**
+
+Append to `schema.py`:
+
+```python
+class Form(BaseModel):
+    title: str
+    domain: str
+    scenario: Optional[str] = None
+    fields: List[FieldDef]
+
+    def field_oids(self) -> List[str]:
+        return [f.oid for f in self.fields]
+```
+
+**Checkpoint 3-2**
+
+```bash
+poetry run python - <<'PY'
+from crfgen.schema import Form, FieldDef
+fm = Form(
+    title="Vital Signs",
+    domain="VS",
+    fields=[FieldDef(oid="VSORRES", prompt="Res", datatype="text", cdash_var="VSORRES")]
+)
+assert fm.field_oids() == ["VSORRES"]
+print("Form OK")
+PY
+```
+
+Expected: `Form OK`
+
+### **3.3  Utility:  convert from generated client payload**
+
+Create **`src/crfgen/converter.py`**
+
+```python
+"""
+Helpers to translate CDISC Library client DTOs -> crfgen.schema objects.
+"""
+
+from typing import Any
+from crfgen.schema import Form, FieldDef, Codelist
+
+def field_from_api(f: Any) -> FieldDef:
+    cl = (
+        Codelist(nci_code=f.codelist.nci_code, href=f.codelist.href)
+        if getattr(f, "codelist", None) else None
+    )
+    return FieldDef(
+        oid=f.cdash_variable,
+        prompt=f.prompt,
+        datatype=f.datatype,
+        cdash_var=f.cdash_variable,
+        codelist=cl,
+    )
+
+def form_from_api(payload: Any) -> Form:
+    return Form(
+        title=payload.title,
+        domain=payload.domain,
+        scenario=getattr(payload, "scenario", None),
+        fields=[field_from_api(f) for f in payload.fields],
+    )
+```
+
+**Checkpoint 3-3**
+
+```bash
+poetry run python - <<'PY'
+from crfgen.converter import form_from_api
+class FakeField:
+    def __init__(self):
+        self.cdash_variable="TEST"; self.prompt="Q"; self.datatype="text"; self.codelist=None
+class FakePayload:
+    title="Demo"; domain="DM"; scenario=None; fields=[FakeField()]
+demo = form_from_api(FakePayload)
+print(demo.domain, demo.fields[0].oid)
+PY
+```
+
+Expected: `DM TEST`
+
+### **3.4  Serialization helpers**
+
+Add to `schema.py` bottom:
+
+```python
+import json, pathlib
+from typing import Iterable
+
+def dump_forms(forms: Iterable[Form], path: str | pathlib.Path):
+    data = [f.model_dump() for f in forms]
+    pathlib.Path(path).write_text(json.dumps(data, indent=2))
+
+def load_forms(path: str | pathlib.Path) -> List[Form]:
+    raw = json.loads(pathlib.Path(path).read_text())
+    return [Form(**d) for d in raw]
+```
+
+**Checkpoint 3-4**
+
+```bash
+poetry run python - <<'PY'
+from crfgen.schema import Form, FieldDef, dump_forms, load_forms
+tmp="tests/.data/tmp.json"
+forms=[Form(title="x",domain="DM",fields=[FieldDef(oid="ID",prompt="ID",datatype="text",cdash_var="ID")])]
+dump_forms(forms,tmp); r=load_forms(tmp); print(len(r), r[0].domain)
+PY
+```
+
+Expected: `1 DM`
+
+### **3.5  Unit tests**
+
+Create **`tests/test_schema_roundtrip.py`**
+
+```python
+from crfgen.schema import Form, FieldDef, dump_forms, load_forms
+import tempfile, pathlib
+
+def test_roundtrip():
+    f = Form(
+        title="VS",
+        domain="VS",
+        fields=[FieldDef(oid="VSORRES", prompt="Res", datatype="text", cdash_var="VSORRES")]
+    )
+    tmp = pathlib.Path(tempfile.mkdtemp()) / "tmp.json"
+    dump_forms([f], tmp)
+    out = load_forms(tmp)
+    assert out[0].title == "VS"
+```
+
+Run:
+
+```bash
+poetry run pytest -q
+```
+
+**Checkpoint 3-5**
+Output should be:
+
+```
+.
+1 passed in X.XXs
+```
+
+### **Phase 3 Complete**
+
+**Artifacts produced**
+
+* `src/crfgen/schema.py` – canonical Pydantic models + JSON helpers
+* `src/crfgen/converter.py` – API-payload → model translators
+* Unit tests proving instantiation and round-trip serialization
+
+Phase 4 (Crawler) can now consume these models with confidence.
 
 ## **Phase 4 – Crawler → `crf.json`**
 
