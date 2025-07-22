@@ -1,16 +1,10 @@
 import ssl
 from typing import Any, Optional, Union
 
+from crfgen.utils import normalize_headers
+
 import httpx
 from attrs import define, evolve, field
-
-
-def _normalize_headers(headers: dict[str, Any]) -> dict[str, str]:
-    """Convert header values to plain strings."""
-    return {
-        k: (v.decode() if isinstance(v, (bytes, bytearray)) else str(v))
-        for k, v in headers.items()
-    }
 
 
 @define
@@ -61,7 +55,7 @@ class Client:
 
     def with_headers(self, headers: dict[str, str | bytes]) -> "Client":
         """Get a new client matching this one with additional headers."""
-        headers = _normalize_headers(headers)
+        headers = normalize_headers(headers)
         if self._client is not None:
             self._client.headers.update(headers)
         if self._async_client is not None:
@@ -95,7 +89,7 @@ class Client:
     def get_httpx_client(self) -> httpx.Client:
         """Get the underlying httpx.Client, constructing a new one if not previously set"""
         if self._client is None:
-            hdrs = _normalize_headers(self._headers)
+            hdrs = normalize_headers(self._headers)
             self._client = httpx.Client(
                 base_url=self._base_url,
                 cookies=self._cookies,
@@ -127,7 +121,7 @@ class Client:
     def get_async_httpx_client(self) -> httpx.AsyncClient:
         """Get the underlying httpx.AsyncClient, constructing a new one if not previously set"""
         if self._async_client is None:
-            hdrs = _normalize_headers(self._headers)
+            hdrs = normalize_headers(self._headers)
             self._async_client = httpx.AsyncClient(
                 base_url=self._base_url,
                 cookies=self._cookies,
@@ -204,7 +198,7 @@ class AuthenticatedClient:
 
     def with_headers(self, headers: dict[str, str | bytes]) -> "AuthenticatedClient":
         """Get a new client matching this one with additional headers."""
-        headers = _normalize_headers(headers)
+        headers = normalize_headers(headers)
         if self._client is not None:
             self._client.headers.update(headers)
         if self._async_client is not None:
@@ -245,7 +239,7 @@ class AuthenticatedClient:
             )
             auth_val = f"{self.prefix} {token}" if self.prefix else token
             self._headers[self.auth_header_name] = str(auth_val)
-            hdrs = _normalize_headers(self._headers)
+            hdrs = normalize_headers(self._headers)
             self._client = httpx.Client(
                 base_url=self._base_url,
                 cookies=self._cookies,
@@ -286,7 +280,7 @@ class AuthenticatedClient:
             )
             auth_val = f"{self.prefix} {token}" if self.prefix else token
             self._headers[self.auth_header_name] = str(auth_val)
-            hdrs = _normalize_headers(self._headers)
+            hdrs = normalize_headers(self._headers)
             self._async_client = httpx.AsyncClient(
                 base_url=self._base_url,
                 cookies=self._cookies,
