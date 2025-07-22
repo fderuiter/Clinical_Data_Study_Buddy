@@ -51,26 +51,132 @@ This file tracks progress across all phases of the project. Tick off each task a
   * `black`, `ruff`, `isort`, `pre-commit`, `pytest`, `pytest-cov`
 * [ ] Run `poetry install` and verify imports (`pandas`, `jinja2`)
 
-## Phase 2 – Bring in the OpenAPI spec & generate client
+## Phase 2 – Bring the official CDISC Library OpenAPI spec into your project
 
-* [ ] Download spec JSON → `openapi/cdisc-library.json` (or YAML)
-* [ ] *(Optional)* Convert JSON → YAML (`openapi/cdisc-library.yaml`)
-* [ ] Generate client:
+*(all commands run from the repo root; assume Poetry is already initialised per Phase 1)*
 
-  ```
-  poetry run openapi-python-client generate \
-    --path openapi/cdisc-library.yaml \
-    --meta none \
-    --config '{"package_name":"cdisc_library_client",…}'
-  ```
-* [ ] Move `cdisc_library_client/` → `src/`
-* [ ] Add to `pyproject.toml` under `[tool.poetry.packages]`:
+### **2.0  Create a home for the spec**
 
-  ```toml
-  cdisc_library_client = { from = "src", include = "cdisc_library_client" }
-  crfgen                = { from = "src", include = "crfgen" }
-  ```
-* [ ] Run `poetry install` and verify `import cdisc_library_client`
+```bash
+mkdir -p openapi
+```
+
+### **2.1  Download the spec (JSON flavour)**
+
+CDISC now publishes the Swagger / OAS 3 definition openly:
+
+```bash
+curl -L \
+  -o openapi/cdisc-library.json \
+  https://www.cdisc.org/system/files/cdisc_library/api_documentation/CDISC1-share-2.0-1.1.0-swagger.json
+```
+
+> *Tip:* add the second URL – <https://www.cdisc.org/cdisc-library/api-documentation/oas3> – to your bookmarks; CDISC updates it whenever a new IG or endpoint ships.
+
+### **2.2  Optional – Convert JSON → YAML (makes diffs easier)**
+
+`openapi-python-client` accepts either format, but YAML is human-friendlier for reviews.
+
+```bash
+poetry run python - <<'PY'
+import json, yaml, pathlib, sys, os
+raw = json.load(open("openapi/cdisc-library.json"))
+yaml.safe_dump(raw, open("openapi/cdisc-library.yaml", "w"), sort_keys=False)
+PY
+```
+
+Delete the original JSON if you prefer to version just one file.
+
+### **2.3  Generate a typed Python client**
+
+```bash
+poetry run openapi-python-client generate \
+   --path openapi/cdisc-library.yaml \
+   --meta none \
+   --config '{"package_name":"cdisc_library_client","project_name":"cdisc_library_client","package_version":"0.1.0"}'
+```
+
+* The tool creates a new directory **`cdisc_library_client/`** plus a `README.md`.
+* No `pyproject.toml` is generated because we passed `--meta none`; we’ll vendor the code directly.
+
+### **2.4  Move the generated package into `src/`**
+
+```bash
+mv cdisc_library_client src/
+```
+
+Your tree now looks like
+
+```
+src/
+  ├─ cdisc_library_client/   ← <generated code>
+  └─ crfgen/
+openapi/
+  └─ cdisc-library.yaml
+```
+
+### **2.5  Tell Poetry where to find the new code**
+
+Edit **`pyproject.toml`** and add the package to the `[tool.poetry.packages]` table:
+
+```toml
+[tool.poetry.packages]
+cdisc_library_client = { from = "src", include = "cdisc_library_client" }
+crfgen                = { from = "src", include = "crfgen" }
+```
+
+### **2.6  Re-install the local environment**
+
+```bash
+poetry install
+```
+
+Poetry now puts the generated client on the editable path.
+
+### **Checkpoint 2 – Smoke-test the client**
+
+```bash
+poetry run python - <<'PY'
+from cdisc_library_client import Client
+print("Generated client OK - base_url is:", Client.base_url)
+PY
+```
+
+You should see something like:
+
+```
+Generated client OK - base_url is: https://library.cdisc.org/api
+```
+
+*(No HTTP call is made yet; we’re only confirming importability.)*
+
+### **2.7  Commit the spec and generated client**
+
+```bash
+git add openapi/cdisc-library.yaml src/cdisc_library_client
+git commit -m "Add CDISC Library OpenAPI spec and generated client"
+```
+
+*(If your repo uses Git LFS, add the YAML to `.gitattributes` now.)*
+
+### **2.8  Future updates**
+
+Whenever CDISC ships a new version:
+
+```bash
+curl -L -o openapi/cdisc-library.yaml <new-url>
+poetry run openapi-python-client generate \
+        --path openapi/cdisc-library.yaml --meta none \
+        --config '{"package_name":"cdisc_library_client"}'
+mv -f cdisc_library_client src/
+poetry install
+git add openapi/cdisc-library.yaml src/cdisc_library_client
+git commit -m "Refresh API spec & client to <yyyy-mm-dd>"
+```
+
+CI will run and your crawler tests (added in later phases) will catch any breaking field changes.
+
+**Phase 2 is now fully flushed-out, verified against the publicly hosted Swagger JSON, and ends with a working typed client inside your Poetry environment.**
 
 ## **Phase 3 – Domain-model layer (Pydantic)**
 
