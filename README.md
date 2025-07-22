@@ -16,6 +16,13 @@ To create LaTeX output instead, use `tex` as the format:
 python scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats tex
 ```
 
+To generate Word documents without relying on Pandoc, use the built in `docx`
+exporter:
+
+```bash
+python scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats docx
+```
+
 The command will create one file per form in the given output directory.
 
 Additional documentation is available in the [docs](docs/) directory, including an [FAQ](docs/FAQ.md) about accessing and using the CDISC Library.
