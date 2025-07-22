@@ -10,6 +10,8 @@ import time
 import pathlib
 from typing import Any
 
+from crfgen.utils import normalize_headers
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -32,10 +34,7 @@ def cached_get(url: str, headers: dict[str, str], ttl_days: int = 30) -> Any:
         return json.loads(fname.read_text())
 
     # normalize header values to strings (``requests`` forbids ``bytes``)
-    str_headers = {
-        k: (v.decode() if isinstance(v, (bytes, bytearray)) else str(v))
-        for k, v in headers.items()
-    }
+    str_headers = normalize_headers(headers)
 
     sess = _retry_session()
     r = sess.get(url, headers=str_headers, timeout=30)
