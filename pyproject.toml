@@ -10,7 +10,8 @@ packages = [
     { from = "src", include = "crfgen" }
 ]
 
-[tool.poetry.package]
+
+
 include = ["src/crfgen/templates/*.j2", "src/crfgen/style/*"]
 
 [tool.poetry.dependencies]
