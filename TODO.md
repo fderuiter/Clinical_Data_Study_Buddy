@@ -35,21 +35,51 @@ This file tracks progress across all phases of the project. Tick off each task a
 
 ## Phase 1 – Initialize Poetry project
 
-* [ ] Run `poetry init` (set name, version, description, Python ≥3.11, license)
-* [ ] Add runtime deps in `pyproject.toml`:
+* [ ] Run `poetry init` using non-interactive options:
 
-  * `openapi-python-client`
-  * `jinja2`
-  * `pydantic`
-  * `requests`
-  * `pandas`
-  * `openpyxl`
-  * `python-docx`
-  * `odmlib`
-* [ ] Add dev deps under `[tool.poetry.group.dev.dependencies]`:
+  ```bash
+  poetry init --name cdisc-crf-generator \
+    --description "Generate CRFs from CDISC Library" \
+    --author "You <you@example.com>" \
+    --license "Apache-2.0" \
+    --python ">=3.11,<4.0"
+  ```
 
-  * `black`, `ruff`, `isort`, `pre-commit`, `pytest`, `pytest-cov`
-* [ ] Run `poetry install` and verify imports (`pandas`, `jinja2`)
+* [ ] Edit `pyproject.toml` and add the dependencies:
+
+  ```toml
+  [tool.poetry.dependencies]
+  python = ">=3.11,<4.0"
+  openapi-python-client = "^0.19.0"
+  jinja2 = "^3.1"
+  pydantic = "^2.7"
+  requests = "^2.32"
+  pandas = "^2.2"
+  openpyxl = "^3.1"
+  python-docx = "^1.1"
+  odmlib = "^0.9"
+
+  [tool.poetry.group.dev.dependencies]
+  black = "^24.0"
+  ruff = "^0.5.0"
+  pytest = "^8.0"
+  pytest-cov = "^5.0"
+  pre-commit = "^4.0"
+  ```
+
+* [ ] Install the environment:
+
+  ```bash
+  poetry install
+  ```
+
+* [ ] **Checkpoint 1** – verify basic imports:
+
+  ```bash
+  poetry run python -c "import pandas, jinja2; print('ok')"
+  ```
+
+  Should print `ok` without error.
 
 ## Phase 2 – Bring the official CDISC Library OpenAPI spec into your project
 
@@ -1472,3 +1502,4 @@ Push a trivial style violation commit (e.g. remove a space) to trigger CI.
 * Release artifacts published on tagging
 
 Once every box is ticked, your **14-phase build** is fully done! 🎉
+
