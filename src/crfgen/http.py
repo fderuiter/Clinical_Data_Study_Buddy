@@ -26,13 +26,19 @@ def _retry_session() -> requests.Session:
     return s
 
 
-def cached_get(url: str, headers: dict[str, str], ttl_days: int = 30) -> Any:
+def cached_get(url: str, headers: dict[str, str | bytes], ttl_days: int = 30) -> Any:
     fname = CACHE_DIR / (url.replace("/", "_").replace(":", "") + ".json")
     if fname.exists() and (time.time() - fname.stat().st_mtime) < ttl_days * 86400:
         return json.loads(fname.read_text())
 
+    # normalize header values to strings (``requests`` forbids ``bytes``)
+    str_headers = {
+        k: (v.decode() if isinstance(v, (bytes, bytearray)) else str(v))
+        for k, v in headers.items()
+    }
+
     sess = _retry_session()
-    r = sess.get(url, headers=headers, timeout=30)
+    r = sess.get(url, headers=str_headers, timeout=30)
     r.raise_for_status()
     fname.write_text(r.text)
     return r.json()

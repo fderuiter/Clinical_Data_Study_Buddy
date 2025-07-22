@@ -14,11 +14,15 @@ ACCEPT = "application/vnd.cdisc+json"
 DELAY = 0.2  # seconds between calls (<= 60 req/min)
 
 
-def _client(token: str) -> AuthenticatedClient:
-    return AuthenticatedClient(base_url=BASE, token=token, timeout=30.0)
+def _client(token: str | bytes) -> AuthenticatedClient:
+    if isinstance(token, (bytes, bytearray)):
+        token = token.decode()
+    return AuthenticatedClient(base_url=BASE, token=str(token), timeout=30.0)
 
 
-def _json(url: str, token: str):
+def _json(url: str, token: str | bytes):
+    if isinstance(token, (bytes, bytearray)):
+        token = token.decode()
     headers = {"Authorization": f"Bearer {token}", "Accept": ACCEPT}
     data = cached_get(url, headers)
     time.sleep(DELAY)
@@ -43,6 +47,7 @@ def harvest(token: str, ig_filter: Optional[str] = None) -> List[Form]:
 
 
 # Convenience writer
+
 
 def write_json(forms: List[Form], path: str = "crf.json") -> None:
     pathlib.Path(path).write_text(json.dumps([f.model_dump() for f in forms], indent=2))
