@@ -82,63 +82,268 @@ This file tracks progress across all phases of the project. Tick off each task a
 * [ ] *(Optional)* Add serialization helpers (`dump_forms` / `load_forms`)
 * [ ] Verify via `poetry run python -c "from crfgen.schema import Form; …"`
 
-## Phase 4 – Crawler (Library → Forms)
+## **Phase 4 – Crawler → `crf.json`**
 
-* [ ] Create `src/crfgen/http.py` for cached GET + retry
-* [ ] Create `src/crfgen/crawl.py` with `harvest(token, version_filter)` & `write_json()`
-* [ ] Create CLI wrapper `scripts/build_canonical.py`
-* [ ] `chmod +x scripts/build_canonical.py`
-* [ ] Run crawl locally (`poetry run scripts/build_canonical.py -v 2-2`) and inspect `crf.json`
+*Objective: use the generated CDISC Library client to pull every CDASH form, translate to our `crfgen.schema.Form` objects, and persist them as `crf.json`. The crawler must respect rate limits, cache responses, and be unit-testable.*
 
-### Crawler implementation details
+---
 
-1. **Create CDISC Library Account and Obtain API Key**
-   - Register for a free CDISC Library account.
-   - Visit the "API Keys" tab and generate an API key.
+### **Overview of deliverables**
 
-2. **Configure API Request Headers**
-   - Base URL: `https://library.cdisc.org/api`.
-   - Include `Authorization: Bearer <api_key>` and `Accept: application/vnd.cdisc+json` headers for all requests.
+| File                          | Purpose                                                                |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| `src/crfgen/http.py`          | Session wrapper: bearer auth, exponential-back-off, on-disk JSON cache |
+| `src/crfgen/crawl.py`         | `harvest()` + `write_json()` functions                                 |
+| `scripts/build_canonical.py`  | CLI entry-point (`poetry run scripts/build_canonical.py`)              |
+| `tests/test_crawl_fixture.py` | Offline unit test with JSON fixture                                    |
+| `tests/test_crawl_live.py`    | *Optional* live “smoke” test (skipped when no `CDISC_PRIMARY_KEY`)         |
 
-3. **Discover Available CDASH IG Versions**
-   - Send `GET /api/mdr/cdashig` to list IG versions.
-   - Collect each version's title and `href` from `_links["versions"]`.
+Each sub-step below ends with a **Checkpoint** command.
 
-4. **Retrieve Domain-Level CRFs for Each IG Version**
-   - For every IG version `href`, request the domain list via `_links["domains"]`.
-   - Fetch each domain's JSON using its `href`.
+---
 
-5. **Handle Domains with Multiple Scenarios**
-   - Check each domain response for `_links["scenarios"]`.
-   - When scenarios exist, request each scenario URL to obtain separate CRF data.
+## **4.0  Auth & env assumptions**
 
-6. **Capture Fields and Controlled Terminology**
-   - Inspect the `fields` array in each CRF for CDASH variable info and codelist references.
-   - Cache codelist JSON by NCI code so repeated references reuse the same data.
+The Library uses a **Bearer token**.
+We’ll read it from `os.environ["CDISC_PRIMARY_KEY"]` only when needed.
 
-7. **Support Pagination**
-   - Follow `_links["next"]` when present on paged endpoints until no next link remains.
+---
 
-8. **Respect API Rate Limits**
-   - Limit to roughly 60 requests per minute (e.g., `time.sleep(0.2)` between calls).
-   - Implement retry/back-off logic via `requests` adapters.
+## **4.1  HTTP utility module**
 
-9. **Increase Network Robustness**
-   - Wrap API calls in a retry mechanism (five tries with exponential back-off).
-   - Handle temporary network or service errors gracefully.
+Create **`src/crfgen/http.py`**
 
-10. **Record Version Metadata**
-    - Save both the IG version string and the `standardRelease` date when storing CRF data.
+```python
+"""
+Light wrapper around requests to add retry/back-off and
+JSON disk-cache (protects Library quota & speeds tests).
+"""
 
-11. **Validate Each CRF Against CDISC Schema**
-    - Retrieve `cdash-form.schema.json` from `/api/schemas`.
-    - Validate downloaded CRF JSON and fail fast on unexpected fields.
+from __future__ import annotations
+import json, os, time, pathlib
+from typing import Any
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-12. **Transform to Your Canonical Format**
-    - Convert CRF JSON to your preferred representation (ODM, FHIR Questionnaire, custom JSON, etc.).
+CACHE_DIR = pathlib.Path(".cache")
+CACHE_DIR.mkdir(exist_ok=True)
 
-13. **Confirm Unsupported Elements**
-    - Note that some narrative content (e.g., Assumptions sections) remains outside the API and must be handled separately if needed.
+def _retry_session() -> requests.Session:
+    r = Retry(total=5, backoff_factor=0.4, status_forcelist=[502, 503, 504, 429])
+    s = requests.Session()
+    s.mount("https://", HTTPAdapter(max_retries=r))
+    return s
+
+def cached_get(url: str, headers: dict[str, str], ttl_days: int = 30) -> Any:
+    fname = CACHE_DIR / (url.replace("/", "_").replace(":", "") + ".json")
+    if fname.exists() and (time.time() - fname.stat().st_mtime) < ttl_days * 86400:
+        return json.loads(fname.read_text())
+
+    sess = _retry_session()
+    r = sess.get(url, headers=headers, timeout=30)
+    r.raise_for_status()
+    fname.write_text(r.text)
+    return r.json()
+```
+
+**Checkpoint 4-1**
+
+```bash
+poetry run python - <<'PY'
+from crfgen.http import cached_get
+data = cached_get("https://httpbin.org/json", headers={})
+print("title" in data)
+PY
+```
+
+Expected: prints `True` and a file appears in `.cache/`.
+
+---
+
+## **4.2  Implement the crawler**
+
+Create **`src/crfgen/crawl.py`**
+
+```python
+from __future__ import annotations
+from typing import List, Optional
+import os, time
+
+from cdisc_library_client.api.default import md_r_cdashig_get  # endpoint names come from generated code
+from cdisc_library_client.client import AuthenticatedClient
+from crfgen.schema import Form
+from crfgen.converter import form_from_api
+from crfgen.http import cached_get
+
+BASE = "https://library.cdisc.org/api"
+ACCEPT = "application/vnd.cdisc+json"
+DELAY = 0.2  # seconds between calls (<= 60 req/min)
+
+def _client(token: str) -> AuthenticatedClient:
+    return AuthenticatedClient(base_url=BASE, token=token, timeout=30.0)
+
+def _json(url: str, token: str):
+    hdr = {"Authorization": f"Bearer {token}", "Accept": ACCEPT}
+    data = cached_get(url, hdr)
+    time.sleep(DELAY)  # politeness
+    return data
+
+def harvest(token: str, ig_filter: Optional[str] = None) -> List[Form]:
+    """Pull CDASH IG → domains → scenarios, convert to Form."""
+    root = _json(f"{BASE}/mdr/cdashig", token)
+    forms: list[Form] = []
+    for ver in root["_links"]["versions"]:
+        if ig_filter and ig_filter not in ver["title"]:
+            continue
+        ig = _json(ver["href"], token)
+        for dom_link in ig["_links"]["domains"]:
+            dom = _json(dom_link["href"], token)
+            scenarios = dom["_links"].get("scenarios") or []
+            payloads = [dom] + [_json(s["href"], token) for s in scenarios]
+            for p in payloads:
+                forms.append(form_from_api(p))
+    return forms
+
+# Convenience writer
+import json, pathlib
+def write_json(forms: List[Form], path="crf.json"):
+    pathlib.Path(path).write_text(json.dumps([f.model_dump() for f in forms], indent=2))
+```
+
+**Checkpoint 4-2** *(requires API key, but tiny pull)*
+
+```bash
+export CDISC_PRIMARY_KEY=YOURTOKEN
+poetry run python - <<'PY'
+from crfgen.crawl import harvest
+import os
+forms = harvest(os.environ["CDISC_PRIMARY_KEY"], ig_filter="2-2")
+print("forms:", len(forms))
+print(forms[0].domain, "fields:", len(forms[0].fields))
+PY
+```
+
+Expect: non-zero forms & sensible field counts.
+
+---
+
+## **4.3  CLI script**
+
+Create **`scripts/build_canonical.py`**
+
+```python
+#!/usr/bin/env python
+import argparse, os, sys
+from crfgen.crawl import harvest, write_json
+
+p = argparse.ArgumentParser()
+p.add_argument("-o", "--out", default="crf.json")
+p.add_argument("-v", "--version", help="IG version substring (optional)")
+args = p.parse_args()
+
+token = os.getenv("CDISC_PRIMARY_KEY")
+if not token:
+    sys.exit("ERROR: set CDISC_PRIMARY_KEY environment variable")
+
+forms = harvest(token, ig_filter=args.version)
+write_json(forms, args.out)
+print(f"✅  Saved {len(forms)} forms -> {args.out}")
+```
+
+Make executable:
+
+```bash
+chmod +x scripts/build_canonical.py
+```
+
+**Checkpoint 4-3**
+
+```bash
+poetry run scripts/build_canonical.py -v 2-2 -o tmp.json
+jq '.|length' tmp.json
+```
+
+You should see a number (> 0).
+
+---
+
+## **4.4  Offline unit-test with captured fixture**
+
+1. Capture a tiny sample once:
+
+```bash
+poetry run scripts/build_canonical.py -v 2-2 -o tests/.data/sample_crf.json
+```
+
+*(Then commit that fixture to the repo.)*
+
+2. Create **`tests/test_crawl_fixture.py`**
+
+```python
+import json
+from crfgen.schema import Form
+
+def test_fixture_loads():
+    data = json.load(open("tests/.data/sample_crf.json"))
+    forms = [Form(**d) for d in data]
+    assert forms, "fixture empty"
+    vs = [f for f in forms if f.domain == "VS"]
+    assert vs and vs[0].fields, "Vitals missing fields"
+```
+
+**Checkpoint 4-4**
+
+```bash
+poetry run pytest tests/test_crawl_fixture.py -q
+```
+
+Expected: `.` (pass)
+
+---
+
+## **4.5  Optional live smoke-test**
+
+**`tests/test_crawl_live.py`**
+
+```python
+import os, pytest
+from crfgen.crawl import harvest
+
+token = os.getenv("CDISC_PRIMARY_KEY")
+@pytest.mark.skipif(not token, reason="no API key in env")
+def test_live_pull_small():
+    forms = harvest(token, ig_filter="2-2")
+    assert len(forms) >= 40  # CDASH 2.2 domains
+```
+
+This runs in local dev & CI where the secret is available.
+
+**Checkpoint 4-5**
+
+Run `poetry run pytest -q` locally (should show 2 tests, skip if no key).
+
+---
+
+## **4.6  Git‐add & commit**
+
+```bash
+git add src/crfgen/http.py src/crfgen/crawl.py scripts/build_canonical.py tests
+git commit -m "Phase 4: crawler + cache + CLI with unit tests"
+```
+
+---
+
+## **Phase 4 complete – Acceptance criteria**
+
+| Item                         | How to verify                                                      |
+| ---------------------------- | ------------------------------------------------------------------ |
+| **Crawler returns ≥ 1 form** | `poetry run scripts/build_canonical.py -o crf.json` prints a count |
+| **Disk cache used**          | Subsequent runs hit `.cache/…json` files & skip remote call        |
+| **Unit tests pass**          | `poetry run pytest -q` all green                                   |
+| **Rate-limit friendly**      | No HTTP 429 seen when pulling full IG (observe in console)         |
+
+You can now proceed to Phase 5 (templates & exporters) with confidence that `crf.json` is always reproducible and validated.
 
 ## **Phase 5 – Templates & Exporters**
 
