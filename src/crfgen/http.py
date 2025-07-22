@@ -26,7 +26,7 @@ def _retry_session() -> requests.Session:
     return s
 
 
-def cached_get(url: str, headers: dict[str, str | bytes], ttl_days: int = 30) -> Any:
+def cached_get(url: str, headers: dict[str, str], ttl_days: int = 30) -> Any:
     fname = CACHE_DIR / (url.replace("/", "_").replace(":", "") + ".json")
     if fname.exists() and (time.time() - fname.stat().st_mtime) < ttl_days * 86400:
         return json.loads(fname.read_text())

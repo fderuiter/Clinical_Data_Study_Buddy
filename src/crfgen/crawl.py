@@ -14,13 +14,13 @@ ACCEPT = "application/vnd.cdisc+json"
 DELAY = 0.2  # seconds between calls (<= 60 req/min)
 
 
-def _client(token: str | bytes) -> AuthenticatedClient:
+def _client(token: str) -> AuthenticatedClient:
     if isinstance(token, (bytes, bytearray)):
         token = token.decode()
     return AuthenticatedClient(base_url=BASE, token=str(token), timeout=30.0)
 
 
-def _json(url: str, token: str | bytes):
+def _json(url: str, token: str):
     if isinstance(token, (bytes, bytearray)):
         token = token.decode()
     headers = {"Authorization": f"Bearer {token}", "Accept": ACCEPT}
@@ -29,7 +29,7 @@ def _json(url: str, token: str | bytes):
     return data
 
 
-def harvest(token: str | bytes, ig_filter: Optional[str] = None) -> List[Form]:
+def harvest(token: str, ig_filter: Optional[str] = None) -> List[Form]:
     """Pull CDASH IG -> domains -> scenarios and convert to Form objects."""
     if isinstance(token, (bytes, bytearray)):
         token = token.decode()
