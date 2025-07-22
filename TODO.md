@@ -99,6 +99,208 @@ This file tracks progress across all phases of the project. Tick off each task a
 
 * [ ] Create `src/crfgen/exporter/registry.py` with `register()`, `get()`, `formats()`
 
+## **Phase 6 – Build Dispatcher CLI**
+
+*Objective: wire up a single "build" script (`scripts/build.py`) that reads `crf.json`, invokes all registered exporters, and writes to an `artefacts/` directory. We’ll validate both manually and via a unit test.*
+
+---
+
+### 6.0  Ensure preconditions
+
+* You’ve completed Phases 1–5.
+* `crf.json` exists (from Phase 4).
+* `scripts/` directory exists and is on PATH in CI.
+
+**Checkpoint 6-0**
+
+```bash
+ls scripts build_canonical.py
+test -f src/crfgen/exporter/registry.py
+```
+
+No errors.
+
+---
+
+### 6.1  Create `scripts/build.py`
+
+```bash
+cat > scripts/build.py <<'EOF'
+#!/usr/bin/env python3
+"""
+Dispatch to each exporter to generate all formats from crf.json.
+"""
+import sys, json, importlib
+from pathlib import Path
+from crfgen.schema import Form
+from crfgen.exporter import registry as reg
+
+# Import exporters to register them
+import crfgen.exporter.markdown  # noqa
+import crfgen.exporter.latex     # noqa
+import crfgen.exporter.docx      # noqa
+import crfgen.exporter.csv       # noqa
+import crfgen.exporter.xlsx      # noqa
+import crfgen.exporter.odm       # noqa
+
+def main():
+    import argparse
+    p = argparse.ArgumentParser()
+    p.add_argument("--source", "-s", default="crf.json",
+                   help="Path to the canonical JSON")
+    p.add_argument("--outdir", "-o", default="artefacts",
+                   help="Directory to emit artifacts")
+    p.add_argument("--formats", "-f", nargs="+",
+                   default=reg.formats(),
+                   help="Which formats to generate")
+    args = p.parse_args()
+
+    src = Path(args.source)
+    if not src.exists():
+        sys.exit(f"ERROR: source file not found: {src}")
+
+    with src.open() as fp:
+        data = json.load(fp)
+    forms = [Form(**d) for d in data]
+
+    outdir = Path(args.outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    for fmt in args.formats:
+        fn = reg.get(fmt)
+        print(f"[build] Rendering {fmt} → {outdir}")
+        fn(forms, outdir)
+
+if __name__ == "__main__":
+    main()
+EOF
+```
+
+Make it executable:
+
+```bash
+chmod +x scripts/build.py
+```
+
+**Checkpoint 6-1**
+
+```bash
+head -n 5 scripts/build.py
+# should show the shebang and docstring
+```
+
+---
+
+### 6.2  Manual smoke-test
+
+Use the sample fixture:
+
+```bash
+poetry run scripts/build.py \
+  --source tests/.data/sample_crf.json \
+  --outdir tmp_artifacts \
+  --formats md csv tex
+```
+
+**Checkpoint 6-2**
+
+```bash
+ls tmp_artifacts
+# Expect: DM.md  -- or whatever domain in fixture
+#         forms.csv
+#         DM.tex
+```
+
+Open one briefly:
+
+```bash
+head tmp_artifacts/DM.md
+```
+
+---
+
+### 6.3  Unit test for the build CLI
+
+Create **`tests/test_build_cli.py`**:
+
+```python
+import subprocess, sys, pathlib
+import pytest
+
+@pytest.mark.parametrize("fmt", [["md"], ["csv"], ["md","csv"]])
+def test_build_cli(tmp_path, fmt):
+    # Run build.py with the mini fixture
+    cmd = [
+        sys.executable,
+        "scripts/build.py",
+        "--source", "tests/.data/sample_crf.json",
+        "--outdir", str(tmp_path),
+        "--formats", *fmt
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+
+    # Check output files exist
+    for f in fmt:
+        if f == "md":
+            assert any(tmp_path.glob("*.md"))
+        elif f == "csv":
+            assert (tmp_path / "forms.csv").exists()
+        elif f == "tex":
+            assert any(tmp_path.glob("*.tex"))
+```
+
+**Checkpoint 6-3**
+
+```bash
+poetry run pytest tests/test_build_cli.py -q
+```
+
+Should see all parameterized runs pass.
+
+---
+
+### 6.4  Integrate into CI
+
+In **`.github/workflows/ci.yml`**, after the crawl step, replace individual calls with:
+
+```yaml
+      - name: Build all formats
+        run: |
+          poetry run scripts/build.py --source crf.json --outdir artefacts
+```
+
+Ensure that step runs *after* `build_canonical.py`.
+
+**Checkpoint 6-4**
+Trigger a PR or push to main; confirm in Actions log that:
+
+```
+[build] Rendering md → artefacts
+[build] Rendering tex → artefacts
+...
+```
+
+and that the `artefacts/` directory is populated in the uploaded artifact.
+
+---
+
+### 6.5  Commit & push
+
+```bash
+git add scripts/build.py tests/test_build_cli.py
+git commit -m "Phase 6: add build dispatcher CLI + tests"
+git push
+```
+
+---
+
+## **Phase 6 complete**
+
+* **scripts/build.py** exists, executable, and imports all exporters.
+* Manual and automated tests verify the CLI correctly writes selected formats.
+* CI pipeline updated to invoke one command to generate all artifacts.
+
 ## Phase 7 – Exporters
 
 * [ ] Markdown: `src/crfgen/exporter/markdown.py`
