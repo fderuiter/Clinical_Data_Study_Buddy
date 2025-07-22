@@ -1444,12 +1444,150 @@ Push a trivial style violation commit (e.g. remove a space) to trigger CI.
 * [ ] `chmod +x scripts/build.py`
 * [ ] Test manually: `poetry run scripts/build.py --formats md csv`
 
-## Phase 9 – Minimal tests
+## Phase 9 – Scheduled Library Sync & Auto-Update PRs
 
-* [ ] Add fixture `tests/.data/mini_crf.json`
-* [ ] Write `tests/test_schema.py`
-* [ ] Write `tests/test_export_md.py`
-* [ ] Run `poetry run pytest -q`
+*Objective: keep your `crf.json` canon in sync with CDISC Library on a regular cadence, creating a PR whenever new or changed forms appear.*
+
+### 9.1  Add the sync workflow file
+
+**Path:** `.github/workflows/weekly-sync.yml`
+
+```yaml
+name: Weekly CDISC Library Sync
+
+# Run every Monday at 04:00 UTC, plus manually via workflow_dispatch
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # for creating branches & PRs
+      pull-requests: write # for creating PRs
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: poetry install --no-root
+
+      - name: Crawl CDISC Library → crf.json
+        env:
+          CDISC_API_KEY: ${{ secrets.CDISC_API_KEY }}
+        run: poetry run scripts/build_canonical.py -o crf.json
+
+      - name: Check for crf.json changes
+        id: diff
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # If crf.json changed, exit 1 so next step runs
+          git diff --exit-code crf.json
+
+      - name: Create Pull Request
+        if: failure() && github.event_name != 'workflow_dispatch'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          commit-message: "chore: weekly CDISC Library sync"
+          branch: "sync/cdisc-${{ github.run_id }}"
+          title: "Weekly CDISC Library Sync"
+          body: |
+            This PR updates `crf.json` with the latest forms from the CDISC Library.
+            Review the changes below and merge if everything looks good.
+          base: main
+```
+
+**Checkpoint 9-1**
+
+```bash
+ls .github/workflows/weekly-sync.yml
+grep -R "schedule:" .github/workflows/weekly-sync.yml
+```
+
+You should see the file and the cron expression.
+
+### 9.2  Add required repository secrets
+
+1. **CDISC_API_KEY** – your Library bearer token (already used by CI).
+2. **GH_TOKEN** – a fine-grained GitHub token (or `${{ secrets.GITHUB_TOKEN }}`) with `contents: write` and `pull-requests: write` permissions.
+
+**Checkpoint 9-2**
+
+* In GitHub UI, go to **Settings → Secrets → Actions** and confirm both `CDISC_API_KEY` and `GH_TOKEN` are present.
+* Or run (with `gh` CLI):
+
+  ```bash
+  gh secret list | grep -E 'CDISC_API_KEY|GH_TOKEN'
+  ```
+
+### 9.3  Manual trigger verification
+
+1. Push changes to `main` so weekly-sync job appears in Actions.
+2. In the **Actions** tab, select **Weekly CDISC Library Sync** and click **Run workflow**.
+3. Choose `main` branch and click **Run workflow**.
+
+**Checkpoint 9-3**
+
+* Observe a new run starting.
+* In **Checks**, you should see **`Crawl CDISC Library → crf.json`** succeed and **`Create Pull Request`** skip if no differences.
+
+### 9.4  Simulate a diff to test PR creation
+
+1. Locally, edit `crf.json` (e.g. change a form title).
+2. Commit that change on a feature branch and push.
+3. Dispatch the workflow manually again.
+
+**Checkpoint 9-4**
+
+* A new branch `sync/cdisc-<run_id>` is created.
+* A PR appears titled **Weekly CDISC Library Sync** with your modified `crf.json` as the diff.
+
+### 9.5  Monitor and clean up old sync branches
+
+By default, each run creates a new branch. You may:
+
+* **Auto-merge** trivial PRs via the **merge queue** or **GitHub Actions** after validation.
+* **Delete** stale branches manually or via a scheduled cleanup action.
+
+**Checkpoint 9-5**
+
+* In the **Branches** list, confirm sync branches exist.
+* Delete one via the GitHub UI or CLI:
+
+  ```bash
+  gh pr close <PR-number> && gh repo delete-branch sync/cdisc-<run_id>
+  ```
+
+### 9.6  (Optional) Add a badge to README
+
+```markdown
+![Weekly Sync Status](https://github.com/<org>/<repo>/actions/workflows/weekly-sync.yml/badge.svg)
+```
+
+**Checkpoint 9-6**
+
+* View README in GitHub; the badge shows the latest run status.
+
+---
+
+## **Phase 9 complete**
+
+* A scheduled workflow pulls the latest CDISC CRFs weekly.
+* Changes to `crf.json` automatically surface in a pull request for review.
+* Secrets and permissions are configured to let the bot create PRs.
+* You’ve manually tested both “no diff” and “diff” scenarios.
 
 ## Phase 10 – Pre-commit hooks
 
@@ -1468,13 +1606,6 @@ Push a trivial style violation commit (e.g. remove a space) to trigger CI.
   * `build.py` → `artefacts/`
   * upload artefacts
 * [ ] Push and confirm green build + downloadable artefacts
-
-## Phase 12 – Weekly sync workflow
-
-* [ ] Create `.github/workflows/weekly-sync.yml` (cron + dispatch)
-* [ ] Add GitHub secret `GH_TOKEN` if needed
-* [ ] Manual dispatch to verify no-change run
-* [ ] Edit `crf.json`, dispatch to verify PR creation
 
 ## Phase 13 – Release flow
 
