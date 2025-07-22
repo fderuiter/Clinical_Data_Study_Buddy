@@ -140,10 +140,376 @@ This file tracks progress across all phases of the project. Tick off each task a
 13. **Confirm Unsupported Elements**
     - Note that some narrative content (e.g., Assumptions sections) remains outside the API and must be handled separately if needed.
 
-## Phase 5 – Templates
+## **Phase 5 – Templates & Exporters**
 
-* [ ] Create `src/crfgen/templates/markdown.j2`
-* [ ] Create `src/crfgen/templates/latex.j2`
+*Goal : take `crf.json`, run each exporter, and drop multi-format artefacts into `artefacts/`.
+We’ll add exporters incrementally, each with its own validation checkpoint and unit test.*
+
+---
+
+### 5.0  Prepare directories
+
+```bash
+mkdir -p src/crfgen/templates artefacts
+```
+
+Add these to **`pyproject.toml`** *if not present* so Poetry packages the templates:
+
+```toml
+[tool.poetry.package]
+include = ["src/crfgen/templates/*.j2", "src/crfgen/style/*"]
+```
+
+**Checkpoint 5-0** – `git add` the new paths; `git status` is clean.
+
+---
+
+## **5 A – Markdown**
+
+#### 5A-1  Template
+
+`src/crfgen/templates/markdown.j2`
+
+```jinja
+# {{ form.title }}{% if form.scenario %} ({{ form.scenario }}){% endif %}
+
+| OID | Prompt | Datatype | Codelist |
+|-----|--------|----------|----------|
+{% for fld in form.fields -%}
+| `{{ fld.oid }}` | {{ fld.prompt|replace('|','\\|') }} | {{ fld.datatype }} | {% if fld.codelist %}{{ fld.codelist.nci_code }}{% endif %} |
+{% endfor %}
+```
+
+#### 5A-2  Exporter
+
+`src/crfgen/exporter/markdown.py`
+
+```python
+from pathlib import Path
+from typing import List
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from ..schema import Form
+from .registry import register
+
+env = Environment(
+    loader=FileSystemLoader(Path(__file__).parent.parent / "templates"),
+    autoescape=select_autoescape()
+)
+
+@register("md")
+def render_md(forms: List[Form], out_dir: Path):
+    tpl = env.get_template("markdown.j2")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for f in forms:
+        (out_dir / f"{f.domain}.md").write_text(tpl.render(form=f))
+```
+
+#### **Checkpoint 5A**
+
+```bash
+poetry run scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats md
+ls artefacts/*.md | head
+```
+
+At least one `*.md` file appears.
+
+---
+
+## **5 B – LaTeX**
+
+#### 5B-1  Template
+
+`src/crfgen/templates/latex.j2`
+
+```jinja
+\section*{ {{ form.title }}{% if form.scenario %} ({{ form.scenario }}){% endif %} }
+\begin{tabular}{llll}
+\textbf{OID} & \textbf{Prompt} & \textbf{Datatype} & \textbf{Codelist}\\ \hline
+{% for fld in form.fields -%}
+{{ fld.oid }} & {{ fld.prompt|replace('&','\\&') }} & {{ fld.datatype }} & {% if fld.codelist %}{{ fld.codelist.nci_code }}{% endif %} \\
+{% endfor %}
+\end{tabular}
+```
+
+#### 5B-2  Exporter
+
+`src/crfgen/exporter/latex.py`
+
+```python
+from pathlib import Path
+from typing import List
+from jinja2 import Environment, FileSystemLoader
+from ..schema import Form
+from .registry import register
+
+env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
+
+@register("tex")
+def render_tex(forms: List[Form], out_dir: Path):
+    out_dir.mkdir(exist_ok=True, parents=True)
+    tpl = env.get_template("latex.j2")
+    for f in forms:
+        (out_dir / f"{f.domain}.tex").write_text(tpl.render(form=f))
+```
+
+#### **Checkpoint 5B**
+
+```bash
+poetry run scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats tex
+ls artefacts/*.tex | head
+```
+
+---
+
+## **5 C – DOCX (via Pandoc)**
+
+> Ensure Pandoc is installed locally; CI step installs it with `apt-get install -y pandoc`.
+
+#### 5C-1  Add a reference doc (optional branding)
+
+Place a styled Word file at `src/crfgen/style/reference.docx`.
+*(An empty doc is fine for now.)*
+
+#### 5C-2  Exporter
+
+`src/crfgen/exporter/docx.py`
+
+```python
+import subprocess, tempfile, shutil
+from pathlib import Path
+from typing import List
+from .markdown import render_md
+from ..schema import Form
+from .registry import register
+
+@register("docx")
+def render_docx(forms: List[Form], out_dir: Path,
+               reference_doc="src/crfgen/style/reference.docx"):
+    tmp = Path(tempfile.mkdtemp(prefix="md-"))
+    try:
+        render_md(forms, tmp)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for md in tmp.glob("*.md"):
+            subprocess.run(
+                ["pandoc", md, "-o", out_dir / (md.stem + ".docx"),
+                 "--reference-doc", reference_doc],
+                check=True
+            )
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+```
+
+#### **Checkpoint 5C**
+
+```bash
+poetry run scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats docx
+file artefacts/*.docx | head
+```
+
+A DOCX file should report “Microsoft Word”.
+
+---
+
+## **5 D – CSV**
+
+`src/crfgen/exporter/csv.py`
+
+```python
+import pandas as pd
+from pathlib import Path
+from typing import List
+from ..schema import Form
+from .registry import register
+
+@register("csv")
+def render_csv(forms: List[Form], out_dir: Path):
+    rows = []
+    for f in forms:
+        for fld in f.fields:
+            rows.append({
+                "form": f.title,
+                "domain": f.domain,
+                "scenario": f.scenario or "",
+                "oid": fld.oid,
+                "prompt": fld.prompt,
+                "datatype": fld.datatype,
+                "codelist": fld.codelist.nci_code if fld.codelist else ""
+            })
+    out_dir.mkdir(exist_ok=True, parents=True)
+    pd.DataFrame(rows).to_csv(out_dir / "forms.csv", index=False)
+```
+
+#### **Checkpoint 5D**
+
+```bash
+poetry run scripts/build.py --source tests/.data/sample_crf.json --outdir artefacts --formats csv
+head artefacts/forms.csv
+```
+
+---
+
+## **5 E – XLSX**
+
+`src/crfgen/exporter/xlsx.py`
+
+```python
+import pandas as pd
+from pathlib import Path
+from typing import List
+from ..schema import Form
+from .registry import register
+
+@register("xlsx")
+def render_xlsx(forms: List[Form], out_dir: Path):
+    out_dir.mkdir(exist_ok=True, parents=True)
+    with pd.ExcelWriter(out_dir / "forms.xlsx") as xw:
+        for f in forms:
+            df = pd.DataFrame([{
+                "OID": fld.oid,
+                "Prompt": fld.prompt,
+                "Datatype": fld.datatype,
+                "Codelist": fld.codelist.nci_code if fld.codelist else ""
+            } for fld in f.fields])
+            sheet = f"{f.domain[:28]}{('-'+f.scenario) if f.scenario else ''}"[:31]
+            df.to_excel(xw, sheet_name=sheet or f.domain, index=False)
+```
+
+#### **Checkpoint 5E**
+
+```bash
+poetry run python - <<'PY'
+import openpyxl, pathlib
+wb=openpyxl.load_workbook("artefacts/forms.xlsx")
+print("Sheets:", wb.sheetnames[:3])
+PY
+```
+
+---
+
+## **5 F – ODM XML (minimal)**
+
+`src/crfgen/exporter/odm.py`
+
+```python
+from pathlib import Path
+from typing import List
+from odmlib.odm_1_3 import odm_element_factory
+from ..schema import Form
+from .registry import register
+
+@register("odm")
+def render_odm(forms: List[Form], out_dir: Path):
+    odm = odm_element_factory("ODM")
+    odm.set_attribute("Description", "Generated CRFs")
+    study = odm.new_element("Study")
+    study.set_attribute("OID", "ST.CRFGEN")
+    mdv = study.new_element("MetaDataVersion")
+    mdv.set_attribute("OID", "MDV.1")
+    for f in forms:
+        formdef = mdv.new_element("FormDef")
+        formdef.set_attribute("OID", f"F.{f.domain}")
+        formdef.set_attribute("Name", f.title)
+    out_dir.mkdir(exist_ok=True, parents=True)
+    (out_dir / "forms.odm.xml").write_text(odm.to_xml())
+```
+
+#### **Checkpoint 5F**
+
+```bash
+grep "<FormDef" artefacts/forms.odm.xml | head
+```
+
+Should list `<FormDef OID="F.VS" …>` etc.
+
+---
+
+## **5 G – Registry import side-effects**
+
+Make sure **`scripts/build.py`** imports every exporter once:
+
+```python
+import crfgen.exporter.markdown   # noqa
+import crfgen.exporter.latex      # noqa
+import crfgen.exporter.docx       # noqa
+import crfgen.exporter.csv        # noqa
+import crfgen.exporter.xlsx       # noqa
+import crfgen.exporter.odm        # noqa
+```
+
+*(We already did earlier, but confirm all six.)*
+
+---
+
+## **5 H – Unit tests for exporters**
+
+`tests/test_exporters.py`
+
+```python
+import pathlib, json, tempfile
+from crfgen.schema import Form
+from crfgen.exporter import registry as reg
+import importlib
+
+# import exporters so they register
+for m in ("markdown","latex","csv"):
+    importlib.import_module(f"crfgen.exporter.{m}")
+
+forms = [Form(**json.load(open("tests/.data/sample_crf.json"))[0])]
+
+def _tmpdir():
+    return pathlib.Path(tempfile.mkdtemp())
+
+def test_md():
+    out=_tmpdir(); reg.get("md")(forms, out)
+    assert any(out.glob("*.md"))
+
+def test_csv():
+    out=_tmpdir(); reg.get("csv")(forms, out)
+    assert (out/"forms.csv").exists()
+```
+
+Run:
+
+```bash
+poetry run pytest -q
+```
+
+**Checkpoint 5H** – All exporter tests pass.
+
+---
+
+## **5 I – End-to-end manual build**
+
+```bash
+export CDISC_API_KEY=YOURTOKEN
+poetry run scripts/build_canonical.py -o crf.json
+poetry run scripts/build.py --outdir artefacts
+tree artefacts | head
+```
+
+You should see:
+
+```
+├─ VS.md
+├─ VS.tex
+├─ VS.docx
+├─ forms.csv
+├─ forms.xlsx
+└─ forms.odm.xml
+```
+
+**Checkpoint 5I** – All six formats present and non-empty (> 0 B).
+
+---
+
+## **Phase 5 complete – exit criteria**
+
+| Criterion                                       | Evidence                                                                                     |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Each exporter writes file(s) without exceptions | Manual run (Checkpoint 5I)                                                                   |
+| Unit tests green                                | `pytest -q` passes incl. exporter tests                                                      |
+| Pandoc not found → friendly error               | Uninstall Pandoc locally & try DOCX exporter – should raise `FileNotFoundError` with message |
+| Styles overridable                              | Replace `style/reference.docx`, regenerate – DOCX adopts styles                              |
 
 ## Phase 6 – Exporter Registry
 
