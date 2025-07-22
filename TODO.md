@@ -1443,6 +1443,324 @@ Push a trivial style violation commit (e.g. remove a space) to trigger CI.
 * [ ] Create `scripts/build.py` to load `crf.json`, call all exporters
 * [ ] `chmod +x scripts/build.py`
 * [ ] Test manually: `poetry run scripts/build.py --formats md csv`
+## Phase 8 – Governance & Release Management
+
+*Objective: set up project-wide policies, templates, automation, and release workflows to ensure clear ownership, smooth collaboration, and robust security practices.*
+
+---
+
+### 8.1 Add a CODEOWNERS file
+
+**Path:** `.github/CODEOWNERS`
+
+```text
+# Require review from the crfgen-maintainers team on all changes
+*       @your-org/crfgen-maintainers
+
+# Specialists: review HTTP or API changes
+src/crfgen/http.py   @your-org/api-team
+```
+
+**Checkpoint 8-1**
+
+```bash
+ls -1 .github/CODEOWNERS && head -n 3 .github/CODEOWNERS
+```
+
+---
+
+### 8.2 Issue & Pull Request templates
+
+#### 8.2.1 Issue templates
+
+**Paths:**
+
+* `.github/ISSUE_TEMPLATE/bug_report.md`
+* `.github/ISSUE_TEMPLATE/feature_request.md`
+
+**`bug_report.md`:**
+
+```markdown
+---
+name: Bug report
+about: Report a problem in the CDISC CRF generator pipeline
+title: "[BUG] "
+labels: bug
+assignees: ''
+
+---
+**Describe the bug**
+A clear and concise description of what the bug is.
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. ...
+2. ...
+3. `poetry run scripts/build_canonical.py ...`
+4. `poetry run scripts/build.py ...`
+
+**Expected behavior**
+What you expected to happen.
+
+**Environment (please complete the following information):**
+- OS: [e.g. Ubuntu 22.04]
+- Python version: [e.g. 3.11.5]
+- Poetry version: [e.g. 1.8.0]
+
+**Additional context**
+Add any other context about the problem here.
+```
+
+**`feature_request.md`:**
+
+```markdown
+---
+name: Feature request
+about: Suggest an enhancement for the CRF generator
+title: "[FEATURE] "
+labels: enhancement
+assignees: ''
+
+---
+**Is your feature request related to a problem? Please describe.**
+
+**Describe the solution you'd like**
+
+**Describe alternatives you've considered**
+
+**Additional context**
+```
+
+**Checkpoint 8-2**
+
+```bash
+ls -1 .github/ISSUE_TEMPLATE | sed -e '1,2!d'
+```
+
+#### 8.2.2 Pull Request template
+
+**Path:** `.github/PULL_REQUEST_TEMPLATE.md`
+
+```markdown
+## Description
+Please include a summary of the change and the motivation.
+
+## Related issue
+Closes #<issue number>
+
+## Type of change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+
+## Checklist
+- [ ] My code follows project style (black, isort, ruff)
+- [ ] I added tests and they pass
+- [ ] I updated documentation if needed
+```
+
+**Checkpoint 8-3**
+
+```bash
+head -n 5 .github/PULL_REQUEST_TEMPLATE.md
+```
+
+---
+
+### 8.3 Automated dependency updates (Dependabot)
+
+**Path:** `.github/dependabot.yml`
+
+```yaml
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+      interval: "weekly"
+```
+
+**Checkpoint 8-4**
+
+```bash
+grep -R "package-ecosystem" .github/dependabot.yml
+```
+
+---
+
+### 8.4 Security scanning with CodeQL
+
+**Path:** `.github/workflows/codeql-analysis.yml`
+
+```yaml
+name: CodeQL Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ "python" ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+      - name: Analyze
+        uses: github/codeql-action/analyze@v2
+```
+
+**Checkpoint 8-5**
+
+```bash
+ls .github/workflows | grep codeql-analysis.yml
+```
+
+---
+
+### 8.5 Release automation
+
+**Path:** `.github/workflows/release.yml`
+
+```yaml
+name: Release Artefacts
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: poetry install --no-dev
+
+      - name: Generate CRF JSON
+        env:
+          CDISC_API_KEY: ${{ secrets.CDISC_API_KEY }}
+        run: poetry run scripts/build_canonical.py -o crf.json
+
+      - name: Build all formats
+        run: poetry run scripts/build.py --outdir artefacts
+
+      - name: Archive artefacts
+        run: zip -r artefacts.zip artefacts/
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload ZIP
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          asset_path: artefacts.zip
+          asset_name: crf-artefacts-${{ github.ref_name }}.zip
+          asset_content_type: application/zip
+```
+
+**Checkpoint 8-6**
+
+```bash
+grep -R "push:" .github/workflows/release.yml
+```
+
+---
+
+### 8.6 Repository metadata & policies
+
+Create **`CONTRIBUTING.md`**:
+
+````markdown
+# Contributing
+
+1. Fork the repo & create a feature branch from main.
+2. Ensure the code passes `pre-commit` locally:
+   ```bash
+   poetry install
+   poetry run pre-commit run --all-files
+   ```
+
+3. Write tests and update docs.
+4. Submit a pull request using the PR template.
+````
+
+Create **`CODE_OF_CONDUCT.md`** (Contributor Covenant excerpt):
+
+```markdown
+# Contributor Covenant Code of Conduct
+
+…[standard text]…
+````
+
+Create **`SECURITY.md`**:
+
+```markdown
+# Security Policy
+
+Report vulnerabilities to security@your-org.org. We will respond within 3 business days.
+```
+
+**Checkpoint 8-7**
+
+```bash
+ls CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md
+```
+
+---
+
+### 8.7 Branch protection & repository settings
+
+> *This step is manual or via the GitHub CLI.*
+
+1. **Protect `main` branch**:
+
+   * Require pull-request reviews before merging (at least 1 approval).
+   * Require status checks: `lint-test-build`, `CodeQL Analysis`.
+   * Include administrators.
+2. **Enforce signed commits** (optional).
+
+**Checkpoint 8-8**
+In your repo **Settings → Branches → Branch protection rules**, verify the above policies are active.
+
+---
+
+## **Phase 8 complete**
+
+* CODEOWNERS, issue/PR templates, contributing guides, and security policies are in place.
+* Dependabot and CodeQL scanning run automatically.
+* Release workflow builds & publishes artefacts on tag.
+* Branch protection enforces reviews and CI checks.
 
 ## Phase 9 – Scheduled Library Sync & Auto-Update PRs
 

@@ -1,0 +1,5 @@
+# Require review from the crfgen-maintainers team on all changes
+*       @your-org/crfgen-maintainers
+
+# Specialists: review HTTP or API changes
+src/crfgen/http.py   @your-org/api-team
