@@ -1,8 +1,8 @@
 import os
+
 import pytest
 
 from crfgen.crawl import harvest
-
 
 token = os.getenv("CDISC_PRIMARY_KEY")
 

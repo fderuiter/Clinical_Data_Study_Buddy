@@ -1,6 +1,7 @@
+import pathlib
 import subprocess
 import sys
-import pathlib
+
 import pytest
 
 
@@ -26,4 +27,3 @@ def test_build_cli(tmp_path: pathlib.Path, fmt):
             assert (tmp_path / "forms.csv").exists()
         elif f == "tex":
             assert any(tmp_path.glob("*.tex"))
-

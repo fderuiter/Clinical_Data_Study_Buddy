@@ -4,7 +4,7 @@ Helpers to translate CDISC Library client DTOs -> crfgen.schema objects.
 
 from typing import Any
 
-from crfgen.schema import Form, FieldDef, Codelist
+from crfgen.schema import Codelist, FieldDef, Form
 
 
 def _get(obj: Any, key: str):
@@ -16,7 +16,9 @@ def _get(obj: Any, key: str):
 def field_from_api(f: Any) -> FieldDef:
     codelist_obj = _get(f, "codelist")
     cl = (
-        Codelist(nci_code=_get(codelist_obj, "nci_code"), href=_get(codelist_obj, "href"))
+        Codelist(
+            nci_code=_get(codelist_obj, "nci_code"), href=_get(codelist_obj, "href")
+        )
         if codelist_obj
         else None
     )

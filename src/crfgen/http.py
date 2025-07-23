@@ -6,16 +6,15 @@ JSON disk-cache (protects Library quota & speeds tests).
 from __future__ import annotations
 
 import json
-import time
 import pathlib
+import time
 from typing import Any
-
-from cdisc_library_client.utils import normalize_headers
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from cdisc_library_client.utils import normalize_headers
 
 CACHE_DIR = pathlib.Path(".cache")
 CACHE_DIR.mkdir(exist_ok=True)

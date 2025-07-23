@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional, Literal, Iterable
-
 import json
 import pathlib
+from typing import Iterable, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic.config import ConfigDict

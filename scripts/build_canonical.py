@@ -5,7 +5,6 @@ import sys
 
 from crfgen.crawl import harvest, write_json
 
-
 p = argparse.ArgumentParser()
 p.add_argument("-o", "--out", default="crf.json")
 p.add_argument("-v", "--version", help="IG version substring (optional)")

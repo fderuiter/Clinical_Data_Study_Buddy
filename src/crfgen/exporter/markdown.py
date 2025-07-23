@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Sequence
 
 from crfgen.schema import Form
+
 from .registry import register
 
 
@@ -13,4 +14,3 @@ def export_markdown(forms: Sequence[Form], outdir: Path) -> None:
             fh.write(f"# {form.title}\n")
             for fld in form.fields:
                 fh.write(f"- {fld.prompt} ({fld.oid})\n")
-

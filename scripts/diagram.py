@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Generate architecture diagram using matplotlib."""
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 
 def rbox(ax, xy, w, h, text, fontsize=9):
@@ -86,7 +86,7 @@ def arrow(ax, start_key, end_key, vert_shift=0):
     sx, sy = boxes[start_key][0]
     sw, sh = boxes[start_key][1], boxes[start_key][2]
     ex, ey = boxes[end_key][0]
-    ew, eh = boxes[end_key][1], boxes[end_key][2]
+    _, eh = boxes[end_key][1], boxes[end_key][2]
     start = (sx + sw, sy + sh / 2 + vert_shift)
     end = (ex, ey + eh / 2 + vert_shift)
     ax.add_patch(

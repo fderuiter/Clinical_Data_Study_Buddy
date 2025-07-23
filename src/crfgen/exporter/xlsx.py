@@ -1,8 +1,10 @@
 from pathlib import Path
 from typing import Sequence
+
 import openpyxl
 
 from crfgen.schema import Form
+
 from .registry import register
 
 
@@ -16,4 +18,3 @@ def export_xlsx(forms: Sequence[Form], outdir: Path) -> None:
         for fld in form.fields:
             ws.append([form.domain, fld.oid, fld.prompt])
     wb.save(path)
-
