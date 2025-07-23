@@ -20,6 +20,8 @@ jobs:
           poetry-version: '1.7.1'
       - name: Install dependencies
         run: poetry install -n
+      - name: Pre-commit checks
+        run: poetry run pre-commit run --all-files --show-diff-on-failure
       - name: Build canonical JSON
         env:
           CDISC_PRIMARY_KEY: ${{ secrets.CDISC_PRIMARY_KEY }}
