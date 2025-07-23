@@ -2,20 +2,20 @@
 """
 Dispatch to each exporter to generate all formats from crf.json.
 """
-import sys
 import json
+import sys
 from pathlib import Path
 
-from crfgen.schema import Form
-from crfgen.exporter import registry as reg
+import crfgen.exporter.csv  # noqa
+import crfgen.exporter.docx  # noqa
+import crfgen.exporter.latex  # noqa
 
 # Import exporters to register them
 import crfgen.exporter.markdown  # noqa
-import crfgen.exporter.latex  # noqa
-import crfgen.exporter.docx  # noqa
-import crfgen.exporter.csv  # noqa
-import crfgen.exporter.xlsx  # noqa
 import crfgen.exporter.odm  # noqa
+import crfgen.exporter.xlsx  # noqa
+from crfgen.exporter import registry as reg
+from crfgen.schema import Form
 
 
 def main() -> None:

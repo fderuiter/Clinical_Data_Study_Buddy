@@ -1,8 +1,9 @@
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Sequence
-import xml.etree.ElementTree as ET
 
 from crfgen.schema import Form
+
 from .registry import register
 
 
@@ -15,4 +16,3 @@ def export_odm(forms: Sequence[Form], outdir: Path) -> None:
             ET.SubElement(form_el, "ItemRef", OID=fld.oid)
     tree = ET.ElementTree(root)
     tree.write(outdir / "forms.xml", encoding="utf-8", xml_declaration=True)
-

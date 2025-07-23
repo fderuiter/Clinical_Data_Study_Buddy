@@ -1,5 +1,5 @@
 """Exporters for various output formats."""
 
-from .registry import register, get, formats
+from .registry import formats, get, register
 
 __all__ = ["register", "get", "formats"]

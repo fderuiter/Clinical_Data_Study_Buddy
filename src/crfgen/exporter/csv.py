@@ -1,8 +1,9 @@
+import csv
 from pathlib import Path
 from typing import Sequence
-import csv
 
 from crfgen.schema import Form
+
 from .registry import register
 
 
@@ -15,4 +16,3 @@ def export_csv(forms: Sequence[Form], outdir: Path) -> None:
         for form in forms:
             for fld in form.fields:
                 writer.writerow([form.domain, fld.oid, fld.prompt])
-

@@ -9,4 +9,3 @@ def test_normalize_headers_bytes():
 def test_normalize_headers_mixed_types():
     headers = {"Foo": bytearray(b"bar"), "Num": 123}
     assert normalize_headers(headers) == {"Foo": "bar", "Num": "123"}
-
