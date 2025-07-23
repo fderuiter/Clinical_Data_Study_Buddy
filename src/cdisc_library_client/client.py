@@ -1,7 +1,7 @@
 import ssl
 from typing import Any, Optional, Union
 
-from crfgen.utils import normalize_headers
+from .utils import normalize_headers
 
 import httpx
 from attrs import define, evolve, field

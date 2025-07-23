@@ -10,7 +10,7 @@ import time
 import pathlib
 from typing import Any
 
-from crfgen.utils import normalize_headers
+from cdisc_library_client.utils import normalize_headers
 
 import requests
 from requests.adapters import HTTPAdapter
