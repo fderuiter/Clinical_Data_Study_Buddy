@@ -4,19 +4,26 @@ on:
   push:
     branches: [ main ]
   pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   analyze:
+    name: Analyze
     runs-on: ubuntu-latest
     permissions:
-      contents: read
       security-events: write
     strategy:
       fail-fast: false
       matrix:
         language: [ "python" ]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
