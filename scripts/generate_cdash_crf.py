@@ -6,11 +6,11 @@ import pathlib
 
 import pandas as pd
 from docx import Document
-from docx.shared import Pt, Inches
 from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.shared import Pt
 
 
 def _add_page_field(paragraph):
@@ -50,7 +50,9 @@ def load_ig(ig_path: str) -> pd.DataFrame:
     return ig_df
 
 
-def build_domain_crf(domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path) -> None:
+def build_domain_crf(
+    domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
+) -> None:
     """Create a Word document for a single CDASH domain."""
 
     document = Document()
@@ -66,7 +68,8 @@ def build_domain_crf(domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
     style.font.size = Pt(10)
 
     # Header placeholders for protocol metadata
-    hdr_tbl = section.header.add_table(rows=1, cols=3)
+    hdr_width = section.page_width - section.left_margin - section.right_margin
+    hdr_tbl = section.header.add_table(rows=1, cols=3, width=hdr_width)
     hdr_tbl.style = "Table Grid"
     hdr_cells = hdr_tbl.rows[0].cells
     hdr_cells[0].text = "Protocol ID: __________"
@@ -116,7 +119,11 @@ def build_domain_crf(domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
             instructions.append(str(row.get("Implementation Notes")))
         label_lower = str(row.get("Display Label", "")).lower()
         var_upper = row["Variable"].upper()
-        if "date" in label_lower or var_upper.endswith("DT") or var_upper.endswith("DAT"):
+        if (
+            "date" in label_lower
+            or var_upper.endswith("DT")
+            or var_upper.endswith("DAT")
+        ):
             instructions.append("Format: dd/mm/yyyy")
 
         instr_para = cells[5].paragraphs[0]
