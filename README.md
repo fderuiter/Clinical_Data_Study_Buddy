@@ -11,9 +11,12 @@ secrets are supplied as bytes.
 ## Generating CDASH CRFs
 
 The repository includes `scripts/generate_cdash_crf.py` which converts the
-official CDASH workbooks into simple Word documents—one per domain.  The script
-requires `pandas`, `python-docx` and `openpyxl` which are already listed in the
-project dependencies.
+official CDASH workbooks into Word documents—one per domain.  The script now
+adds extra metadata from the IG such as variable type, controlled terminology
+and completion instructions.  Generated CRFs use a consistent landscape layout
+with protocol information in the header and versioned footers with page numbers.
+`pandas`, `python-docx` and `openpyxl` are already listed in the project
+dependencies.
 
 ```bash
 python scripts/generate_cdash_crf.py \
@@ -27,5 +30,5 @@ python scripts/generate_cdash_crf.py --model CDASH_Model_v1.3.xlsx \
 ```
 
 Edit `build_domain_crf()` in the script to customise the table layout or add
-study branding.
+study branding or adjust fonts and orientation if needed.
 
