@@ -6,6 +6,28 @@ import pathlib
 
 import pandas as pd
 from docx import Document
+from docx.shared import Pt, Inches
+from docx.enum.section import WD_ORIENT
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+
+
+def _add_page_field(paragraph):
+    """Insert a Word page number field into *paragraph*."""
+    run = paragraph.add_run()
+    fld_char_begin = OxmlElement("w:fldChar")
+    fld_char_begin.set(qn("w:fldCharType"), "begin")
+    run._r.append(fld_char_begin)
+
+    instr = OxmlElement("w:instrText")
+    instr.set(qn("xml:space"), "preserve")
+    instr.text = "PAGE"
+    run._r.append(instr)
+
+    fld_char_end = OxmlElement("w:fldChar")
+    fld_char_end.set(qn("w:fldCharType"), "end")
+    run._r.append(fld_char_end)
 
 
 def load_ig(ig_path: str) -> pd.DataFrame:
@@ -32,22 +54,48 @@ def build_domain_crf(domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
     """Create a Word document for a single CDASH domain."""
 
     document = Document()
+
+    # Use landscape orientation for readability
+    section = document.sections[0]
+    section.orientation = WD_ORIENT.LANDSCAPE
+    section.page_width, section.page_height = section.page_height, section.page_width
+
+    # Standardise font
+    style = document.styles["Normal"]
+    style.font.name = "Arial"
+    style.font.size = Pt(10)
+
+    # Header placeholders for protocol metadata
+    hdr_tbl = section.header.add_table(rows=1, cols=3)
+    hdr_tbl.style = "Table Grid"
+    hdr_cells = hdr_tbl.rows[0].cells
+    hdr_cells[0].text = "Protocol ID: __________"
+    hdr_cells[1].text = "Site Code: __________"
+    hdr_cells[2].text = "Subject ID: __________"
+
+    # Footer with version and automatic page numbering
+    f_p = section.footer.add_paragraph("CRF Version 1.0 ")
+    _add_page_field(f_p)
+    f_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
     document.add_heading(f"{domain} Domain CRF", level=1)
 
     # Add a table with extra metadata columns to provide more context
-    table = document.add_table(rows=1, cols=5, style="Light Grid")
+    table = document.add_table(rows=1, cols=6, style="Table Grid")
     hdr = table.rows[0].cells
     hdr[0].text = "Variable"
     hdr[1].text = "Label / Question"
     hdr[2].text = "Type"
     hdr[3].text = "Controlled Terminology"
-    hdr[4].text = "Instructions"
+    hdr[4].text = "Data Entry"
+    hdr[5].text = "Instructions"
 
     for _, row in domain_df.sort_values("Order").iterrows():
         cells = table.add_row().cells
         cells[0].text = row["Variable"]
         cells[1].text = str(row["Display Label"])
         cells[2].text = str(row.get("Type", ""))
+
         ct_val = row.get("CT Values")
         ct_code = row.get("CT Codes")
         if pd.notna(ct_val):
@@ -57,12 +105,26 @@ def build_domain_crf(domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
         else:
             ct = ""
         cells[3].text = ct
+
+        # Placeholder where data should be recorded
+        cells[4].text = "_______________"
+
         instructions = []
         if pd.notna(row.get("CRF Instructions")):
             instructions.append(str(row.get("CRF Instructions")))
         if pd.notna(row.get("Implementation Notes")):
             instructions.append(str(row.get("Implementation Notes")))
-        cells[4].text = " \n".join(instructions)
+        label_lower = str(row.get("Display Label", "")).lower()
+        var_upper = row["Variable"].upper()
+        if "date" in label_lower or var_upper.endswith("DT") or var_upper.endswith("DAT"):
+            instructions.append("Format: dd/mm/yyyy")
+
+        instr_para = cells[5].paragraphs[0]
+        for idx, item in enumerate(instructions):
+            run = instr_para.add_run(item)
+            run.italic = True
+            if idx < len(instructions) - 1:
+                instr_para.add_run("\n")
 
     out_path = out_dir / f"{domain}_CRF.docx"
     document.save(out_path)
