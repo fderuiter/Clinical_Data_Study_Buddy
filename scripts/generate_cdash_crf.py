@@ -16,7 +16,13 @@ def load_ig(ig_path: str) -> pd.DataFrame:
         ig_df["CDASHIG Variable Label"]
     )
     ig_df.rename(
-        columns={"CDASHIG Variable": "Variable", "Variable Order": "Order"},
+        columns={
+            "CDASHIG Variable": "Variable",
+            "Variable Order": "Order",
+            "Case Report Form Completion Instructions": "CRF Instructions",
+            "CDISC CT Codelist Submission Values(s), Subset Submission Value(s)": "CT Values",
+            "CDISC CT Codelist Code(s), Subset Codes(s)": "CT Codes",
+        },
         inplace=True,
     )
     return ig_df
@@ -28,17 +34,35 @@ def build_domain_crf(domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
     document = Document()
     document.add_heading(f"{domain} Domain CRF", level=1)
 
-    table = document.add_table(rows=1, cols=3)
+    # Add a table with extra metadata columns to provide more context
+    table = document.add_table(rows=1, cols=5, style="Light Grid")
     hdr = table.rows[0].cells
     hdr[0].text = "Variable"
     hdr[1].text = "Label / Question"
-    hdr[2].text = "Data Entry"
+    hdr[2].text = "Type"
+    hdr[3].text = "Controlled Terminology"
+    hdr[4].text = "Instructions"
 
     for _, row in domain_df.sort_values("Order").iterrows():
         cells = table.add_row().cells
         cells[0].text = row["Variable"]
         cells[1].text = str(row["Display Label"])
-        cells[2].text = "_______________________________"
+        cells[2].text = str(row.get("Type", ""))
+        ct_val = row.get("CT Values")
+        ct_code = row.get("CT Codes")
+        if pd.notna(ct_val):
+            ct = str(ct_val)
+        elif pd.notna(ct_code):
+            ct = str(ct_code)
+        else:
+            ct = ""
+        cells[3].text = ct
+        instructions = []
+        if pd.notna(row.get("CRF Instructions")):
+            instructions.append(str(row.get("CRF Instructions")))
+        if pd.notna(row.get("Implementation Notes")):
+            instructions.append(str(row.get("Implementation Notes")))
+        cells[4].text = " \n".join(instructions)
 
     out_path = out_dir / f"{domain}_CRF.docx"
     document.save(out_path)
