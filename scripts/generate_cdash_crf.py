@@ -10,7 +10,7 @@ from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Pt
+from docx.shared import Pt, Inches
 
 
 def _add_page_field(paragraph):
@@ -56,6 +56,16 @@ def build_domain_crf(
     """Create a Word document for a single CDASH domain."""
 
     document = Document()
+    # Fixed column widths (inches) to keep tables aligned across pages
+    col_widths = [
+        Inches(1.0),
+        Inches(3.0),
+        Inches(0.9),
+        Inches(2.0),
+        Inches(1.3),
+        Inches(2.2),
+        Inches(0.5),  # reserved/unused
+    ]
 
     # Use landscape orientation for readability
     section = document.sections[0]
@@ -85,6 +95,7 @@ def build_domain_crf(
 
     # Add a table with extra metadata columns to provide more context
     table = document.add_table(rows=1, cols=6, style="Table Grid")
+    table.autofit = False
     hdr = table.rows[0].cells
     hdr[0].text = "Variable"
     hdr[1].text = "Label / Question"
@@ -92,9 +103,13 @@ def build_domain_crf(
     hdr[3].text = "Controlled Terminology"
     hdr[4].text = "Data Entry"
     hdr[5].text = "Instructions"
+    for i, width in enumerate(col_widths[: len(hdr)]):
+        hdr[i].width = width
 
     for _, row in domain_df.sort_values("Order").iterrows():
         cells = table.add_row().cells
+        for i, width in enumerate(col_widths[: len(cells)]):
+            cells[i].width = width
         cells[0].text = row["Variable"]
         cells[1].text = str(row["Display Label"])
         cells[2].text = str(row.get("Type", ""))
