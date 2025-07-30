@@ -10,7 +10,7 @@ from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Pt, Inches
+from docx.shared import Pt
 
 
 def _add_page_field(paragraph):
@@ -164,6 +164,9 @@ def build_domain_crf(
     hdr[6].text = "Required"
     _shade(hdr[6], "FFC7CE")
 
+    ct_legend: dict[str, int] = {}
+    footnotes: dict[str, int] = {}
+
     for idx, row in enumerate(domain_df.sort_values("Order").iterrows(), start=1):
         _, row = row
         cells = table.add_row().cells
@@ -179,7 +182,12 @@ def build_domain_crf(
             ct = str(ct_code)
         else:
             ct = ""
-        cells[3].text = ct
+
+        if len(ct) > 40:
+            idx_ct = ct_legend.setdefault(ct, len(ct_legend) + 1)
+            cells[3].text = f"\u2020{idx_ct}"
+        else:
+            cells[3].text = ct
 
         entry_para = cells[4].paragraphs[0]
         label_lower = str(row.get("Display Label", "")).lower()
@@ -203,8 +211,17 @@ def build_domain_crf(
         instructions = []
         if pd.notna(row.get("CRF Instructions")):
             instructions.append(str(row.get("CRF Instructions")))
-        if pd.notna(row.get("Implementation Notes")):
-            instructions.append(str(row.get("Implementation Notes")))
+        impl_note = row.get("Implementation Notes")
+        if pd.notna(impl_note):
+            impl_note = str(impl_note)
+            if len(impl_note) > 60:
+                fn_idx = footnotes.setdefault(impl_note, len(footnotes) + 1)
+                instructions.append(f"[{fn_idx}]")
+            else:
+                instructions.append(impl_note)
+
+            if any(t in impl_note.lower() for t in ["if ", "derive", "origin"]):
+                instructions.append("Validate dependencies across domains")
         if (
             "date" in label_lower
             or var_upper.endswith("DT")
@@ -226,9 +243,28 @@ def build_domain_crf(
         else:
             req_cell.text = ""
 
+
         if idx % 3 == 0:
             for c in cells:
                 _add_bottom_border(c)
+
+    if footnotes:
+        document.add_heading("Footnotes", level=2)
+        for text, num in footnotes.items():
+            p = document.add_paragraph()
+            p.add_run(f"[{num}] ").bold = True
+            p.add_run(text)
+
+    if ct_legend:
+        document.add_page_break()
+        document.add_heading("Controlled Terminology legend", level=2)
+        legend = document.add_table(rows=len(ct_legend) + 1, cols=2, style="Table Grid")
+        legend.cell(0, 0).text = "Symbol"
+        legend.cell(0, 1).text = "Controlled Terminology"
+        for ct_text, idx_ct in ct_legend.items():
+            row_ct = legend.add_row().cells
+            row_ct[0].text = f"\u2020{idx_ct}"
+            row_ct[1].text = ct_text
 
     out_path = out_dir / f"{domain}_CRF.docx"
     document.save(out_path)
