@@ -42,6 +42,11 @@ def test_generate(tmp_path):
     assert len(table.columns) == 7
     assert table.cell(0, 6).text == "Required"
 
+    texts = "\n".join(p.text for p in doc.paragraphs)
+    assert "Footnotes" in texts
+    assert "[1]" in texts
+
     with ZipFile(doc_path) as zf:
         xml = zf.read("word/document.xml").decode("utf-8")
         assert "w14:checkbox" in xml or "w14:date" in xml
+        assert "Validate dependencies" in xml
