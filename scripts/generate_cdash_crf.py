@@ -10,7 +10,7 @@ from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Pt
+from docx.shared import Pt, Inches
 
 
 def _add_page_field(paragraph):
@@ -28,6 +28,69 @@ def _add_page_field(paragraph):
     fld_char_end = OxmlElement("w:fldChar")
     fld_char_end.set(qn("w:fldCharType"), "end")
     run._r.append(fld_char_end)
+
+
+def _add_bottom_border(cell) -> None:
+    """Add a thin bottom border to *cell*."""
+    tc_pr = cell._tc.get_or_add_tcPr()
+    borders = tc_pr.find(qn("w:tcBorders"))
+    if borders is None:
+        borders = OxmlElement("w:tcBorders")
+        tc_pr.append(borders)
+    bottom = borders.find(qn("w:bottom"))
+    if bottom is None:
+        bottom = OxmlElement("w:bottom")
+        borders.append(bottom)
+    bottom.set(qn("w:val"), "single")
+    bottom.set(qn("w:sz"), "4")
+    bottom.set(qn("w:color"), "auto")
+
+
+def _shade(cell, color: str) -> None:
+    """Shade *cell* with *color* (hex RGB)."""
+    tc_pr = cell._tc.get_or_add_tcPr()
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:fill"), color)
+    tc_pr.append(shd)
+
+
+def _add_checkbox(paragraph) -> None:
+    """Insert a checkbox content control into *paragraph*."""
+    sdt = OxmlElement("w:sdt")
+    pr = OxmlElement("w:sdtPr")
+    cb = OxmlElement("w14:checkbox")
+    pr.append(cb)
+    content = OxmlElement("w:sdtContent")
+    r = OxmlElement("w:r")
+    t = OxmlElement("w:t")
+    t.text = " "
+    r.append(t)
+    content.append(r)
+    sdt.append(pr)
+    sdt.append(content)
+    paragraph._p.append(sdt)
+
+
+def _add_date_picker(paragraph) -> None:
+    """Insert a date picker content control into *paragraph*."""
+    sdt = OxmlElement("w:sdt")
+    pr = OxmlElement("w:sdtPr")
+    dt = OxmlElement("w14:date")
+    pr.append(dt)
+    content = OxmlElement("w:sdtContent")
+    r = OxmlElement("w:r")
+    t = OxmlElement("w:t")
+    t.text = ""
+    r.append(t)
+    content.append(r)
+    sdt.append(pr)
+    sdt.append(content)
+    paragraph._p.append(sdt)
+
+
+def _add_underline_entry(paragraph, length: int) -> None:
+    run = paragraph.add_run(" " * length)
+    run.font.underline = True
 
 
 def load_ig(ig_path: str) -> pd.DataFrame:
@@ -84,7 +147,13 @@ def build_domain_crf(
     document.add_heading(f"{domain} Domain CRF", level=1)
 
     # Add a table with extra metadata columns to provide more context
-    table = document.add_table(rows=1, cols=6, style="Table Grid")
+    table = document.add_table(rows=1, cols=7, style="Table Grid")
+    table.autofit = False
+    total_width = section.page_width - section.left_margin - section.right_margin
+    col_width = int(total_width / 7)
+    for col in table.columns:
+        col.width = col_width
+
     hdr = table.rows[0].cells
     hdr[0].text = "Variable"
     hdr[1].text = "Label / Question"
@@ -92,8 +161,11 @@ def build_domain_crf(
     hdr[3].text = "Controlled Terminology"
     hdr[4].text = "Data Entry"
     hdr[5].text = "Instructions"
+    hdr[6].text = "Required"
+    _shade(hdr[6], "FFC7CE")
 
-    for _, row in domain_df.sort_values("Order").iterrows():
+    for idx, row in enumerate(domain_df.sort_values("Order").iterrows(), start=1):
+        _, row = row
         cells = table.add_row().cells
         cells[0].text = row["Variable"]
         cells[1].text = str(row["Display Label"])
@@ -109,16 +181,30 @@ def build_domain_crf(
             ct = ""
         cells[3].text = ct
 
-        # Placeholder where data should be recorded
-        cells[4].text = "_______________"
+        entry_para = cells[4].paragraphs[0]
+        label_lower = str(row.get("Display Label", "")).lower()
+        var_upper = row["Variable"].upper()
+        if (
+            "date" in label_lower
+            or var_upper.endswith("DT")
+            or var_upper.endswith("DAT")
+        ):
+            _add_date_picker(entry_para)
+        elif ct and len(str(ct).split(";")) <= 4:
+            for i, val in enumerate(str(ct).split(";")):
+                if i:
+                    entry_para.add_run(" ")
+                _add_checkbox(entry_para)
+                entry_para.add_run(val.strip())
+        else:
+            expected = max(len(str(ct)), 10)
+            _add_underline_entry(entry_para, expected)
 
         instructions = []
         if pd.notna(row.get("CRF Instructions")):
             instructions.append(str(row.get("CRF Instructions")))
         if pd.notna(row.get("Implementation Notes")):
             instructions.append(str(row.get("Implementation Notes")))
-        label_lower = str(row.get("Display Label", "")).lower()
-        var_upper = row["Variable"].upper()
         if (
             "date" in label_lower
             or var_upper.endswith("DT")
@@ -127,11 +213,22 @@ def build_domain_crf(
             instructions.append("Format: dd/mm/yyyy")
 
         instr_para = cells[5].paragraphs[0]
-        for idx, item in enumerate(instructions):
+        for i_ins, item in enumerate(instructions):
             run = instr_para.add_run(item)
             run.italic = True
-            if idx < len(instructions) - 1:
+            if i_ins < len(instructions) - 1:
                 instr_para.add_run("\n")
+
+        req_cell = cells[6]
+        req_text = row.get("CRF Instructions")
+        if isinstance(req_text, str) and any(k in req_text.lower() for k in ["required", "mandatory"]):
+            req_cell.text = "Yes"
+        else:
+            req_cell.text = ""
+
+        if idx % 3 == 0:
+            for c in cells:
+                _add_bottom_border(c)
 
     out_path = out_dir / f"{domain}_CRF.docx"
     document.save(out_path)
