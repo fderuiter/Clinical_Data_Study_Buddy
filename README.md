@@ -170,3 +170,34 @@ The following options are available for the `generate_synthetic_data.py` script:
 | `--therapeutic-area` | Therapeutic area                             | "Oncology" |
 | `--format`         | Output format (csv, json, xpt)               | "csv"      |
 | `--output-dir`     | Directory to save the downloaded file        | "."        |
+
+## Generating EDC Raw Dataset Package
+
+This project includes a script to generate a complete package of raw EDC datasets for a clinical study. The script, `scripts/generate_raw_dataset_package.py`, generates a ZIP file containing multiple datasets with consistent subjects across all domains. It also includes a draft `define.xml` file (currently with limited metadata).
+
+### Quickstart
+
+To generate a raw dataset package, run the `scripts/generate_raw_dataset_package.py` script with the desired parameters. For example, to generate a package with DM, VS, and LB domains for 10 subjects in the Oncology therapeutic area, run the following command:
+
+```bash
+poetry run python scripts/generate_raw_dataset_package.py \
+    --num-subjects 10 \
+    --domains DM VS LB \
+    --therapeutic-area Oncology \
+    --output-dir ./raw_dataset_package
+```
+
+This will generate a `edc_raw_datasets.zip` file in the `raw_dataset_package` directory.
+
+### Options
+
+The following options are available for the `generate_raw_dataset_package.py` script:
+
+| Option             | Description                                  | Default    |
+| ------------------ | -------------------------------------------- | ---------- |
+| `--num-subjects`   | Number of subjects (10-200)                  | 50         |
+| `--therapeutic-area` | Therapeutic area for the study               | "Oncology" |
+| `--domains`        | List of domains to include (e.g., DM AE VS)  | (required) |
+| `--study-story`    | Study story to simulate (none, high_dropout) | "none"     |
+| `--output-format`  | Output format for datasets (csv, json, xpt)  | "csv"      |
+| `--output-dir`     | Directory to save the generated package      | "."        |
