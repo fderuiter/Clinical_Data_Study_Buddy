@@ -29,7 +29,7 @@ def harvest(client: AuthenticatedClient, ig_filter: Optional[str] = None) -> Lis
         if ig_filter and ig_filter not in ver_link["title"]:
             continue
         ig = _json(client, ver_link["href"])
-        for dom_link in ig["_links"]["domains"]:
+        for dom_link in ig["_links"].get("domains", []):
             dom = _json(client, dom_link["href"])
             scenarios = dom["_links"].get("scenarios") or []
             payloads = [dom] + [_json(client, s["href"]) for s in scenarios]
