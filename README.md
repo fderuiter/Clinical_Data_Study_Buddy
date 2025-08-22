@@ -124,3 +124,33 @@ python scripts/generate_cdash_crf.py --model CDASH_Model_v1.3.xlsx \
 Edit `build_domain_crf()` in the script to customise the table layout or add
 study branding or adjust fonts and orientation if needed.
 
+## Generating Synthetic Datasets
+
+In addition to generating CRFs from the CDISC Library, this project can also generate synthetic CDISC-compliant datasets using the cdiscdataset.com API.
+
+### Quickstart
+
+To generate a synthetic dataset, run the `scripts/generate_synthetic_data.py` script with the desired parameters. For example, to generate an SDTM dataset for the DM domain, run the following command:
+
+```bash
+python scripts/generate_synthetic_data.py \
+    --dataset-type SDTM \
+    --domain DM \
+    --num-subjects 100 \
+    --output-dir ./synthetic_data
+```
+
+This will generate a CSV file in the `synthetic_data` directory.
+
+### Options
+
+The following options are available for the `generate_synthetic_data.py` script:
+
+| Option             | Description                                  | Default    |
+| ------------------ | -------------------------------------------- | ---------- |
+| `--dataset-type`   | Type of dataset to generate (SDTM, ADaM, SEND) |            |
+| `--domain`         | Domain for the dataset                       |            |
+| `--num-subjects`   | Number of subjects                           | 50         |
+| `--therapeutic-area` | Therapeutic area                             | "Oncology" |
+| `--format`         | Output format (csv, json, xpt)               | "csv"      |
+| `--output-dir`     | Directory to save the downloaded file        | "."        |
