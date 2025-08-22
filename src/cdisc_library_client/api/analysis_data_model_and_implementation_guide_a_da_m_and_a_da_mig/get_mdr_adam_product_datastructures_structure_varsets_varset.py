@@ -17,11 +17,7 @@ def _get_kwargs(
 ) -> dict[str, Any]:
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/mdr/adam/{product}/datastructures/{structure}/varsets/{varset}".format(
-            product=product,
-            structure=structure,
-            varset=varset,
-        ),
+        "url": f"/mdr/adam/{product}/datastructures/{structure}/varsets/{varset}",
     }
 
     return _kwargs

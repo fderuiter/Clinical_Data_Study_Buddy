@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -64,9 +59,7 @@ class AdamProductDatastructuresLinks:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.adam_datastructure_ref_element import AdamDatastructureRefElement
-        from ..models.adam_product_datastructures_ref import (
-            AdamProductDatastructuresRef,
-        )
+        from ..models.adam_product_datastructures_ref import AdamProductDatastructuresRef
 
         d = dict(src_dict)
         _self_ = d.pop("self", UNSET)
@@ -86,9 +79,7 @@ class AdamProductDatastructuresLinks:
         data_structures = []
         _data_structures = d.pop("dataStructures", UNSET)
         for data_structures_item_data in _data_structures or []:
-            data_structures_item = AdamDatastructureRefElement.from_dict(
-                data_structures_item_data
-            )
+            data_structures_item = AdamDatastructureRefElement.from_dict(data_structures_item_data)
 
             data_structures.append(data_structures_item)
 

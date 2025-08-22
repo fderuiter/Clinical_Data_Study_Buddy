@@ -88,6 +88,22 @@ The script will:
 
 For the most consistent and reliable setup, you can use the provided development container. This avoids any "works on my machine" issues.
 
+## Updating the CDISC Library API Client
+
+This project includes a generated Python client for the CDISC Library API located in `src/cdisc_library_client`. This client is generated from the official CDISC Library OpenAPI specification.
+
+To update the client to the latest version, you can use the following command:
+
+```bash
+make update-sdk
+```
+
+This command will:
+1.  Download the latest OpenAPI specification from the official CDISC website.
+2.  Regenerate the Python client in `src/cdisc_library_client`.
+
+It is recommended to run this command periodically to ensure the client is up-to-date with any changes to the CDISC Library API.
+
 **Prerequisites:**
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Visual Studio Code](https://code.visualstudio.com/)

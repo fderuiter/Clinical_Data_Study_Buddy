@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -109,9 +104,7 @@ class AdamDatastructure:
         analysis_variable_sets = []
         _analysis_variable_sets = d.pop("analysisVariableSets", UNSET)
         for analysis_variable_sets_item_data in _analysis_variable_sets or []:
-            analysis_variable_sets_item = AdamVarset.from_dict(
-                analysis_variable_sets_item_data
-            )
+            analysis_variable_sets_item = AdamVarset.from_dict(analysis_variable_sets_item_data)
 
             analysis_variable_sets.append(analysis_variable_sets_item)
 

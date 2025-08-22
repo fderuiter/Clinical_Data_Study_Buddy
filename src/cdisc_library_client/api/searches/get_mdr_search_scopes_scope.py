@@ -15,17 +15,13 @@ def _get_kwargs(
 ) -> dict[str, Any]:
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/mdr/search/scopes/{scope}".format(
-            scope=scope,
-        ),
+        "url": f"/mdr/search/scopes/{scope}",
     }
 
     return _kwargs
 
 
-def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[ScopeValues]:
+def _parse_response(*, client: Union[AuthenticatedClient, Client], response: httpx.Response) -> Optional[ScopeValues]:
     if response.status_code == 200:
         response_200 = ScopeValues.from_dict(response.json())
 
@@ -36,9 +32,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[ScopeValues]:
+def _build_response(*, client: Union[AuthenticatedClient, Client], response: httpx.Response) -> Response[ScopeValues]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,

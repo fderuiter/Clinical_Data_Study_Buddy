@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -93,9 +88,7 @@ class SdtmClassVariableLinks:
         from ..models.root_sdtm_class_variable_ref import RootSdtmClassVariableRef
         from ..models.sdtm_class_ref import SdtmClassRef
         from ..models.sdtm_class_variable_ref import SdtmClassVariableRef
-        from ..models.sdtm_class_variable_ref_qualifies import (
-            SdtmClassVariableRefQualifies,
-        )
+        from ..models.sdtm_class_variable_ref_qualifies import SdtmClassVariableRefQualifies
         from ..models.sdtm_product_ref import SdtmProductRef
 
         d = dict(src_dict)
@@ -123,9 +116,7 @@ class SdtmClassVariableLinks:
         qualifies_variables = []
         _qualifies_variables = d.pop("qualifiesVariables", UNSET)
         for qualifies_variables_item_data in _qualifies_variables or []:
-            qualifies_variables_item = SdtmClassVariableRefQualifies.from_dict(
-                qualifies_variables_item_data
-            )
+            qualifies_variables_item = SdtmClassVariableRefQualifies.from_dict(qualifies_variables_item_data)
 
             qualifies_variables.append(qualifies_variables_item)
 

@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -88,9 +83,7 @@ class CdashigProductScenarios:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.cdashig_product_scenarios_links import (
-            CdashigProductScenariosLinks,
-        )
+        from ..models.cdashig_product_scenarios_links import CdashigProductScenariosLinks
 
         d = dict(src_dict)
         name = d.pop("name", UNSET)

@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    Any,
-    TypeVar,
-    Union,
-    cast,
-)
+from typing import Any, TypeVar, Union, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -81,9 +76,7 @@ class ExportCdashigDomainVariablesRow:
 
         cdashig_core = self.cdashig_core
 
-        case_report_form_completion_instructions = (
-            self.case_report_form_completion_instructions
-        )
+        case_report_form_completion_instructions = self.case_report_form_completion_instructions
 
         sdtmig_target: Union[Unset, list[str]] = UNSET
         if not isinstance(self.sdtmig_target, Unset):
@@ -123,17 +116,13 @@ class ExportCdashigDomainVariablesRow:
         if cdashig_core is not UNSET:
             field_dict["CDASHIG Core"] = cdashig_core
         if case_report_form_completion_instructions is not UNSET:
-            field_dict["Case Report Form Completion Instructions"] = (
-                case_report_form_completion_instructions
-            )
+            field_dict["Case Report Form Completion Instructions"] = case_report_form_completion_instructions
         if sdtmig_target is not UNSET:
             field_dict["SDTMIG Target"] = sdtmig_target
         if mapping_instructions is not UNSET:
             field_dict["Mapping Instructions"] = mapping_instructions
         if controlled_terminology_codelist_name is not UNSET:
-            field_dict["Controlled Terminology Codelist Name"] = (
-                controlled_terminology_codelist_name
-            )
+            field_dict["Controlled Terminology Codelist Name"] = controlled_terminology_codelist_name
         if implementation_notes is not UNSET:
             field_dict["Implementation Notes"] = implementation_notes
 
@@ -166,17 +155,13 @@ class ExportCdashigDomainVariablesRow:
 
         cdashig_core = d.pop("CDASHIG Core", UNSET)
 
-        case_report_form_completion_instructions = d.pop(
-            "Case Report Form Completion Instructions", UNSET
-        )
+        case_report_form_completion_instructions = d.pop("Case Report Form Completion Instructions", UNSET)
 
         sdtmig_target = cast(list[str], d.pop("SDTMIG Target", UNSET))
 
         mapping_instructions = d.pop("Mapping Instructions", UNSET)
 
-        controlled_terminology_codelist_name = d.pop(
-            "Controlled Terminology Codelist Name", UNSET
-        )
+        controlled_terminology_codelist_name = d.pop("Controlled Terminology Codelist Name", UNSET)
 
         implementation_notes = d.pop("Implementation Notes", UNSET)
 

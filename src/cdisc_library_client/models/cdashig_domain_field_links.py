@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -18,9 +13,7 @@ if TYPE_CHECKING:
     from ..models.root_cdashig_domain_field_ref import RootCdashigDomainFieldRef
     from ..models.root_ct_codelist_ref_element import RootCtCodelistRefElement
     from ..models.sdtm_class_variable_ref_target import SdtmClassVariableRefTarget
-    from ..models.sdtmig_dataset_variable_ref_target import (
-        SdtmigDatasetVariableRefTarget,
-    )
+    from ..models.sdtmig_dataset_variable_ref_target import SdtmigDatasetVariableRefTarget
 
 
 T = TypeVar("T", bound="CdashigDomainFieldLinks")
@@ -47,9 +40,7 @@ class CdashigDomainFieldLinks:
     root_item: Union[Unset, "RootCdashigDomainFieldRef"] = UNSET
     prior_version: Union[Unset, "CdashigDomainFieldRef"] = UNSET
     sdtm_class_mapping_targets: Union[Unset, list["SdtmClassVariableRefTarget"]] = UNSET
-    sdtmig_dataset_mapping_targets: Union[
-        Unset, list["SdtmigDatasetVariableRefTarget"]
-    ] = UNSET
+    sdtmig_dataset_mapping_targets: Union[Unset, list["SdtmigDatasetVariableRefTarget"]] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -84,23 +75,15 @@ class CdashigDomainFieldLinks:
         if not isinstance(self.sdtm_class_mapping_targets, Unset):
             sdtm_class_mapping_targets = []
             for sdtm_class_mapping_targets_item_data in self.sdtm_class_mapping_targets:
-                sdtm_class_mapping_targets_item = (
-                    sdtm_class_mapping_targets_item_data.to_dict()
-                )
+                sdtm_class_mapping_targets_item = sdtm_class_mapping_targets_item_data.to_dict()
                 sdtm_class_mapping_targets.append(sdtm_class_mapping_targets_item)
 
         sdtmig_dataset_mapping_targets: Union[Unset, list[dict[str, Any]]] = UNSET
         if not isinstance(self.sdtmig_dataset_mapping_targets, Unset):
             sdtmig_dataset_mapping_targets = []
-            for (
-                sdtmig_dataset_mapping_targets_item_data
-            ) in self.sdtmig_dataset_mapping_targets:
-                sdtmig_dataset_mapping_targets_item = (
-                    sdtmig_dataset_mapping_targets_item_data.to_dict()
-                )
-                sdtmig_dataset_mapping_targets.append(
-                    sdtmig_dataset_mapping_targets_item
-                )
+            for sdtmig_dataset_mapping_targets_item_data in self.sdtmig_dataset_mapping_targets:
+                sdtmig_dataset_mapping_targets_item = sdtmig_dataset_mapping_targets_item_data.to_dict()
+                sdtmig_dataset_mapping_targets.append(sdtmig_dataset_mapping_targets_item)
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -132,9 +115,7 @@ class CdashigDomainFieldLinks:
         from ..models.root_cdashig_domain_field_ref import RootCdashigDomainFieldRef
         from ..models.root_ct_codelist_ref_element import RootCtCodelistRefElement
         from ..models.sdtm_class_variable_ref_target import SdtmClassVariableRefTarget
-        from ..models.sdtmig_dataset_variable_ref_target import (
-            SdtmigDatasetVariableRefTarget,
-        )
+        from ..models.sdtmig_dataset_variable_ref_target import SdtmigDatasetVariableRefTarget
 
         d = dict(src_dict)
         _self_ = d.pop("self", UNSET)
@@ -182,21 +163,15 @@ class CdashigDomainFieldLinks:
         sdtm_class_mapping_targets = []
         _sdtm_class_mapping_targets = d.pop("sdtmClassMappingTargets", UNSET)
         for sdtm_class_mapping_targets_item_data in _sdtm_class_mapping_targets or []:
-            sdtm_class_mapping_targets_item = SdtmClassVariableRefTarget.from_dict(
-                sdtm_class_mapping_targets_item_data
-            )
+            sdtm_class_mapping_targets_item = SdtmClassVariableRefTarget.from_dict(sdtm_class_mapping_targets_item_data)
 
             sdtm_class_mapping_targets.append(sdtm_class_mapping_targets_item)
 
         sdtmig_dataset_mapping_targets = []
         _sdtmig_dataset_mapping_targets = d.pop("sdtmigDatasetMappingTargets", UNSET)
-        for sdtmig_dataset_mapping_targets_item_data in (
-            _sdtmig_dataset_mapping_targets or []
-        ):
-            sdtmig_dataset_mapping_targets_item = (
-                SdtmigDatasetVariableRefTarget.from_dict(
-                    sdtmig_dataset_mapping_targets_item_data
-                )
+        for sdtmig_dataset_mapping_targets_item_data in _sdtmig_dataset_mapping_targets or []:
+            sdtmig_dataset_mapping_targets_item = SdtmigDatasetVariableRefTarget.from_dict(
+                sdtmig_dataset_mapping_targets_item_data
             )
 
             sdtmig_dataset_mapping_targets.append(sdtmig_dataset_mapping_targets_item)

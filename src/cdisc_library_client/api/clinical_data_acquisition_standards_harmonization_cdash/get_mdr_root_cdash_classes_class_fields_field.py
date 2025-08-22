@@ -16,10 +16,7 @@ def _get_kwargs(
 ) -> dict[str, Any]:
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/mdr/root/cdash/classes/{class_}/fields/{field}".format(
-            class_=class_,
-            field=field,
-        ),
+        "url": f"/mdr/root/cdash/classes/{class_}/fields/{field}",
     }
 
     return _kwargs

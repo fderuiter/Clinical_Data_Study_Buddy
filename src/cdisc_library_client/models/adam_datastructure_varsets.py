@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -73,9 +68,7 @@ class AdamDatastructureVarsets:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.adam_datastructure_varsets_links import (
-            AdamDatastructureVarsetsLinks,
-        )
+        from ..models.adam_datastructure_varsets_links import AdamDatastructureVarsetsLinks
 
         d = dict(src_dict)
         ordinal = d.pop("ordinal", UNSET)

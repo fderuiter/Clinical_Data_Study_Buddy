@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -15,9 +10,7 @@ if TYPE_CHECKING:
     from ..models.cdashig_class_ref import CdashigClassRef
     from ..models.cdashig_domain_ref import CdashigDomainRef
     from ..models.cdashig_product_ref import CdashigProductRef
-    from ..models.cdashig_scenario_field_ref_element import (
-        CdashigScenarioFieldRefElement,
-    )
+    from ..models.cdashig_scenario_field_ref_element import CdashigScenarioFieldRefElement
     from ..models.cdashig_scenario_fields_ref import CdashigScenarioFieldsRef
 
 
@@ -87,9 +80,7 @@ class CdashigScenarioFieldsLinks:
         from ..models.cdashig_class_ref import CdashigClassRef
         from ..models.cdashig_domain_ref import CdashigDomainRef
         from ..models.cdashig_product_ref import CdashigProductRef
-        from ..models.cdashig_scenario_field_ref_element import (
-            CdashigScenarioFieldRefElement,
-        )
+        from ..models.cdashig_scenario_field_ref_element import CdashigScenarioFieldRefElement
         from ..models.cdashig_scenario_fields_ref import CdashigScenarioFieldsRef
 
         d = dict(src_dict)

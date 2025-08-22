@@ -1,9 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -46,37 +42,21 @@ class ExportQrsResponses:
 
         sequence = self.sequence
 
-        responses_original_result_codelist_c_code = (
-            self.responses_original_result_codelist_c_code
-        )
+        responses_original_result_codelist_c_code = self.responses_original_result_codelist_c_code
 
-        responses_original_result_term_c_code = (
-            self.responses_original_result_term_c_code
-        )
+        responses_original_result_term_c_code = self.responses_original_result_term_c_code
 
-        responses_original_result_unit_codelist_c_code = (
-            self.responses_original_result_unit_codelist_c_code
-        )
+        responses_original_result_unit_codelist_c_code = self.responses_original_result_unit_codelist_c_code
 
-        responses_original_result_unit_term_c_code = (
-            self.responses_original_result_unit_term_c_code
-        )
+        responses_original_result_unit_term_c_code = self.responses_original_result_unit_term_c_code
 
-        responses_standardized_result_codelist_c_code = (
-            self.responses_standardized_result_codelist_c_code
-        )
+        responses_standardized_result_codelist_c_code = self.responses_standardized_result_codelist_c_code
 
-        responses_standardized_result_term_c_code = (
-            self.responses_standardized_result_term_c_code
-        )
+        responses_standardized_result_term_c_code = self.responses_standardized_result_term_c_code
 
-        responses_standardized_result_unit_codelist_c_code = (
-            self.responses_standardized_result_unit_codelist_c_code
-        )
+        responses_standardized_result_unit_codelist_c_code = self.responses_standardized_result_unit_codelist_c_code
 
-        responses_standardized_result_unit_term_c_code = (
-            self.responses_standardized_result_unit_term_c_code
-        )
+        responses_standardized_result_unit_term_c_code = self.responses_standardized_result_unit_term_c_code
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -86,29 +66,19 @@ class ExportQrsResponses:
         if sequence is not UNSET:
             field_dict["Sequence"] = sequence
         if responses_original_result_codelist_c_code is not UNSET:
-            field_dict["Response's Original Result Codelist C-Code"] = (
-                responses_original_result_codelist_c_code
-            )
+            field_dict["Response's Original Result Codelist C-Code"] = responses_original_result_codelist_c_code
         if responses_original_result_term_c_code is not UNSET:
-            field_dict["Response's Original Result Term C-Code"] = (
-                responses_original_result_term_c_code
-            )
+            field_dict["Response's Original Result Term C-Code"] = responses_original_result_term_c_code
         if responses_original_result_unit_codelist_c_code is not UNSET:
             field_dict["Response's Original Result Unit Codelist C-Code"] = (
                 responses_original_result_unit_codelist_c_code
             )
         if responses_original_result_unit_term_c_code is not UNSET:
-            field_dict["Response's Original Result Unit Term C-Code"] = (
-                responses_original_result_unit_term_c_code
-            )
+            field_dict["Response's Original Result Unit Term C-Code"] = responses_original_result_unit_term_c_code
         if responses_standardized_result_codelist_c_code is not UNSET:
-            field_dict["Response's Standardized Result Codelist C-Code"] = (
-                responses_standardized_result_codelist_c_code
-            )
+            field_dict["Response's Standardized Result Codelist C-Code"] = responses_standardized_result_codelist_c_code
         if responses_standardized_result_term_c_code is not UNSET:
-            field_dict["Response's Standardized Result Term C-Code"] = (
-                responses_standardized_result_term_c_code
-            )
+            field_dict["Response's Standardized Result Term C-Code"] = responses_standardized_result_term_c_code
         if responses_standardized_result_unit_codelist_c_code is not UNSET:
             field_dict["Response's Standardized Result Unit Codelist C-Code"] = (
                 responses_standardized_result_unit_codelist_c_code
@@ -127,37 +97,23 @@ class ExportQrsResponses:
 
         sequence = d.pop("Sequence", UNSET)
 
-        responses_original_result_codelist_c_code = d.pop(
-            "Response's Original Result Codelist C-Code", UNSET
-        )
+        responses_original_result_codelist_c_code = d.pop("Response's Original Result Codelist C-Code", UNSET)
 
-        responses_original_result_term_c_code = d.pop(
-            "Response's Original Result Term C-Code", UNSET
-        )
+        responses_original_result_term_c_code = d.pop("Response's Original Result Term C-Code", UNSET)
 
-        responses_original_result_unit_codelist_c_code = d.pop(
-            "Response's Original Result Unit Codelist C-Code", UNSET
-        )
+        responses_original_result_unit_codelist_c_code = d.pop("Response's Original Result Unit Codelist C-Code", UNSET)
 
-        responses_original_result_unit_term_c_code = d.pop(
-            "Response's Original Result Unit Term C-Code", UNSET
-        )
+        responses_original_result_unit_term_c_code = d.pop("Response's Original Result Unit Term C-Code", UNSET)
 
-        responses_standardized_result_codelist_c_code = d.pop(
-            "Response's Standardized Result Codelist C-Code", UNSET
-        )
+        responses_standardized_result_codelist_c_code = d.pop("Response's Standardized Result Codelist C-Code", UNSET)
 
-        responses_standardized_result_term_c_code = d.pop(
-            "Response's Standardized Result Term C-Code", UNSET
-        )
+        responses_standardized_result_term_c_code = d.pop("Response's Standardized Result Term C-Code", UNSET)
 
         responses_standardized_result_unit_codelist_c_code = d.pop(
             "Response's Standardized Result Unit Codelist C-Code", UNSET
         )
 
-        responses_standardized_result_unit_term_c_code = d.pop(
-            "Response's Standardized Result Unit Term C-Code", UNSET
-        )
+        responses_standardized_result_unit_term_c_code = d.pop("Response's Standardized Result Unit Term C-Code", UNSET)
 
         export_qrs_responses = cls(
             response_group=response_group,

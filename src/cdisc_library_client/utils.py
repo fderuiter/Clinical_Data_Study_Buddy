@@ -1,15 +1,16 @@
-from __future__ import annotations
-
-from typing import Any, Mapping
+from typing import Any, Dict
 
 
-def normalize_headers(headers: Mapping[str, Any]) -> dict[str, str]:
-    """Return ``headers`` with values coerced to plain strings.
-
-    Any ``bytes`` or ``bytearray`` values are decoded using the default
-    encoding. Other values are converted via ``str()``.
+def normalize_headers(headers: Dict[str, Any]) -> Dict[str, str]:
     """
-    return {
-        k: (v.decode() if isinstance(v, (bytes, bytearray)) else str(v))
-        for k, v in headers.items()
-    }
+    Normalize headers to be a dictionary of strings.
+    """
+    normalized = {}
+    for k, v in headers.items():
+        if isinstance(v, bytes):
+            normalized[k] = v.decode("utf-8")
+        elif isinstance(v, bytearray):
+            normalized[k] = v.decode("utf-8")
+        else:
+            normalized[k] = str(v)
+    return normalized

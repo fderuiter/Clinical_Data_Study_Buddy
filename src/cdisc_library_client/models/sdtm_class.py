@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -118,9 +113,7 @@ class SdtmClass:
         class_variables = []
         _class_variables = d.pop("classVariables", UNSET)
         for class_variables_item_data in _class_variables or []:
-            class_variables_item = SdtmClassVariable.from_dict(
-                class_variables_item_data
-            )
+            class_variables_item = SdtmClassVariable.from_dict(class_variables_item_data)
 
             class_variables.append(class_variables_item)
 

@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -12,9 +7,7 @@ from attrs import field as _attrs_field
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
-    from ..models.cdashig_scenario_field_ref_version import (
-        CdashigScenarioFieldRefVersion,
-    )
+    from ..models.cdashig_scenario_field_ref_version import CdashigScenarioFieldRefVersion
     from ..models.root_cdashig_scenario_field_ref import RootCdashigScenarioFieldRef
 
 
@@ -57,9 +50,7 @@ class RootCdashigScenarioFieldLinks:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.cdashig_scenario_field_ref_version import (
-            CdashigScenarioFieldRefVersion,
-        )
+        from ..models.cdashig_scenario_field_ref_version import CdashigScenarioFieldRefVersion
         from ..models.root_cdashig_scenario_field_ref import RootCdashigScenarioFieldRef
 
         d = dict(src_dict)

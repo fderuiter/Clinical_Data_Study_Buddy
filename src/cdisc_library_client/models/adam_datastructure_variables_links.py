@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -72,9 +67,7 @@ class AdamDatastructureVariablesLinks:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.adam_datastructure_variables_ref import (
-            AdamDatastructureVariablesRef,
-        )
+        from ..models.adam_datastructure_variables_ref import AdamDatastructureVariablesRef
         from ..models.adam_product_ref import AdamProductRef
         from ..models.adam_variable_ref_element import AdamVariableRefElement
 
@@ -103,9 +96,7 @@ class AdamDatastructureVariablesLinks:
         analysis_variables = []
         _analysis_variables = d.pop("analysisVariables", UNSET)
         for analysis_variables_item_data in _analysis_variables or []:
-            analysis_variables_item = AdamVariableRefElement.from_dict(
-                analysis_variables_item_data
-            )
+            analysis_variables_item = AdamVariableRefElement.from_dict(analysis_variables_item_data)
 
             analysis_variables.append(analysis_variables_item)
 

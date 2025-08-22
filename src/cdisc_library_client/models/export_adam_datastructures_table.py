@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -52,9 +47,7 @@ class ExportAdamDatastructuresTable:
         datastructures = []
         _datastructures = d.pop("datastructures", UNSET)
         for datastructures_item_data in _datastructures or []:
-            datastructures_item = ExportAdamDatastructuresRow.from_dict(
-                datastructures_item_data
-            )
+            datastructures_item = ExportAdamDatastructuresRow.from_dict(datastructures_item_data)
 
             datastructures.append(datastructures_item)
 

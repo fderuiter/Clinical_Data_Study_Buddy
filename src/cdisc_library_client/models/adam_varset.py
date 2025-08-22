@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -101,9 +96,7 @@ class AdamVarset:
         analysis_variables = []
         _analysis_variables = d.pop("analysisVariables", UNSET)
         for analysis_variables_item_data in _analysis_variables or []:
-            analysis_variables_item = AdamVariable.from_dict(
-                analysis_variables_item_data
-            )
+            analysis_variables_item = AdamVariable.from_dict(analysis_variables_item_data)
 
             analysis_variables.append(analysis_variables_item)
 

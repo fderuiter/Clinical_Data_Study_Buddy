@@ -1,9 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -84,9 +80,7 @@ class ExportSdtmigVariablesRow:
         if type_ is not UNSET:
             field_dict["Type"] = type_
         if controlled_terms_codelist_or_format is not UNSET:
-            field_dict["Controlled Terms, Codelist or Format"] = (
-                controlled_terms_codelist_or_format
-            )
+            field_dict["Controlled Terms, Codelist or Format"] = controlled_terms_codelist_or_format
         if role is not UNSET:
             field_dict["Role"] = role
         if cdisc_notes is not UNSET:
@@ -113,9 +107,7 @@ class ExportSdtmigVariablesRow:
 
         type_ = d.pop("Type", UNSET)
 
-        controlled_terms_codelist_or_format = d.pop(
-            "Controlled Terms, Codelist or Format", UNSET
-        )
+        controlled_terms_codelist_or_format = d.pop("Controlled Terms, Codelist or Format", UNSET)
 
         role = d.pop("Role", UNSET)
 

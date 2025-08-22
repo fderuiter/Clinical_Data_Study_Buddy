@@ -12,6 +12,14 @@ init:
 clean:
 	rm -rf artefacts/ crf.json
 
+update-spec:
+	poetry run python scripts/download_spec.py
+
+generate-client:
+	poetry run python scripts/generate_client.py
+
+update-sdk: update-spec generate-client
+
 build-json:
 	poetry run scripts/build_canonical.py -o crf.json
 

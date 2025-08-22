@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -58,29 +53,21 @@ class ExportCdashTable:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.export_cdash_class_variables_row import (
-            ExportCdashClassVariablesRow,
-        )
-        from ..models.export_cdash_domain_variables_row import (
-            ExportCdashDomainVariablesRow,
-        )
+        from ..models.export_cdash_class_variables_row import ExportCdashClassVariablesRow
+        from ..models.export_cdash_domain_variables_row import ExportCdashDomainVariablesRow
 
         d = dict(src_dict)
         class_variables = []
         _class_variables = d.pop("class-variables", UNSET)
         for class_variables_item_data in _class_variables or []:
-            class_variables_item = ExportCdashClassVariablesRow.from_dict(
-                class_variables_item_data
-            )
+            class_variables_item = ExportCdashClassVariablesRow.from_dict(class_variables_item_data)
 
             class_variables.append(class_variables_item)
 
         domain_variables = []
         _domain_variables = d.pop("domain-variables", UNSET)
         for domain_variables_item_data in _domain_variables or []:
-            domain_variables_item = ExportCdashDomainVariablesRow.from_dict(
-                domain_variables_item_data
-            )
+            domain_variables_item = ExportCdashDomainVariablesRow.from_dict(domain_variables_item_data)
 
             domain_variables.append(domain_variables_item)
 
