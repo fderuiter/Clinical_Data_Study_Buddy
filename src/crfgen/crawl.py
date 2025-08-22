@@ -34,12 +34,13 @@ def harvest(token: str, ig_filter: Optional[str] = None) -> List[Form]:
     """Pull CDASH IG -> domains -> scenarios and convert to Form objects."""
     if isinstance(token, (bytes, bytearray)):
         token = token.decode()
-    root = _json(f"{BASE}/mdr/cdashig", token)
+    products = _json(f"{BASE}/mdr/products/DataCollection", token)
+    cdashig_links = products["_links"]["cdashig"]
     forms: list[Form] = []
-    for ver in root["_links"]["versions"]:
-        if ig_filter and ig_filter not in ver["title"]:
+    for ver_link in cdashig_links:
+        if ig_filter and ig_filter not in ver_link["title"]:
             continue
-        ig = _json(ver["href"], token)
+        ig = _json(ver_link["href"], token)
         for dom_link in ig["_links"]["domains"]:
             dom = _json(dom_link["href"], token)
             scenarios = dom["_links"].get("scenarios") or []
