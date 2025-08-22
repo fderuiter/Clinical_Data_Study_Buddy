@@ -1,10 +1,18 @@
 import requests
 
+
 class CDISCDataSetGeneratorClient:
     def __init__(self, base_url: str = "https://cdiscdataset.com/api"):
         self.base_url = base_url
 
-    def generate_dataset(self, dataset_type: str, domain: str, num_subjects: int, therapeutic_area: str, format: str):
+    def generate_dataset(
+        self,
+        dataset_type: str,
+        domain: str,
+        num_subjects: int,
+        therapeutic_area: str,
+        format: str,
+    ):
         """
         Generates a dataset using the cdiscdataset.com API.
         """

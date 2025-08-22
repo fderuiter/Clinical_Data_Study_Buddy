@@ -4,14 +4,28 @@ import os
 
 from src.cdisc_dataset_generator_client.client import CDISCDataSetGeneratorClient
 
+
 def main():
     parser = argparse.ArgumentParser(description="Generate synthetic CDISC datasets.")
-    parser.add_argument("--dataset-type", required=True, choices=["SDTM", "ADaM", "SEND"], help="Type of dataset to generate.")
+    parser.add_argument(
+        "--dataset-type",
+        required=True,
+        choices=["SDTM", "ADaM", "SEND"],
+        help="Type of dataset to generate.",
+    )
     parser.add_argument("--domain", required=True, help="Domain for the dataset.")
-    parser.add_argument("--num-subjects", type=int, default=50, help="Number of subjects.")
-    parser.add_argument("--therapeutic-area", default="Oncology", help="Therapeutic area.")
-    parser.add_argument("--format", default="csv", choices=["csv", "json", "xpt"], help="Output format.")
-    parser.add_argument("--output-dir", default=".", help="Directory to save the downloaded file.")
+    parser.add_argument(
+        "--num-subjects", type=int, default=50, help="Number of subjects."
+    )
+    parser.add_argument(
+        "--therapeutic-area", default="Oncology", help="Therapeutic area."
+    )
+    parser.add_argument(
+        "--format", default="csv", choices=["csv", "json", "xpt"], help="Output format."
+    )
+    parser.add_argument(
+        "--output-dir", default=".", help="Directory to save the downloaded file."
+    )
     args = parser.parse_args()
 
     client = CDISCDataSetGeneratorClient()
@@ -32,6 +46,7 @@ def main():
     print(f"Downloading dataset to {output_path}...")
     client.download_file(download_url, output_path)
     print("Dataset downloaded successfully.")
+
 
 if __name__ == "__main__":
     main()

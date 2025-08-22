@@ -1,10 +1,12 @@
 import os
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
 from scripts.generate_synthetic_data import main
 
+
 class TestGenerateSyntheticData(unittest.TestCase):
-    @patch('scripts.generate_synthetic_data.CDISCDataSetGeneratorClient')
+    @patch("scripts.generate_synthetic_data.CDISCDataSetGeneratorClient")
     def test_main(self, mock_client):
         # Mock the client's methods
         mock_instance = mock_client.return_value
@@ -15,7 +17,7 @@ class TestGenerateSyntheticData(unittest.TestCase):
             "domain": "DM",
             "num_subjects": 50,
             "therapeutic_area": "Oncology",
-            "format": "csv"
+            "format": "csv",
         }
         mock_instance.download_file.return_value = None
 
@@ -26,14 +28,20 @@ class TestGenerateSyntheticData(unittest.TestCase):
         # Call the main function with test arguments
         test_args = [
             "scripts/generate_synthetic_data.py",
-            "--dataset-type", "SDTM",
-            "--domain", "DM",
-            "--num-subjects", "50",
-            "--therapeutic-area", "Oncology",
-            "--format", "csv",
-            "--output-dir", output_dir,
+            "--dataset-type",
+            "SDTM",
+            "--domain",
+            "DM",
+            "--num-subjects",
+            "50",
+            "--therapeutic-area",
+            "Oncology",
+            "--format",
+            "csv",
+            "--output-dir",
+            output_dir,
         ]
-        with patch('sys.argv', test_args):
+        with patch("sys.argv", test_args):
             main()
 
         # Assert that the client's methods were called with the correct arguments
@@ -58,5 +66,6 @@ class TestGenerateSyntheticData(unittest.TestCase):
         os.remove(downloaded_file_path)
         os.rmdir(output_dir)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
