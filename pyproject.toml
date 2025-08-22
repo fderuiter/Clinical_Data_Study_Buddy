@@ -8,6 +8,7 @@ readme = "README.md"
 packages = [
     { from = "src", include = "cdisc_library_client" },
     { from = "src", include = "crfgen" },
+    { from = "src", include = "openfda_client" }
     { from = "src", include = "protogen" }
 ]
 
@@ -27,6 +28,7 @@ pypandoc = "^1.11"
 matplotlib = "^3.8.4"
 python-dotenv = "^1.1.1"
 pyyaml = "^6.0"
+tenacity = "^8.2.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"

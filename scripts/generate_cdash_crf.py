@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import argparse
 import os
 import pathlib
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List, Any
 import yaml
 
 import pandas as pd
@@ -43,6 +43,7 @@ from src.cdisc_library_client.api.cdash_implementation_guide_cdashig import (
     get_mdr_cdashig_version_domains_domain_fields,
 )
 from src.cdisc_library_client.client import AuthenticatedClient
+from crfgen.populators import populate_ae_from_fda
 from docx import Document
 from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -378,7 +379,7 @@ def _create_admin_section(document, full_title):
     secA_tbl.rows[2].cells[1].text = "__|__|____|____|    DD-MMM-YYYY"
 
 
-def _create_variables_table(document, section, domain_df, domain: str):
+def _create_variables_table(document, section, domain_df, domain: str, fda_adverse_events: List[Dict[str, Any]] = None):
     """Create Section B - Domain Variables."""
     document.add_paragraph()
     var_tbl = document.add_table(rows=1, cols=6, style="Table Grid")
@@ -484,6 +485,18 @@ def _create_variables_table(document, section, domain_df, domain: str):
         run.italic = True
         run.font.size = Pt(9)
 
+    if domain.upper() == "AE" and fda_adverse_events:
+        document.add_page_break()
+        document.add_heading("Suggested Adverse Event Terms from OpenFDA", level=2)
+        fda_tbl = document.add_table(rows=1, cols=1, style="Table Grid")
+        hdr_cell = fda_tbl.rows[0].cells[0]
+        hdr_cell.text = "Reaction Term"
+        _set_cell_shading(hdr_cell, "4F81BD")
+        _style_header_cell(hdr_cell)
+        for event in fda_adverse_events:
+            row_cells = fda_tbl.add_row().cells
+            row_cells[0].text = event["reaction_term"]
+
     if footnotes:
         document.add_heading("Footnotes", level=2)
         for text, num in footnotes.items():
@@ -504,7 +517,7 @@ def _create_variables_table(document, section, domain_df, domain: str):
 
 
 def build_domain_crf(
-    domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path, config: dict
+    domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path, config: dict, fda_adverse_events: List[Dict[str, Any]] = None
 ) -> None:
     """Build a Word document for a single CDASH *domain* and save it to disk."""
 
@@ -530,7 +543,7 @@ def build_domain_crf(
     _create_header(section, config, full_title)
     _create_footer(section, config, full_title)
     _create_admin_section(document, full_title)
-    _create_variables_table(document, section, domain_df, domain)
+    _create_variables_table(document, section, domain_df, domain, fda_adverse_events=fda_adverse_events)
 
     # ---------------------------------------------------------------------
     #  Save document
@@ -563,6 +576,12 @@ def main() -> None:
     parser.add_argument(
         "--config", default="crf_config.yaml", help="Path to the configuration file."
     )
+    parser.add_argument(
+        "--openfda-drug-name", help="Drug name to fetch adverse events from OpenFDA."
+    )
+    parser.add_argument(
+        "--openfda-max-results", type=int, default=20, help="Max adverse events to fetch from OpenFDA."
+    )
 
     args = parser.parse_args()
     out_dir = pathlib.Path(args.out)
@@ -576,6 +595,14 @@ def main() -> None:
     else:
         print(f"Warning: Config file not found at {config_path}. Using default values.")
 
+    fda_adverse_events = None
+    if args.openfda_drug_name:
+        print(f"Fetching adverse events for {args.openfda_drug_name} from OpenFDA...")
+        fda_adverse_events = populate_ae_from_fda(
+            args.openfda_drug_name, max_results=args.openfda_max_results
+        )
+        print(f"Found {len(fda_adverse_events)} suggested adverse event terms.")
+
     ig_df = load_ig(args.ig_version)
 
     target_domains = [d.upper() for d in (args.domains or ig_df["Domain"].unique())]
@@ -584,7 +611,7 @@ def main() -> None:
         if dom_df.empty:
             print(f"\u26a0 Domain {dom} not found in IG – skipped")
             continue
-        build_domain_crf(dom_df, dom, out_dir, config)
+        build_domain_crf(dom_df, dom, out_dir, config, fda_adverse_events=fda_adverse_events)
 
 
 if __name__ == "__main__":
