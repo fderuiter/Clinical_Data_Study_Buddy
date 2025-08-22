@@ -5,6 +5,7 @@ Authentication utilities.
 import os
 
 import httpx
+
 from cdisc_library_client.client import AuthenticatedClient
 
 DUMMY_VALUES = {"", "dummy-key", "***"}
