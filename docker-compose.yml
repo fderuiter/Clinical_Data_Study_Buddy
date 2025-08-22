@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount the entire project directory into the container
+      - .:/app
+      # You can add more specific volume mounts if needed, e.g., for persisting data
+      # - /path/on/host:/path/in/container
+    # Keep the container running in the background
+    command: tail -f /dev/null
