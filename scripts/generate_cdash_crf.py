@@ -199,26 +199,6 @@ def _style_header_cell(cell):
     run.bold = True
     run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
 
-def _add_checkbox(p):
-    """Add a checkbox to paragraph *p*."""
-    # The XML for a checkbox is complex and requires specific namespaces
-    # This is a simplified version based on online examples
-    checkbox_xml = """
-    <w:sdt xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-           xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml">
-      <w:sdtPr>
-        <w14:checkbox>
-          <w14:checked w14:val="0"/>
-        </w14:checkbox>
-      </w:sdtPr>
-      <w:sdtContent>
-        <w:r>
-          <w:sym w:font="Wingdings" w:char="F0FE"/>
-        </w:r>
-      </w:sdtContent>
-    </w:sdt>
-    """
-    p._p.append(parse_xml(checkbox_xml))
 
 ###############################################################################
 # Data I/O helpers
@@ -335,7 +315,7 @@ def build_domain_crf(
     hdr_row = secA_tbl.rows[0]
     hdr_cell = hdr_row.cells[0]
     hdr_cell.merge(hdr_row.cells[1])
-    hdr_cell.text = "SECTION A    ADMINISTRATIVE"
+    hdr_cell.text = "SECTION A  ADMINISTRATIVE"
     _set_cell_shading(hdr_cell, "8064A2")  # muted purple
     _style_header_cell(hdr_cell)
 
@@ -356,10 +336,10 @@ def build_domain_crf(
     #  SECTION B – DOMAIN VARIABLES
     # ---------------------------------------------------------------------
     document.add_paragraph()
-    var_tbl = document.add_table(rows=1, cols=7, style="Table Grid")
+    var_tbl = document.add_table(rows=1, cols=6, style="Table Grid")
     var_tbl.autofit = False
     total_width = section.page_width - section.left_margin - section.right_margin
-    col_width = int(total_width / 7)
+    col_width = int(total_width / 6)
     for col in var_tbl.columns:
         col.width = col_width
 
@@ -371,7 +351,6 @@ def build_domain_crf(
         "Controlled Terminology",
         "Data Entry",
         "Instructions",
-        "Required",
     ]
     for idx, title in enumerate(col_titles):
         hdr_cells[idx].text = title
@@ -450,15 +429,6 @@ def build_domain_crf(
             if i_ins < len(instructions) - 1:
                 instr_para.add_run("\n")
 
-        req_cell = cells[6]
-        req_text = row.get("CRF Instructions")
-        if isinstance(req_text, str) and any(
-            k in req_text.lower() for k in ["required", "mandatory"]
-        ):
-            req_cell.text = "Yes"
-        else:
-            req_cell.text = ""
-
         if idx % 3 == 0:
             for c in cells:
                 _add_bottom_border(c)
@@ -482,39 +452,10 @@ def build_domain_crf(
             row_ct[1].text = ct_text
 
     # ---------------------------------------------------------------------
-    #  SECTION A – ADMINISTRATIVE (static content)
-    # ---------------------------------------------------------------------
-    document.add_paragraph()
-    secA_tbl = document.add_table(rows=3, cols=2, style="Table Grid")
-    secA_tbl.autofit = False
-    secA_tbl.allow_autofit = False
-
-    hdr_row = secA_tbl.rows[0]
-    hdr_cell = hdr_row.cells[0]
-    hdr_cell.merge(hdr_row.cells[1])
-    hdr_cell.text = "SECTION\u00a0A\u00a0\u00a0ADMINISTRATIVE"
-    _set_cell_shading(hdr_cell, "8064A2")
-    _style_header_cell(hdr_cell)
-
-    secA_tbl.rows[1].cells[0].text = f"Was {full_title.lower()} completed?"
-    secA_tbl.rows[1].cells[
-        1
-    ].text = "○\u00a0No (Complete protocol deviation form)    ○\u00a0Yes"
-
-    secA_tbl.rows[2].cells[0].text = "Date of assessment:"
-    secA_tbl.rows[2].cells[1].text = "__|__|____|____|    DD‑MMM‑YYYY"
-
-    # ---------------------------------------------------------------------
-    #  Footnotes
-    # ---------------------------------------------------------------------
-    document.add_paragraph("Footnotes", style="Heading 2")
-    document.add_paragraph("[1] Placeholder footnote text.")
-    document.add_paragraph("Validate dependencies")
-
-    # ---------------------------------------------------------------------
     #  Save document
     # ---------------------------------------------------------------------
-    out_path = out_dir / f"{domain}_CRF.docx"
+    safe_title = full_title.replace(" / ", "_").replace(" ", "_")
+    out_path = out_dir / f"{domain}_{safe_title}_CRF.docx"
     document.save(out_path)
     print(f"\u2713 Saved {out_path.relative_to(out_dir.parent)}")
 
@@ -525,9 +466,7 @@ def build_domain_crf(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Generate Word CRFs from CDASH metadata workbooks."
-    )
+    parser = argparse.ArgumentParser(description="Generate Word CRF shells")
     parser.add_argument(
         "--model",
         required=True,

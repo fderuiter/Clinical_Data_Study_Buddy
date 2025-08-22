@@ -46,9 +46,10 @@ def test_generate(tmp_path):
     assert "Footnotes" in texts
     assert "[1]" in texts
 
-    admin = doc.tables[1].cell(0, 0).text.replace("\xa0", " ")
+    admin = doc.tables[0].cell(0, 0).text.replace("\xa0", " ")
     assert admin == "SECTION A  ADMINISTRATIVE"
     from zipfile import ZipFile
+
     with ZipFile(doc_path) as zf:
         xml = zf.read("word/document.xml").decode("utf-8")
         assert "w14:checkbox" in xml or "w14:date" in xml
@@ -60,4 +61,3 @@ def test_generate(tmp_path):
     # The variables table is the second one
     table = doc.tables[1]
     assert len(table.columns) == 6
-
