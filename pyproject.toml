@@ -19,7 +19,7 @@ requests = "^2.32"
 pandas = "^2.2"
 openpyxl = "^3.1"
 python-docx = "^1.1"
-odmlib = "^0.1"
+odmlib = {git = "https://github.com/swhume/odmlib.git", rev = "57b8ae069b1d6783cf73b8860b85dee6be0853ed"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
