@@ -19,9 +19,7 @@ def render_odm(forms: Sequence[Form], out_dir: Path):
     study = ODM.Study(OID="ST.CRFGEN")
     root.Study.append(study)
 
-    mdv = ODM.MetaDataVersion(
-        OID="MDV.1", Name="CRF Generation MetaDataVersion"
-    )
+    mdv = ODM.MetaDataVersion(OID="MDV.1", Name="CRF Generation MetaDataVersion")
     study.MetaDataVersion.append(mdv)
 
     for f in forms:
