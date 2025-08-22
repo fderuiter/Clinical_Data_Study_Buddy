@@ -21,7 +21,7 @@ def _json(client: AuthenticatedClient, url: str):
 
 def harvest(client: AuthenticatedClient, ig_filter: Optional[str] = None) -> List[Form]:
     """Pull CDASH IG -> domains -> scenarios and convert to Form objects."""
-    base_url = str(client.get_httpx_client().base_url)
+    base_url = str(client.get_httpx_client().base_url).rstrip("/")
     products = _json(client, f"{base_url}/mdr/products/DataCollection")
     cdashig_links = products["_links"]["cdashig"]
     forms: list[Form] = []

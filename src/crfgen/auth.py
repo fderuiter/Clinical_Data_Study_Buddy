@@ -10,7 +10,7 @@ from cdisc_library_client.client import AuthenticatedClient
 
 DUMMY_VALUES = {"", "dummy-key", "***"}
 BASE = "https://library.cdisc.org/api"
-ACCEPT = "application/vnd.cdisc+json"
+ACCEPT = "application/json"
 
 
 def get_api_key() -> str:
