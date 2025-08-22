@@ -7,7 +7,8 @@ license = "Apache-2.0"
 readme = "README.md"
 packages = [
     { from = "src", include = "cdisc_library_client" },
-    { from = "src", include = "crfgen" }
+    { from = "src", include = "crfgen" },
+    { from = "src", include = "protogen" }
 ]
 
 [tool.poetry.dependencies]
@@ -21,6 +22,7 @@ openpyxl = "^3.1"
 python-docx = "^1.1"
 odmlib = {git = "https://github.com/swhume/odmlib.git", rev = "57b8ae069b1d6783cf73b8860b85dee6be0853ed"}
 httpx = "^0.28.1"
+matplotlib = "^3.8.4"
 python-dotenv = "^1.1.1"
 pyyaml = "^6.0"
 
@@ -31,6 +33,7 @@ pytest = "^8.0"
 pytest-cov = "^6.2"
 pre-commit = "^4.0"
 isort = "^5.12.0"
+pytest-mock = "^3.12.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -39,3 +42,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.isort]
 profile = "black"
 skip = ["src/cdisc_library_client"]
+
+[tool.poetry.scripts]
+crfgen = "crfgen.crfgen:main"
