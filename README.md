@@ -308,3 +308,43 @@ python scripts/generate_sdrg.py \
     --config study_config.json \
     --out sdrg.docx
 ```
+
+## OpenFDA Integration
+
+This project includes features to integrate data from [open.fda.gov](https://open.fda.gov/) to enrich the generated CRFs.
+
+### Populating CRFs with Adverse Event Data
+
+You can automatically populate the Adverse Events (AE) CRF with suggested terms for a specific drug. The `generate_cdash_crf.py` script has a new option to support this:
+
+```bash
+python scripts/generate_cdash_crf.py \
+    --ig-version v2.3 \
+    --domains AE \
+    --openfda-drug-name "Aspirin" \
+    --openfda-max-results 50
+```
+
+This will fetch the top 50 most frequently reported adverse events for Aspirin from OpenFDA and add them to a separate table in the generated `AE_Adverse_Events_CRF.docx` document, providing a useful reference for common adverse events.
+
+### Standalone OpenFDA Script
+
+For more advanced queries, you can use the standalone `populate_crf_from_fda.py` script. This script allows you to fetch adverse events or drug labeling information and output it in various formats.
+
+**Examples:**
+
+Fetch adverse events for a drug and save as JSON:
+```bash
+python scripts/populate_crf_from_fda.py \
+    --drug-name "Ibuprofen" \
+    --domain AE \
+    --max-results 100 \
+    --output-format json > ibuprofen_aes.json
+```
+
+Fetch drug label information for a drug:
+```bash
+python scripts/populate_crf_from_fda.py \
+    --drug-name "Tylenol" \
+    --domain LABEL
+```
