@@ -1,7 +1,7 @@
 import pytest
 
-from crfgen.auth import get_api_key
-from crfgen.crawl import harvest
+from crfgen.utils import get_api_key
+from cdisc_library_client.harvest import harvest
 
 try:
     token = get_api_key()
