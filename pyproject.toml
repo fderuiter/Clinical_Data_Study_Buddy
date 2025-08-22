@@ -21,6 +21,7 @@ openpyxl = "^3.1"
 python-docx = "^1.1"
 odmlib = {git = "https://github.com/swhume/odmlib.git", rev = "57b8ae069b1d6783cf73b8860b85dee6be0853ed"}
 httpx = "^0.28.1"
+python-dotenv = "^1.1.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"

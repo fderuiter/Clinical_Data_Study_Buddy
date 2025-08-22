@@ -29,6 +29,15 @@ build-all:
 test:
 	poetry run pytest
 
+generate-spec:
+	poetry run python scripts/generate_spec_template.py
+
+generate-dataset:
+	poetry run python scripts/generate_dataset_from_spec.py
+
+validate-dataset:
+	poetry run python scripts/validate_dataset.py
+
 fmt:
 	poetry run black .
 	poetry run ruff check . --fix
