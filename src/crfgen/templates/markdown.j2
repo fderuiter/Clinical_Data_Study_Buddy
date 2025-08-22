@@ -1,0 +1,7 @@
+# {{ form.title }}{% if form.scenario %} ({{ form.scenario }}){% endif %}
+
+| OID | Prompt | Datatype | Codelist |
+|-----|--------|----------|----------|
+{% for fld in form.fields -%}
+| `{{ fld.oid }}` | {{ fld.prompt|replace('|','\\|') }} | {{ fld.datatype }} | {% if fld.codelist %}{{ fld.codelist.nci_code }}{% endif %} |
+{% endfor %}

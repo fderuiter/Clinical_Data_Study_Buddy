@@ -1,16 +1,17 @@
 from pathlib import Path
 from typing import Sequence
 
-from crfgen.schema import Form
+from jinja2 import Environment, FileSystemLoader
 
+from ..schema import Form
 from .registry import register
+
+env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
 
 
 @register("tex")
-def export_latex(forms: Sequence[Form], outdir: Path) -> None:
-    for form in forms:
-        path = outdir / f"{form.domain}.tex"
-        with path.open("w") as fh:
-            fh.write(f"\\section{{{form.title}}}\n")
-            for fld in form.fields:
-                fh.write(f"\\item {fld.prompt} ({fld.oid})\n")
+def render_tex(forms: Sequence[Form], out_dir: Path):
+    out_dir.mkdir(exist_ok=True, parents=True)
+    tpl = env.get_template("latex.j2")
+    for f in forms:
+        (out_dir / f"{f.domain}.tex").write_text(tpl.render(form=f))
