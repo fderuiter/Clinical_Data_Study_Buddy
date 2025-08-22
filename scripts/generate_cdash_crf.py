@@ -147,6 +147,27 @@ def _style_header_cell(cell):
     run.bold = True
     run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
 
+def _add_checkbox(p):
+    """Add a checkbox to paragraph *p*."""
+    # The XML for a checkbox is complex and requires specific namespaces
+    # This is a simplified version based on online examples
+    checkbox_xml = """
+    <w:sdt xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+           xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml">
+      <w:sdtPr>
+        <w14:checkbox>
+          <w14:checked w14:val="0"/>
+        </w14:checkbox>
+      </w:sdtPr>
+      <w:sdtContent>
+        <w:r>
+          <w:sym w:font="Wingdings" w:char="F0FE"/>
+        </w:r>
+      </w:sdtContent>
+    </w:sdt>
+    """
+    p._p.append(parse_xml(checkbox_xml))
+
 ###############################################################################
 # Data I/O helpers
 ###############################################################################
@@ -263,7 +284,12 @@ def build_domain_crf(domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
 
     # Row 1 – Question completed?
     secA_tbl.rows[1].cells[0].text = f"Was {full_title.lower()} completed?"
-    secA_tbl.rows[1].cells[1].text = "○ No (Complete protocol deviation form)    ○ Yes"
+    # Add checkboxes for Yes/No
+    p = secA_tbl.rows[1].cells[1].paragraphs[0]
+    _add_checkbox(p)
+    p.add_run(" No (Complete protocol deviation form)    ")
+    _add_checkbox(p)
+    p.add_run(" Yes")
 
     # Row 2 – Date of assessment
     secA_tbl.rows[2].cells[0].text = "Date of assessment:"
@@ -333,6 +359,13 @@ def build_domain_crf(domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
             run.italic = True
             if idx < len(instructions) - 1:
                 instr_para.add_run("\n")
+
+    # ---------------------------------------------------------------------
+    #  Footnotes
+    # ---------------------------------------------------------------------
+    document.add_paragraph("Footnotes", style="Heading 2")
+    document.add_paragraph("[1] Placeholder footnote text.")
+    document.add_paragraph("Validate dependencies")
 
     # ---------------------------------------------------------------------
     #  Save document
