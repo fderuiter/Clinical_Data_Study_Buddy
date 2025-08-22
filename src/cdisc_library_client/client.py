@@ -238,7 +238,7 @@ class AuthenticatedClient:
                 else self.token
             )
             auth_val = f"{self.prefix} {token}" if self.prefix else token
-            self._headers[self.auth_header_name] = str(auth_val)
+            self._headers[self.auth_header_name] = auth_val
             hdrs = normalize_headers(self._headers)
             self._client = httpx.Client(
                 base_url=self._base_url,
@@ -279,7 +279,7 @@ class AuthenticatedClient:
                 else self.token
             )
             auth_val = f"{self.prefix} {token}" if self.prefix else token
-            self._headers[self.auth_header_name] = str(auth_val)
+            self._headers[self.auth_header_name] = auth_val
             hdrs = normalize_headers(self._headers)
             self._async_client = httpx.AsyncClient(
                 base_url=self._base_url,

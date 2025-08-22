@@ -14,8 +14,6 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from cdisc_library_client.utils import normalize_headers
-
 CACHE_DIR = pathlib.Path(".cache")
 CACHE_DIR.mkdir(exist_ok=True)
 
@@ -32,11 +30,8 @@ def cached_get(url: str, headers: dict[str, str], ttl_days: int = 30) -> Any:
     if fname.exists() and (time.time() - fname.stat().st_mtime) < ttl_days * 86400:
         return json.loads(fname.read_text())
 
-    # normalize header values to strings (``requests`` forbids ``bytes``)
-    str_headers = normalize_headers(headers)
-
     sess = _retry_session()
-    r = sess.get(url, headers=str_headers, timeout=30)
+    r = sess.get(url, headers=headers, timeout=30)
     r.raise_for_status()
     fname.write_text(r.text)
     return r.json()
