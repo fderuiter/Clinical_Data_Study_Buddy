@@ -37,8 +37,27 @@ def test_generate(tmp_path):
     from docx import Document
 
     doc = Document(doc_path)
+    # The first table is the administrative section (2 cols)
+    # The second table is the variables section (6 cols)
+    table = doc.tables[1]
+    assert len(table.columns) == 6
+
+    texts = "\n".join(p.text for p in doc.paragraphs)
+    assert "Footnotes" in texts
+    assert "[1]" in texts
+
+    admin = doc.tables[1].cell(0, 0).text.replace("\xa0", " ")
+    assert admin == "SECTION A  ADMINISTRATIVE"
+    from zipfile import ZipFile
+    with ZipFile(doc_path) as zf:
+        xml = zf.read("word/document.xml").decode("utf-8")
+        assert "w14:checkbox" in xml or "w14:date" in xml
+        assert "Validate dependencies" in xml
+        assert xml.count("<w:bottom") > 0
+
     # There are two tables in the document, one for admin and one for variables
     assert len(doc.tables) == 2
     # The variables table is the second one
     table = doc.tables[1]
     assert len(table.columns) == 6
+
