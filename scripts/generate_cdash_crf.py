@@ -199,6 +199,26 @@ def _style_header_cell(cell):
     run.bold = True
     run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
 
+def _add_checkbox(p):
+    """Add a checkbox to paragraph *p*."""
+    # The XML for a checkbox is complex and requires specific namespaces
+    # This is a simplified version based on online examples
+    checkbox_xml = """
+    <w:sdt xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+           xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml">
+      <w:sdtPr>
+        <w14:checkbox>
+          <w14:checked w14:val="0"/>
+        </w14:checkbox>
+      </w:sdtPr>
+      <w:sdtContent>
+        <w:r>
+          <w:sym w:font="Wingdings" w:char="F0FE"/>
+        </w:r>
+      </w:sdtContent>
+    </w:sdt>
+    """
+    p._p.append(parse_xml(checkbox_xml))
 
 ###############################################################################
 # Data I/O helpers
@@ -302,6 +322,35 @@ def build_domain_crf(
     _add_page_field(f_right)
     f_right.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     f_right.runs[0].font.color.rgb = RGBColor(0x80, 0x80, 0x80)
+
+    # ---------------------------------------------------------------------
+    #  SECTION A – ADMINISTRATIVE (static content)
+    # ---------------------------------------------------------------------
+    document.add_paragraph()
+    secA_tbl = document.add_table(rows=3, cols=2, style="Table Grid")
+    secA_tbl.autofit = False
+    secA_tbl.allow_autofit = False
+
+    # Header row (spanning two columns)
+    hdr_row = secA_tbl.rows[0]
+    hdr_cell = hdr_row.cells[0]
+    hdr_cell.merge(hdr_row.cells[1])
+    hdr_cell.text = "SECTION A    ADMINISTRATIVE"
+    _set_cell_shading(hdr_cell, "8064A2")  # muted purple
+    _style_header_cell(hdr_cell)
+
+    # Row 1 – Question completed?
+    secA_tbl.rows[1].cells[0].text = f"Was {full_title.lower()} completed?"
+    # Add checkboxes for Yes/No
+    p = secA_tbl.rows[1].cells[1].paragraphs[0]
+    _add_checkbox(p)
+    p.add_run(" No (Complete protocol deviation form)    ")
+    _add_checkbox(p)
+    p.add_run(" Yes")
+
+    # Row 2 – Date of assessment
+    secA_tbl.rows[2].cells[0].text = "Date of assessment:"
+    secA_tbl.rows[2].cells[1].text = "__|__|____|____|    DD‑MMM‑YYYY"
 
     # ---------------------------------------------------------------------
     #  SECTION B – DOMAIN VARIABLES
@@ -454,6 +503,13 @@ def build_domain_crf(
 
     secA_tbl.rows[2].cells[0].text = "Date of assessment:"
     secA_tbl.rows[2].cells[1].text = "__|__|____|____|    DD‑MMM‑YYYY"
+
+    # ---------------------------------------------------------------------
+    #  Footnotes
+    # ---------------------------------------------------------------------
+    document.add_paragraph("Footnotes", style="Heading 2")
+    document.add_paragraph("[1] Placeholder footnote text.")
+    document.add_paragraph("Validate dependencies")
 
     # ---------------------------------------------------------------------
     #  Save document

@@ -1,16 +1,20 @@
 from pathlib import Path
 from typing import Sequence
 
-from crfgen.schema import Form
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from ..schema import Form
 from .registry import register
+
+env = Environment(
+    loader=FileSystemLoader(Path(__file__).parent.parent / "templates"),
+    autoescape=select_autoescape(),
+)
 
 
 @register("md")
-def export_markdown(forms: Sequence[Form], outdir: Path) -> None:
-    for form in forms:
-        path = outdir / f"{form.domain}.md"
-        with path.open("w") as fh:
-            fh.write(f"# {form.title}\n")
-            for fld in form.fields:
-                fh.write(f"- {fld.prompt} ({fld.oid})\n")
+def render_md(forms: Sequence[Form], out_dir: Path):
+    tpl = env.get_template("markdown.j2")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for f in forms:
+        (out_dir / f"{f.domain}.md").write_text(tpl.render(form=f))
