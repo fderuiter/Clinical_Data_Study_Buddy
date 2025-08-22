@@ -8,8 +8,8 @@ from . import __version__
 from .exporter.registry import get as get_exporter
 from cdisc_library_client.harvest import harvest
 from protogen.protocol import StudyProtocol, generate_protocol_markdown
-from src.tfl_models import TFLSpec
-from src.tfl_migration import migrate_spec, TFLSpecMigrationError
+from src.tfl.models import TFLSpec
+from src.tfl.migration import migrate_spec, TFLSpecMigrationError
 
 
 console = Console()
