@@ -29,13 +29,3 @@ def field_from_api(f: Any) -> FieldDef:
         cdash_var=_get(f, "cdash_variable"),
         codelist=cl,
     )
-
-
-def form_from_api(payload: Any) -> Form:
-    fields_data = _get(payload, "fields") or []
-    return Form(
-        title=_get(payload, "title"),
-        domain=_get(payload, "domain"),
-        scenario=_get(payload, "scenario"),
-        fields=[field_from_api(f) for f in fields_data],
-    )
