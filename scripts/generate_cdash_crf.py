@@ -35,6 +35,7 @@ import argparse
 import os
 import pathlib
 from typing import Dict, Tuple
+import yaml
 
 import pandas as pd
 from src.cdisc_library_client.api.cdash_implementation_guide_cdashig import (
@@ -102,6 +103,9 @@ DOMAIN_INFO: Dict[str, Tuple[str, str]] = {
     "CO": ("Special Purpose", "Comments"),
     "DM": ("Special Purpose", "Demographics"),
 }
+
+
+REPEATING_DOMAINS = {"AE", "CE", "CM", "DS", "DV", "HO", "MH", "SA"}
 
 
 def get_domain_info(domain: str) -> Tuple[str, str]:
@@ -299,32 +303,9 @@ def load_ig(ig_version: str) -> pd.DataFrame:
 ###############################################################################
 
 
-def build_domain_crf(
-    domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path
-) -> None:
-    """Build a Word document for a single CDASH *domain* and save it to disk."""
-
-    category, full_title = get_domain_info(domain)
-
-    # ---------------------------------------------------------------------
-    #  Document meta & base formatting
-    # ---------------------------------------------------------------------
-    document = Document()
-
-    section = document.sections[0]
-    section.orientation = WD_ORIENT.LANDSCAPE
-    section.page_width, section.page_height = section.page_height, section.page_width
-
-    # Uniform font for entire document
-    style = document.styles["Normal"]
-    style.font.name = "Arial"
-    style.font.size = Pt(10)
-
-    # ---------------------------------------------------------------------
-    #  Page header (dark band with white text)
-    # ---------------------------------------------------------------------
+def _create_header(section, config, full_title):
+    """Create the page header."""
     header = section.header
-
     hdr_tbl = header.add_table(rows=2, cols=2, width=section.page_width)
     hdr_tbl.alignment = WD_ALIGN_PARAGRAPH.LEFT
     hdr_tbl.autofit = False
@@ -333,10 +314,11 @@ def build_domain_crf(
     sponsor_cell, title_cell = hdr_tbl.rows[0].cells
     meta_cell_L, meta_cell_R = hdr_tbl.rows[1].cells
 
-    # Row‑0: sponsor block & CRF title block
-    sponsor_cell.text = "Sponsor Study Name"
+    # Row-0: sponsor block & CRF title block
+    sponsor_cell.text = config.get("study_metadata", {}).get(
+        "sponsor_name", "Sponsor Study Name"
+    )
     title_cell.text = full_title
-
     sponsor_cell.width = title_cell.width = section.page_width / 2
 
     for c in (sponsor_cell, title_cell):
@@ -347,19 +329,20 @@ def build_domain_crf(
     title_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     title_para.runs[0].font.size = Pt(14)
 
-    # Row‑1: Subject meta‑data placeholders
-    meta_cell_L.text = "Subject ID: _____‑___‑___    SITE #: ___"
+    # Row-1: Subject meta-data placeholders
+    protocol_id = config.get("study_metadata", {}).get("protocol_id", "_____‑___‑___")
+    meta_cell_L.text = f"Subject ID: {protocol_id}    SITE #: ___"
     meta_cell_R.text = "Initials: ___ ___ ___"
     for c in (meta_cell_L, meta_cell_R):
         _set_cell_shading(c, "3F3F3F")
         _style_header_cell(c)
 
-    # ---------------------------------------------------------------------
-    #  Footer (version label at left, page # at right)
-    # ---------------------------------------------------------------------
-    footer = section.footer
 
-    f_left = footer.add_paragraph(f"{full_title}, Version 1.0 DRAFT")
+def _create_footer(section, config, full_title):
+    """Create the page footer."""
+    footer = section.footer
+    version_label = config.get("version_label", "Version 1.0 DRAFT")
+    f_left = footer.add_paragraph(f"{full_title}, {version_label}")
     f_left.alignment = WD_ALIGN_PARAGRAPH.LEFT
     f_left.runs[0].font.color.rgb = RGBColor(0x80, 0x80, 0x80)
 
@@ -369,38 +352,34 @@ def build_domain_crf(
     f_right.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     f_right.runs[0].font.color.rgb = RGBColor(0x80, 0x80, 0x80)
 
-    # ---------------------------------------------------------------------
-    #  SECTION A – ADMINISTRATIVE (static content)
-    # ---------------------------------------------------------------------
+
+def _create_admin_section(document, full_title):
+    """Create Section A - Administrative."""
     document.add_paragraph()
     secA_tbl = document.add_table(rows=3, cols=2, style="Table Grid")
     secA_tbl.autofit = False
     secA_tbl.allow_autofit = False
 
-    # Header row (spanning two columns)
     hdr_row = secA_tbl.rows[0]
     hdr_cell = hdr_row.cells[0]
     hdr_cell.merge(hdr_row.cells[1])
-    hdr_cell.text = "SECTION A  ADMINISTRATIVE"
+    hdr_cell.text = "SECTION A  ADMINISTRATIVE"
     _set_cell_shading(hdr_cell, "8064A2")  # muted purple
     _style_header_cell(hdr_cell)
 
-    # Row 1 – Question completed?
     secA_tbl.rows[1].cells[0].text = f"Was {full_title.lower()} completed?"
-    # Add checkboxes for Yes/No
     p = secA_tbl.rows[1].cells[1].paragraphs[0]
     _add_checkbox(p)
     p.add_run(" No (Complete protocol deviation form)    ")
     _add_checkbox(p)
     p.add_run(" Yes")
 
-    # Row 2 – Date of assessment
     secA_tbl.rows[2].cells[0].text = "Date of assessment:"
-    secA_tbl.rows[2].cells[1].text = "__|__|____|____|    DD‑MMM‑YYYY"
+    secA_tbl.rows[2].cells[1].text = "__|__|____|____|    DD-MMM-YYYY"
 
-    # ---------------------------------------------------------------------
-    #  SECTION B – DOMAIN VARIABLES
-    # ---------------------------------------------------------------------
+
+def _create_variables_table(document, section, domain_df, domain: str):
+    """Create Section B - Domain Variables."""
     document.add_paragraph()
     var_tbl = document.add_table(rows=1, cols=6, style="Table Grid")
     var_tbl.autofit = False
@@ -411,12 +390,8 @@ def build_domain_crf(
 
     hdr_cells = var_tbl.rows[0].cells
     col_titles = [
-        "Variable",
-        "Label / Question",
-        "Type",
-        "Controlled Terminology",
-        "Data Entry",
-        "Instructions",
+        "Variable", "Label / Question", "Type",
+        "Controlled Terminology", "Data Entry", "Instructions",
     ]
     for idx, title in enumerate(col_titles):
         hdr_cells[idx].text = title
@@ -484,7 +459,7 @@ def build_domain_crf(
             if any(t in impl_note.lower() for t in ["if ", "derive", "origin"]):
                 instructions.append("Validate dependencies across domains")
 
-        # Auto‑detect date fields and add a formatting hint
+        # Auto-detect date fields and add a formatting hint
         if "date" in label_lower or var_upper.endswith(("DT", "DAT")):
             instructions.append("Format: dd/mm/yyyy")
 
@@ -498,6 +473,16 @@ def build_domain_crf(
         if idx % 3 == 0:
             for c in cells:
                 _add_bottom_border(c)
+
+    if domain.upper() in REPEATING_DOMAINS:
+        instruction_row = var_tbl.add_row()
+        instruction_cell = instruction_row.cells[0]
+        instruction_cell.merge(instruction_row.cells[-1])
+        p = instruction_cell.paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run("Right-click -> Insert -> Insert Rows Below to add more entries.")
+        run.italic = True
+        run.font.size = Pt(9)
 
     if footnotes:
         document.add_heading("Footnotes", level=2)
@@ -516,6 +501,36 @@ def build_domain_crf(
             row_ct = legend.add_row().cells
             row_ct[0].text = f"\u2020{idx_ct}"
             row_ct[1].text = ct_text
+
+
+def build_domain_crf(
+    domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path, config: dict
+) -> None:
+    """Build a Word document for a single CDASH *domain* and save it to disk."""
+
+    category, full_title = get_domain_info(domain)
+
+    # ---------------------------------------------------------------------
+    #  Document meta & base formatting
+    # ---------------------------------------------------------------------
+    document = Document()
+
+    section = document.sections[0]
+    section.orientation = WD_ORIENT.LANDSCAPE
+    section.page_width, section.page_height = section.page_height, section.page_width
+
+    # Uniform font for entire document
+    style = document.styles["Normal"]
+    style.font.name = "Arial"
+    style.font.size = Pt(10)
+
+    # ---------------------------------------------------------------------
+    #  Create document components
+    # ---------------------------------------------------------------------
+    _create_header(section, config, full_title)
+    _create_footer(section, config, full_title)
+    _create_admin_section(document, full_title)
+    _create_variables_table(document, section, domain_df, domain)
 
     # ---------------------------------------------------------------------
     #  Save document
@@ -545,10 +560,21 @@ def main() -> None:
         metavar="DOMAIN",
         help="Optional domain whitelist (e.g. AE CM VS)",
     )
+    parser.add_argument(
+        "--config", default="crf_config.yaml", help="Path to the configuration file."
+    )
 
     args = parser.parse_args()
     out_dir = pathlib.Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    config = {}
+    config_path = pathlib.Path(args.config)
+    if config_path.exists():
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
+    else:
+        print(f"Warning: Config file not found at {config_path}. Using default values.")
 
     ig_df = load_ig(args.ig_version)
 
@@ -558,7 +584,7 @@ def main() -> None:
         if dom_df.empty:
             print(f"\u26a0 Domain {dom} not found in IG – skipped")
             continue
-        build_domain_crf(dom_df, dom, out_dir)
+        build_domain_crf(dom_df, dom, out_dir, config)
 
 
 if __name__ == "__main__":
