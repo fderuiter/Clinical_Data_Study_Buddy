@@ -1,9 +1,12 @@
 import click
 from rich.console import Console
+import os
 
 from . import __version__
-from .exporter.registry import get_exporter
+from .exporter.registry import get as get_exporter
 from cdisc_library_client.harvest import harvest
+from protogen.protocol import StudyProtocol, generate_protocol_markdown
+
 
 console = Console()
 
@@ -80,6 +83,35 @@ def generate(
     else:
         console.log("No exporter found, skipping exporting.")
 
+@app.command()
+@click.option("--therapeutic-area", required=True, help="Therapeutic area of the study.")
+@click.option("--treatment-arm", multiple=True, help="A treatment arm of the study. Can be specified multiple times.")
+@click.option("--duration-weeks", required=True, type=int, help="Duration of the study in weeks.")
+@click.option("--phase", required=True, type=int, help="Phase of the study.")
+@click.option("--output-dir", default="output", help="Output directory for the protocol documents.")
+def protocol(therapeutic_area: str, treatment_arm: list[str], duration_weeks: int, phase: int, output_dir: str):
+    """
+    Generate a study protocol document.
+    """
+    console.log(f"Generating study protocol in {output_dir}...")
+    os.makedirs(output_dir, exist_ok=True)
+
+    protocol_data = {
+        "therapeutic_area": therapeutic_area,
+        "treatment_arms": treatment_arm,
+        "duration_weeks": duration_weeks,
+        "phase": phase,
+    }
+
+    study_protocol = StudyProtocol(**protocol_data)
+
+    output_path = generate_protocol_markdown(study_protocol, output_dir)
+
+    console.log(f"Protocol document generated at {output_path}")
+
 
 def main():
     app()
+
+if __name__ == "__main__":
+    main()
