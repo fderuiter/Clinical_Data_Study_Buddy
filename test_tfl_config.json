@@ -1,0 +1,25 @@
+{
+    "tfls": [
+        {
+            "type": "table",
+            "id": "table-01",
+            "title": "Test Table",
+            "domain": "DM",
+            "style": {
+                "font": {
+                    "name": "Times New Roman",
+                    "size": 12
+                }
+            }
+        }
+    ],
+    "output_dir": "test_artefacts",
+    "output_formats": ["docx", "pdf", "rtf"],
+    "data_path": "test_data",
+    "style": {
+        "font": {
+            "name": "Arial",
+            "size": 10
+        }
+    }
+}
