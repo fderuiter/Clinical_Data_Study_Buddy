@@ -91,10 +91,13 @@ poetry install
 echo "Dependencies installed successfully."
 
 echo "Installing pre-commit hooks..."
-# Unset core.hooksPath to allow pre-commit to install hooks
-git config --global --unset-all core.hooksPath
-poetry run pre-commit install
-
-echo "Pre-commit hooks installed successfully."
+if [ -z "$CI" ]; then
+    # Unset core.hooksPath to allow pre-commit to install hooks
+    git config --global --unset-all core.hooksPath
+    poetry run pre-commit install
+    echo "Pre-commit hooks installed successfully."
+else
+    echo "Skipping pre-commit hook installation in CI environment."
+fi
 
 echo "Setup complete. The development environment is ready."
