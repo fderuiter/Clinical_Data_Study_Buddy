@@ -92,7 +92,7 @@ echo "Dependencies installed successfully."
 
 echo "Installing pre-commit hooks..."
 # Unset core.hooksPath to allow pre-commit to install hooks
-git config --unset-all core.hooksPath
+git config --global --unset-all core.hooksPath
 poetry run pre-commit install
 
 echo "Pre-commit hooks installed successfully."
