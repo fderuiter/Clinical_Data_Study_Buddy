@@ -9,7 +9,7 @@ def test_help():
         text=True,
     )
     assert result.returncode == 0, result.stderr
-    assert "Generate Word CRFs from CDASH metadata workbooks." in result.stdout
+    assert "Generate Word CRF shells" in result.stdout
 
 
 def test_generate(tmp_path):
@@ -35,7 +35,6 @@ def test_generate(tmp_path):
     assert doc_path.exists()
 
     from docx import Document
-    from zipfile import ZipFile
 
     doc = Document(doc_path)
     # The first table is the administrative section (2 cols)
@@ -55,3 +54,10 @@ def test_generate(tmp_path):
         assert "w14:checkbox" in xml or "w14:date" in xml
         assert "Validate dependencies" in xml
         assert xml.count("<w:bottom") > 0
+
+    # There are two tables in the document, one for admin and one for variables
+    assert len(doc.tables) == 2
+    # The variables table is the second one
+    table = doc.tables[1]
+    assert len(table.columns) == 6
+
