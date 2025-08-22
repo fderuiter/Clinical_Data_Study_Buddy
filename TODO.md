@@ -1988,3 +1988,95 @@ Push the change and verify the badges display correctly.
 
 Once every box is ticked, your **14-phase build** is fully done! 🎉
 
+## Phase 15 – Feature Expansion (inspired by cdiscdataset.com)
+
+*This section outlines potential future features for the generator, expanding its scope from CRF generation to a more comprehensive clinical data generation tool. The generated data is synthetic, intended for testing and educational purposes, and not for regulatory submission.*
+
+---
+
+### **15.1 Dataset Generation (UI)**
+
+*   [ ] **Implement Core Dataset Generator:**
+    *   [ ] Generate synthetic, CDISC-compliant datasets for **SDTM**, **ADaM**, and **SEND**.
+    *   [ ] **(Enhancement)** Implement advanced cross-domain logic for greater data realism (e.g., linking AEs to MH or CM).
+    *   [ ] **(Enhancement)** Add a "learn from example" mode to generate statistically similar data from a user-provided template dataset.
+    *   [ ] **(Enhancement)** Add an "imperfect data" simulation mode to intentionally introduce realistic errors for testing validation scripts.
+
+*   [ ] **UI for Dataset Generation:**
+    *   [ ] Allow selection of dataset type: SDTM, ADaM, SEND.
+    *   [ ] Allow selection of a specific domain from a list of standard domains (e.g., SDTM: DM, AE, LB, VS; ADaM: ADSL, ADAE, ADLB, ADVS, ADTTE; SEND: TS, DM, LB, MI, MA, OM).
+    *   [ ] Allow selection of therapeutic area, with condition/terminology presets.
+    *   [ ] Allow specification of number of subjects and treatment arms.
+    *   [ ] Allow selection of output format.
+    *   [ ] **(Enhancement)** Add a "live preview" panel to show a sample of data as parameters are adjusted.
+    *   [ ] **(Enhancement)** Allow users to save and load generation settings as named "presets" or "profiles".
+    *   [ ] **(Enhancement)** Add an "advanced" UI mode for granular control over variable distributions and correlations.
+
+*   [ ] **Supported Output Formats:**
+    *   [ ] CSV.
+    *   [ ] SAS Program (`.sas`).
+    *   [ ] SAS Transport File (`.xpt`).
+    *   [ ] *Future consideration:* CDISC JSON (currently disabled on reference site).
+    *   [ ] **(Enhancement)** Add support for efficient formats like **Apache Parquet**.
+    *   [ ] **(Enhancement)** Add support for generating data directly into a database (e.g., **PostgreSQL**, **SQLite**).
+
+---
+
+### **15.2 Document & Template Generators**
+
+*   [ ] **Generate EDC Raw Dataset Package:**
+    *   [ ] Generate a ZIP file with multiple raw EDC datasets.
+    *   [ ] Use consistent subjects across all selected domains.
+    *   [ ] Allow user to set number of subjects (e.g., 10-200), therapeutic area, and which datasets to include.
+    *   [ ] **(Enhancement)** Allow users to select a "study story" to generate data reflecting specific scenarios (e.g., high dropout rate).
+    *   [ ] **(Enhancement)** Include a draft `define.xml` file in the generated package.
+
+*   [ ] **Generate SAS Reference Code:**
+    *   [ ] Produce reference SAS code for generating analysis outputs.
+    *   [ ] Allow user to choose source dataset (SDTM/ADaM options), output type, and treatment variable (e.g., TRT01A, TRT01P, ARM, ACTARM, or custom).
+    *   [ ] Support RTF output format.
+    *   [ ] **(Enhancement)** Add support for generating equivalent code in **R** (using `tidyverse`).
+    *   [ ] **(Enhancement)** Generate a complete program including data import, manipulation, analysis, and output steps.
+
+*   [ ] **Generate Blank CRFs:**
+    *   [ ] Generate blank Case Report Forms for SDTM annotation practice.
+    *   [ ] **(Enhancement)** Generate interactive, web-based (HTML) CRFs for a more realistic data entry simulation.
+    *   [ ] **(Enhancement)** *[Advanced]* Attempt to auto-generate draft CRFs by parsing a user-uploaded study protocol.
+
+*   [ ] **Generate TFL Shells:**
+    *   [ ] Generate Tables, Figures, and Listings mock shell documents.
+    *   [ ] Support download in PDF or RTF format.
+    *   [ ] **(Enhancement)** Add an option to populate the TFLs with the generated synthetic data.
+    *   [ ] **(Enhancement)** Allow customization of TFL style and branding (e.g., logos, colors).
+
+*   [ ] **Generate Specification Templates:**
+    *   [ ] Generate Excel-based specification templates for SDTM and ADaM.
+    *   [ ] **(Enhancement)** Create a two-way system: generate a dataset from a spec, and validate a dataset against a spec.
+
+*   [ ] **Generate Study Protocols:**
+    *   [ ] Generate study protocol documents (Phase 1-4 or custom).
+    *   [ ] For custom protocols, take inputs for therapeutic area, treatment arms, and duration.
+    *   [ ] **(Enhancement)** Integrate with clinical trial registries (e.g., ClinicalTrials.gov) to use real protocols as templates.
+    *   [ ] **(Enhancement)** Generate a visual Gantt chart timeline of the study.
+
+*   [ ] **Investigate ADRG/SDRG Generation:**
+    *   [ ] The reference site navigation mentions "Generate ADRG/SDRG", but functionality is unconfirmed. Investigate the purpose and feasibility of this feature.
+    *   [ ] **(Enhancement)** If feasible, expand investigation to include other regional standards (e.g., EMA, NMPA).
+
+---
+
+### **15.3 Utility and Supporting Features**
+
+*   [ ] **REST API for Programmatic Access:**
+    *   [ ] Expose all generation features through a well-documented REST API.
+    *   [ ] Update `openapi.yaml` to include new endpoints.
+    *   [ ] Provide comprehensive API documentation.
+    *   [ ] **(Enhancement)** Implement **webhook support** for notifying users about the completion of long-running jobs.
+    *   [ ] **(Enhancement)** Auto-generate and provide **client libraries** in popular languages (e.g., Python, R) to simplify API usage.
+*   [ ] **(Enhancement)** Integrate with the **CDISC Rules Engine** to validate generated datasets.
+    *   [ ] After a dataset is generated, automatically run it through the CDISC Rules Engine.
+    *   [ ] The engine should be used to validate the dataset against the appropriate standard and version (e.g., SDTMIG v3.4).
+    *   [ ] Provide a user-friendly validation report based on the engine's output (JSON or XLSX).
+    *   [ ] The UI should clearly present the validation results, including any errors or warnings.
+
+---
