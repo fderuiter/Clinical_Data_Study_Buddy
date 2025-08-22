@@ -29,7 +29,7 @@ def get_client() -> AuthenticatedClient:
     client = AuthenticatedClient(
         base_url=BASE,
         token=token,
-        headers={"Accept": ACCEPT},
+        headers={"Accept": ACCEPT, "Cache-Control": "no-cache"},
         auth_header_name="api-key",
         prefix="",
         timeout=30.0,
