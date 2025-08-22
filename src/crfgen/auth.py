@@ -1,6 +1,7 @@
 """
 Authentication utilities.
 """
+
 import os
 
 DUMMY_VALUES = {"", "dummy-key", "***"}
