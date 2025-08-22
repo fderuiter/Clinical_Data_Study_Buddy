@@ -1,0 +1,14 @@
+{
+  "adam": {
+    "datasets": [
+      {
+        "name": "ADSL",
+        "label": "Subject-Level Analysis Dataset"
+      },
+      {
+        "name": "ADAE",
+        "label": "Adverse Event Analysis Dataset"
+      }
+    ]
+  }
+}

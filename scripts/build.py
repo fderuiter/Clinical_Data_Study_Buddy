@@ -9,6 +9,8 @@ from pathlib import Path
 import crfgen.exporter.csv  # noqa
 import crfgen.exporter.docx  # noqa
 import crfgen.exporter.latex  # noqa
+import crfgen.exporter.pdf  # noqa
+import crfgen.exporter.rtf  # noqa
 
 # Import exporters to register them
 import crfgen.exporter.markdown  # noqa
