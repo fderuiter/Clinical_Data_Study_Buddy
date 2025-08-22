@@ -20,7 +20,7 @@ jobs:
         run: poetry run pre-commit run --all-files --show-diff-on-failure
       - name: Build canonical JSON
         env:
-          CDISC_PRIMARY_KEY: ${{ secrets.CDISC_PRIMARY_KEY }}
+          CDISC_PRIMARY_KEY: ${{ secrets.CDISC_PRIMARY_KEY || 'dummy-key' }}
         run: poetry run scripts/build_canonical.py
       - name: Build all formats
         run: |
