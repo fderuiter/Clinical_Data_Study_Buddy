@@ -1,78 +1,85 @@
-from __future__ import annotations
+import click
+from rich.console import Console
 
-import os
-from typing import List, Optional
+from . import __version__
+from .exporter.registry import get_exporter
+from cdisc_library_client.harvest import harvest
 
-import httpx
-from cdisc_library_client.client import AuthenticatedClient
-from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
-    get_mdr_cdashig_version,
-    get_mdr_cdashig_version_domains,
-    get_mdr_cdashig_version_scenarios,
+console = Console()
+
+
+@click.group()
+@click.version_option(__version__)
+def app():
+    ...
+
+@app.command()
+@click.option(
+    "--api-key",
+    envvar="CDISC_API_KEY",
+    help="CDISC Library API key",
+    required=True,
 )
-from cdisc_library_client.api.default import get_mdr_products_data_collection
+@click.option(
+    "--ig-filter",
+    help="Filter IG by name",
+)
+@click.option(
+    "-c",
+    "--cache",
+    "cache_path",
+    help="Cache path",
+    type=click.Path(dir_okay=False, writable=True),
+)
+@click.option(
+    "-s",
+    "--style",
+    "style_path",
+    help="Style path",
+    type=click.Path(exists=True, dir_okay=False, readable=True),
+)
+@click.option(
+    "-t",
+    "--template",
+    "template_path",
+    help="Template path",
+    type=click.Path(exists=True, dir_okay=False, readable=True),
+)
+@click.option(
+    "-l",
+    "--log",
+    "log_path",
+    help="Log file path",
+    type=click.Path(dir_okay=False, writable=True),
+)
+@click.argument("output_path", type=click.Path(dir_okay=False, writable=True))
+@click.argument("standard")
+@click.argument("version")
+@click.argument("domains", nargs=-1)
+def generate(
+    api_key: str,
+    ig_filter: str,
+    cache_path: str,
+    style_path: str,
+    template_path: str,
+    log_path: str,
+    output_path: str,
+    standard: str,
+    version: str,
+    domains: list[str],
+):
+    """
+    Generate CRF from a CDISC standard
+    """
+    crf = harvest(api_key, ig_filter)
+    exporter = get_exporter(output_path, style_path, template_path)
+    if exporter:
+        with console.status(f"Exporting to {output_path}..."):
+            exporter.export(crf)
+        console.log(f"Exported to {output_path}")
+    else:
+        console.log("No exporter found, skipping exporting.")
 
-from crfgen.schema import Form
 
-
-class CrfGen:
-    def __init__(self, api_key: str, ig_filter: Optional[str] = None):
-        self.api_key = api_key
-        self.ig_filter = ig_filter
-        self.client = self._get_client()
-
-    def _get_client(self) -> AuthenticatedClient:
-        """
-        Get an authenticated client for the CDISC Library API.
-        """
-        transport = httpx.HTTPTransport(retries=5)
-        client = AuthenticatedClient(
-            base_url="https://library.cdisc.org/api",
-            token=self.api_key,
-            headers={"Accept": "application/json", "Cache-Control": "no-cache"},
-            auth_header_name="api-key",
-            prefix="",
-            timeout=30.0,
-            httpx_args={"transport": transport},
-        )
-        return client
-
-    def harvest(self) -> List[Form]:
-        """Pull CDASH IG -> domains -> scenarios and convert to Form objects."""
-        products = get_mdr_products_data_collection.sync(client=self.client)
-        cdashig_links = products.additional_properties["_links"]["cdashig"]
-        forms: list[Form] = []
-        for ver_link in cdashig_links:
-            if self.ig_filter and self.ig_filter not in ver_link["title"]:
-                continue
-            ig = get_mdr_cdashig_version.sync(client=self.client, version=ver_link["title"])
-            for dom_link in ig["_links"].get("domains", []):
-                dom = get_mdr_cdashig_version_domains.sync(client=self.client, version=ver_link["title"], domain=dom_link["title"])
-                scenarios = dom["_links"].get("scenarios") or []
-                payloads = [dom] + [
-                    get_mdr_cdashig_version_scenarios.sync(client=self.client, version=ver_link["title"], domain=dom_link["title"], scenario=s["title"])
-                    for s in scenarios
-                ]
-                for p in payloads:
-                    forms.append(self._form_from_api(p))
-        return forms
-
-    def _form_from_api(self, data: dict) -> Form:
-        """Convert a CDISC Library API response into a Form object."""
-        return Form(
-            name=data.get("name"),
-            ig_name=data.get("igName"),
-            ig_version=data.get("igVersion"),
-            domain=data.get("domain"),
-            scenario=data.get("scenario"),
-            fields=[
-                {
-                    "name": f.get("name"),
-                    "label": f.get("label"),
-                    "field_type": f.get("fieldType"),
-                    "terminology": f.get("terminology"),
-                    "instructions": f.get("instructions"),
-                }
-                for f in data.get("fields", [])
-            ],
-        )
+def main():
+    app()
