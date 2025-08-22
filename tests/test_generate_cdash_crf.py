@@ -9,7 +9,7 @@ def test_help():
         text=True,
     )
     assert result.returncode == 0, result.stderr
-    assert "Generate Word CRF shells" in result.stdout
+    assert "Generate Word CRFs" in result.stdout
 
 
 def test_generate(tmp_path):
@@ -19,9 +19,9 @@ def test_generate(tmp_path):
             sys.executable,
             "scripts/generate_cdash_crf.py",
             "--model",
-            "data_standards/1_collection/CDASH_Model_v1.3.xlsx",
+            "tests/CDASH_Model_v1.3.xlsx",
             "--ig",
-            "data_standards/1_collection/CDASHIG_v2.3.xlsx",
+            "tests/CDASHIG_v2.3 (1).xlsx",
             "--out",
             str(out_dir),
             "--domains",
@@ -31,13 +31,22 @@ def test_generate(tmp_path):
         text=True,
     )
     assert result.returncode == 0, result.stderr
-    doc_path = out_dir / "AE_Adverse_Events_CRF.docx"
+    doc_path = out_dir / "AE_CRF.docx"
     assert doc_path.exists()
 
     from docx import Document
     from zipfile import ZipFile
 
     doc = Document(doc_path)
-    # The first table is the administrative section, the second is the main one.
-    table = doc.tables[1]
-    assert len(table.columns) == 6
+    table = doc.tables[0]
+    assert len(table.columns) == 7
+    assert table.cell(0, 6).text == "Required"
+
+    texts = "\n".join(p.text for p in doc.paragraphs)
+    assert "Footnotes" in texts
+    assert "[1]" in texts
+
+    with ZipFile(doc_path) as zf:
+        xml = zf.read("word/document.xml").decode("utf-8")
+        assert "w14:checkbox" in xml or "w14:date" in xml
+        assert "Validate dependencies" in xml
