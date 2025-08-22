@@ -27,15 +27,16 @@ echo "Detected OS: ${machine}"
 
 # Function to install Python
 install_python() {
-    echo "Attempting to install Python 3.11+..."
+    echo "Attempting to install Python 3.12+..."
     if [ "$machine" == "Linux" ]; then
         if command_exists apt-get; then
             sudo apt-get update
-            sudo apt-get install -y python3.11 python3.11-venv
+            sudo apt-get install -y python3.12 python3.12-venv
         elif command_exists yum; then
-            sudo yum install -y python3.11
+            # RHEL/CentOS often have older package names
+            sudo yum install -y python3
         else
-            echo "Error: Neither apt-get nor yum found. Please install Python 3.11+ manually." >&2
+            echo "Error: Neither apt-get nor yum found. Please install Python 3.12+ manually." >&2
             exit 1
         fi
     elif [ "$machine" == "Mac" ]; then
@@ -43,9 +44,9 @@ install_python() {
             echo "Error: Homebrew not found. Please install Homebrew first, then run this script again." >&2
             exit 1
         fi
-        brew install python@3.11
+        brew install python@3.12
     else
-        echo "Error: Unsupported OS. Please install Python 3.11+ manually." >&2
+        echo "Error: Unsupported OS. Please install Python 3.12+ manually." >&2
         exit 1
     fi
     echo "Python installation complete."
@@ -61,14 +62,14 @@ install_poetry() {
 }
 
 
-# Check for Python 3.11+
-echo "Checking for Python 3.11+..."
+# Check for Python 3.12+
+echo "Checking for Python 3.12+..."
 if ! command_exists python3; then
     install_python
 fi
 
 PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-MIN_VERSION="3.11"
+MIN_VERSION="3.12"
 if [ "$(printf '%s\n' "$MIN_VERSION" "$PYTHON_VERSION" | sort -V | head -n1)" != "$MIN_VERSION" ]; then
     install_python
 fi
