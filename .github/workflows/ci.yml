@@ -12,19 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - uses: abatilo/actions-poetry@v4
-        with:
-          poetry-version: '1.7.1'
-      - name: Install dependencies
-        run: poetry install -n
+      - name: Set up environment
+        run: |
+          chmod +x setup.sh
+          ./setup.sh
       - name: Pre-commit checks
         run: poetry run pre-commit run --all-files --show-diff-on-failure
       - name: Build canonical JSON
         env:
-          CDISC_PRIMARY_KEY: ${{ secrets.CDISC_PRIMARY_KEY }}
+          CDISC_PRIMARY_KEY: ${{ secrets.CDISC_PRIMARY_KEY || 'dummy-key' }}
         run: poetry run scripts/build_canonical.py
       - name: Build all formats
         run: |
