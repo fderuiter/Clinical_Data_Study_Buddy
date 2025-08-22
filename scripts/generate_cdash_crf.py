@@ -199,6 +199,7 @@ def _style_header_cell(cell):
     run.bold = True
     run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
 
+
 ###############################################################################
 # Data I/O helpers
 ###############################################################################
@@ -450,7 +451,6 @@ def build_domain_crf(
             row_ct[0].text = f"\u2020{idx_ct}"
             row_ct[1].text = ct_text
 
-
     # ---------------------------------------------------------------------
     #  Save document
     # ---------------------------------------------------------------------
@@ -466,9 +466,7 @@ def build_domain_crf(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Generate Word CRF shells"
-    )
+    parser = argparse.ArgumentParser(description="Generate Word CRF shells")
     parser.add_argument(
         "--model",
         required=True,
