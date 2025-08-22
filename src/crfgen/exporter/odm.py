@@ -1,18 +1,36 @@
-import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Sequence
 
-from crfgen.schema import Form
+import odmlib.odm_1_3_2.model as ODM
 
+from ..schema import Form
 from .registry import register
 
 
 @register("odm")
-def export_odm(forms: Sequence[Form], outdir: Path) -> None:
-    root = ET.Element("ODM")
-    for form in forms:
-        form_el = ET.SubElement(root, "FormDef", OID=form.domain, Name=form.title)
-        for fld in form.fields:
-            ET.SubElement(form_el, "ItemRef", OID=fld.oid)
-    tree = ET.ElementTree(root)
-    tree.write(outdir / "forms.xml", encoding="utf-8", xml_declaration=True)
+def render_odm(forms: Sequence[Form], out_dir: Path):
+    """Render a list of forms to ODM-XML."""
+    root = ODM.ODM(
+        FileOID="cdisc-crf-gen.v0.1",
+        Granularity="Metadata",
+        FileType="Snapshot",
+        CreationDateTime="2025-08-21T00:00:00",  # Placeholder
+    )
+    study = ODM.Study(OID="ST.CRFGEN")
+    root.Study.append(study)
+
+    mdv = ODM.MetaDataVersion(
+        OID="MDV.1", Name="CRF Generation MetaDataVersion"
+    )
+    study.MetaDataVersion.append(mdv)
+
+    for f in forms:
+        # TODO: The "Repeating" attribute is required by odmlib.
+        # The information is not available in the Form model, so it's hardcoded to "No".
+        # This should be revisited if the crawler can fetch this information.
+        formdef = ODM.FormDef(OID=f"F.{f.domain}", Name=f.title, Repeating="No")
+        mdv.FormDef.append(formdef)
+
+    out_dir.mkdir(exist_ok=True, parents=True)
+    output_path = out_dir / "forms.odm.xml"
+    root.write_xml(str(output_path))
