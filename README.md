@@ -170,3 +170,35 @@ The following options are available for the `generate_synthetic_data.py` script:
 | `--therapeutic-area` | Therapeutic area                             | "Oncology" |
 | `--format`         | Output format (csv, json, xpt)               | "csv"      |
 | `--output-dir`     | Directory to save the downloaded file        | "."        |
+
+## Generating Study Protocols
+
+This project can also generate study protocol documents. This feature is useful for creating a quick draft of a protocol based on a few key parameters.
+
+### Quickstart
+
+To generate a study protocol, use the `protocol` command:
+
+```bash
+poetry run crfgen protocol \
+    --therapeutic-area "Oncology" \
+    --treatment-arm "Drug A + Placebo" \
+    --treatment-arm "Drug B + Placebo" \
+    --duration-weeks 52 \
+    --phase 3 \
+    --output-dir "my_protocol"
+```
+
+This will generate a `protocol.md` file and a `gantt_chart.png` file in the `my_protocol` directory.
+
+### Options
+
+The following options are available for the `protocol` command:
+
+| Option                | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| `--therapeutic-area`  | **Required.** The therapeutic area of the study.            |
+| `--treatment-arm`     | **Required.** A treatment arm of the study. Can be specified multiple times. |
+| `--duration-weeks`    | **Required.** The duration of the study in weeks.           |
+| `--phase`             | **Required.** The phase of the study.                       |
+| `--output-dir`        | The directory to save the generated protocol documents.     |
