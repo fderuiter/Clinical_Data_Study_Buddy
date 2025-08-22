@@ -21,12 +21,14 @@ pandas = "^2.2"
 openpyxl = "^3.1"
 python-docx = "^1.1"
 odmlib = {git = "https://github.com/swhume/odmlib.git", rev = "57b8ae069b1d6783cf73b8860b85dee6be0853ed"}
-httpx = "^0.28.1"
+httpx = "^0.23.0"
 docx2pdf = "^0.1.8"
 pypandoc = "^1.11"
 matplotlib = "^3.8.4"
 python-dotenv = "^1.1.1"
 pyyaml = "^6.0"
+tenacity = "^9.1.2"
+httpx-cache = "^0.13.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
@@ -36,6 +38,7 @@ pytest-cov = "^6.2"
 pre-commit = "^4.0"
 isort = "^5.12.0"
 pytest-mock = "^3.12.0"
+pytest-asyncio = "^1.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -47,3 +50,8 @@ skip = ["src/cdisc_library_client"]
 
 [tool.poetry.scripts]
 crfgen = "crfgen.crfgen:main"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]
