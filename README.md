@@ -202,6 +202,38 @@ The following options are available for the `generate_synthetic_data.py` script:
 | `--format`         | Output format (csv, json, xpt)               | "csv"      |
 | `--output-dir`     | Directory to save the downloaded file        | "."        |
 
+
+## Generating EDC Raw Dataset Package
+
+This project includes a script to generate a complete package of raw EDC datasets for a clinical study. The script, `scripts/generate_raw_dataset_package.py`, generates a ZIP file containing multiple datasets with consistent subjects across all domains. It also includes a draft `define.xml` file (currently with limited metadata).
+
+### Quickstart
+
+To generate a raw dataset package, run the `scripts/generate_raw_dataset_package.py` script with the desired parameters. For example, to generate a package with DM, VS, and LB domains for 10 subjects in the Oncology therapeutic area, run the following command:
+
+```bash
+poetry run python scripts/generate_raw_dataset_package.py \
+    --num-subjects 10 \
+    --domains DM VS LB \
+    --therapeutic-area Oncology \
+    --output-dir ./raw_dataset_package
+```
+
+This will generate a `edc_raw_datasets.zip` file in the `raw_dataset_package` directory.
+
+### Options
+
+The following options are available for the `generate_raw_dataset_package.py` script:
+
+| Option             | Description                                  | Default    |
+| ------------------ | -------------------------------------------- | ---------- |
+| `--num-subjects`   | Number of subjects (10-200)                  | 50         |
+| `--therapeutic-area` | Therapeutic area for the study               | "Oncology" |
+| `--domains`        | List of domains to include (e.g., DM AE VS)  | (required) |
+| `--study-story`    | Study story to simulate (none, high_dropout) | "none"     |
+| `--output-format`  | Output format for datasets (csv, json, xpt)  | "csv"      |
+| `--output-dir`     | Directory to save the generated package      | "."        |
+
 ## Generating Study Protocols
 
 This project can also generate study protocol documents. This feature is useful for creating a quick draft of a protocol based on a few key parameters.
@@ -307,4 +339,44 @@ python scripts/generate_sdrg.py \
     --crf crf.json \
     --config study_config.json \
     --out sdrg.docx
+```
+
+## OpenFDA Integration
+
+This project includes features to integrate data from [open.fda.gov](https://open.fda.gov/) to enrich the generated CRFs.
+
+### Populating CRFs with Adverse Event Data
+
+You can automatically populate the Adverse Events (AE) CRF with suggested terms for a specific drug. The `generate_cdash_crf.py` script has a new option to support this:
+
+```bash
+python scripts/generate_cdash_crf.py \
+    --ig-version v2.3 \
+    --domains AE \
+    --openfda-drug-name "Aspirin" \
+    --openfda-max-results 50
+```
+
+This will fetch the top 50 most frequently reported adverse events for Aspirin from OpenFDA and add them to a separate table in the generated `AE_Adverse_Events_CRF.docx` document, providing a useful reference for common adverse events.
+
+### Standalone OpenFDA Script
+
+For more advanced queries, you can use the standalone `populate_crf_from_fda.py` script. This script allows you to fetch adverse events or drug labeling information and output it in various formats.
+
+**Examples:**
+
+Fetch adverse events for a drug and save as JSON:
+```bash
+python scripts/populate_crf_from_fda.py \
+    --drug-name "Ibuprofen" \
+    --domain AE \
+    --max-results 100 \
+    --output-format json > ibuprofen_aes.json
+```
+
+Fetch drug label information for a drug:
+```bash
+python scripts/populate_crf_from_fda.py \
+    --drug-name "Tylenol" \
+    --domain LABEL
 ```
