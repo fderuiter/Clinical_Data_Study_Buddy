@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: CDISC Library API
-  description: REST API documentation for CDISC Library in production server
+  description: REST API Documentation for CDISC Library in production server
   version: 1.1.0
   contact:
     name: CDISC Library Support
