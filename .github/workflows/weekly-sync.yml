@@ -1,0 +1,54 @@
+name: Weekly CDISC Library Sync
+
+# Run every Monday at 04:00 UTC, plus manually via workflow_dispatch
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # for creating branches & PRs
+      pull-requests: write # for creating PRs
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: poetry install --no-root
+
+      - name: Crawl CDISC Library → crf.json
+        env:
+          CDISC_API_KEY: ${{ secrets.CDISC_API_KEY }}
+        run: poetry run scripts/build_canonical.py -o crf.json
+
+      - name: Check for crf.json changes
+        id: diff
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # If crf.json changed, exit 1 so next step runs
+          git diff --exit-code crf.json
+
+      - name: Create Pull Request
+        if: failure() && github.event_name != 'workflow_dispatch'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          commit-message: "chore: weekly CDISC Library sync"
+          branch: "sync/cdisc-${{ github.run_id }}"
+          title: "Weekly CDISC Library Sync"
+          body: |
+            This PR updates `crf.json` with the latest forms from the CDISC Library.
+            Review the changes below and merge if everything looks good.
+          base: main
