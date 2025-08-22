@@ -140,6 +140,37 @@ python scripts/generate_cdash_crf.py --model CDASH_Model_v1.3.xlsx \
 Edit `build_domain_crf()` in the script to customise the table layout or add
 study branding or adjust fonts and orientation if needed.
 
+## Generating Analysis Code
+
+This project can also generate analysis code in SAS and R for various outputs.
+
+### Quickstart
+
+To generate an analysis script, run the `scripts/generate_analysis.py` script with the desired parameters. For example, to generate a SAS script for a demographics table from the ADSL dataset, run the following command:
+
+```bash
+python scripts/generate_analysis.py \
+    --language sas \
+    --dataset ADSL \
+    --output-type demographics \
+    --treatment-var TRT01A \
+    --output-file demog_table.sas
+```
+
+This will generate a SAS file named `demog_table.sas` in the current directory.
+
+### Options
+
+The following options are available for the `generate_analysis.py` script:
+
+| Option          | Description                                    | Default |
+| --------------- | ---------------------------------------------- | ------- |
+| `--language`    | Language for the generated code (sas or r)     |         |
+| `--dataset`     | Source dataset (e.g., ADSL)                    |         |
+| `--output-type` | Type of analysis output (e.g., Demographics)   |         |
+| `--treatment-var`| Treatment variable (e.g., TRT01A)              |         |
+| `--output-file` | Path to the output file                        |         |
+
 ## Generating Synthetic Datasets
 
 In addition to generating CRFs from the CDISC Library, this project can also generate synthetic CDISC-compliant datasets using the cdiscdataset.com API.
