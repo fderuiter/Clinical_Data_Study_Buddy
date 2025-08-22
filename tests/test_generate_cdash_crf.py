@@ -46,7 +46,7 @@ def test_generate(tmp_path):
     assert "Footnotes" in texts
     assert "[1]" in texts
 
-    admin = doc.tables[1].cell(0, 0).text.replace("\xa0", " ")
+    admin = doc.tables[0].cell(0, 0).text.replace("\xa0", " ")
     assert admin == "SECTION A  ADMINISTRATIVE"
     from zipfile import ZipFile
     with ZipFile(doc_path) as zf:
