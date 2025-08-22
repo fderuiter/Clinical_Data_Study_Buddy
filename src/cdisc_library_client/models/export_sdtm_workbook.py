@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -71,27 +66,21 @@ class ExportSdtmWorkbook:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.export_sdtm_class_variables_row import ExportSdtmClassVariablesRow
-        from ..models.export_sdtm_dataset_variables_row import (
-            ExportSdtmDatasetVariablesRow,
-        )
+        from ..models.export_sdtm_dataset_variables_row import ExportSdtmDatasetVariablesRow
         from ..models.export_sdtm_datasets_row import ExportSdtmDatasetsRow
 
         d = dict(src_dict)
         class_variables = []
         _class_variables = d.pop("class-variables", UNSET)
         for class_variables_item_data in _class_variables or []:
-            class_variables_item = ExportSdtmClassVariablesRow.from_dict(
-                class_variables_item_data
-            )
+            class_variables_item = ExportSdtmClassVariablesRow.from_dict(class_variables_item_data)
 
             class_variables.append(class_variables_item)
 
         dataset_variables = []
         _dataset_variables = d.pop("dataset-variables", UNSET)
         for dataset_variables_item_data in _dataset_variables or []:
-            dataset_variables_item = ExportSdtmDatasetVariablesRow.from_dict(
-                dataset_variables_item_data
-            )
+            dataset_variables_item = ExportSdtmDatasetVariablesRow.from_dict(dataset_variables_item_data)
 
             dataset_variables.append(dataset_variables_item)
 

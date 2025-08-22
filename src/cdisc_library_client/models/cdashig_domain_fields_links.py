@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -74,9 +69,7 @@ class CdashigDomainFieldsLinks:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.cdashig_class_ref import CdashigClassRef
-        from ..models.cdashig_domain_field_ref_element import (
-            CdashigDomainFieldRefElement,
-        )
+        from ..models.cdashig_domain_field_ref_element import CdashigDomainFieldRefElement
         from ..models.cdashig_domain_fields_ref import CdashigDomainFieldsRef
         from ..models.cdashig_product_ref import CdashigProductRef
 

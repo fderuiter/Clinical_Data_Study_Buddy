@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -69,9 +64,7 @@ class QrsResponsegroupsLinks:
         responsegroups = []
         _responsegroups = d.pop("responsegroups", UNSET)
         for responsegroups_item_data in _responsegroups or []:
-            responsegroups_item = QrsResponsegroupRefElement.from_dict(
-                responsegroups_item_data
-            )
+            responsegroups_item = QrsResponsegroupRefElement.from_dict(responsegroups_item_data)
 
             responsegroups.append(responsegroups_item)
 

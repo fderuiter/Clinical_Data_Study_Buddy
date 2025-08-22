@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    Any,
-    TypeVar,
-    Union,
-    cast,
-)
+from typing import Any, TypeVar, Union, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -115,9 +110,7 @@ class ExportCdashDomainVariablesRow:
         if mapping_instructions is not UNSET:
             field_dict["Mapping Instructions"] = mapping_instructions
         if controlled_terminology_codelist_name is not UNSET:
-            field_dict["Controlled Terminology Codelist Name"] = (
-                controlled_terminology_codelist_name
-            )
+            field_dict["Controlled Terminology Codelist Name"] = controlled_terminology_codelist_name
         if implementation_notes is not UNSET:
             field_dict["Implementation Notes"] = implementation_notes
 
@@ -152,9 +145,7 @@ class ExportCdashDomainVariablesRow:
 
         mapping_instructions = d.pop("Mapping Instructions", UNSET)
 
-        controlled_terminology_codelist_name = d.pop(
-            "Controlled Terminology Codelist Name", UNSET
-        )
+        controlled_terminology_codelist_name = d.pop("Controlled Terminology Codelist Name", UNSET)
 
         implementation_notes = d.pop("Implementation Notes", UNSET)
 

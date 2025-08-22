@@ -16,10 +16,7 @@ def _get_kwargs(
 ) -> dict[str, Any]:
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/mdr/sendig/{version}/classes/{class_}/datasets".format(
-            version=version,
-            class_=class_,
-        ),
+        "url": f"/mdr/sendig/{version}/classes/{class_}/datasets",
     }
 
     return _kwargs

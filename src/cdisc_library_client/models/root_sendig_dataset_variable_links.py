@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -13,9 +8,7 @@ from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.root_sendig_dataset_variable_ref import RootSendigDatasetVariableRef
-    from ..models.sendig_dataset_variable_ref_version import (
-        SendigDatasetVariableRefVersion,
-    )
+    from ..models.sendig_dataset_variable_ref_version import SendigDatasetVariableRefVersion
 
 
 T = TypeVar("T", bound="RootSendigDatasetVariableLinks")
@@ -57,12 +50,8 @@ class RootSendigDatasetVariableLinks:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.root_sendig_dataset_variable_ref import (
-            RootSendigDatasetVariableRef,
-        )
-        from ..models.sendig_dataset_variable_ref_version import (
-            SendigDatasetVariableRefVersion,
-        )
+        from ..models.root_sendig_dataset_variable_ref import RootSendigDatasetVariableRef
+        from ..models.sendig_dataset_variable_ref_version import SendigDatasetVariableRefVersion
 
         d = dict(src_dict)
         _self_ = d.pop("self", UNSET)
@@ -75,9 +64,7 @@ class RootSendigDatasetVariableLinks:
         versions = []
         _versions = d.pop("versions", UNSET)
         for versions_item_data in _versions or []:
-            versions_item = SendigDatasetVariableRefVersion.from_dict(
-                versions_item_data
-            )
+            versions_item = SendigDatasetVariableRefVersion.from_dict(versions_item_data)
 
             versions.append(versions_item)
 

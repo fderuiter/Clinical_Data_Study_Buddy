@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -109,9 +104,7 @@ class SdtmigDatasetVariableLinks:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.root_ct_codelist_ref_element import RootCtCodelistRefElement
-        from ..models.root_sdtmig_dataset_variable_ref import (
-            RootSdtmigDatasetVariableRef,
-        )
+        from ..models.root_sdtmig_dataset_variable_ref import RootSdtmigDatasetVariableRef
         from ..models.sdtm_class_variable_ref import SdtmClassVariableRef
         from ..models.sdtm_dataset_variable_ref import SdtmDatasetVariableRef
         from ..models.sdtmig_dataset_ref import SdtmigDatasetRef
@@ -145,9 +138,7 @@ class SdtmigDatasetVariableLinks:
         if isinstance(_model_dataset_variable, Unset):
             model_dataset_variable = UNSET
         else:
-            model_dataset_variable = SdtmDatasetVariableRef.from_dict(
-                _model_dataset_variable
-            )
+            model_dataset_variable = SdtmDatasetVariableRef.from_dict(_model_dataset_variable)
 
         _parent_product = d.pop("parentProduct", UNSET)
         parent_product: Union[Unset, SdtmigProductRef]

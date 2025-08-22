@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -12,12 +7,8 @@ from attrs import field as _attrs_field
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
-    from ..models.export_cdashig_domain_variables_row import (
-        ExportCdashigDomainVariablesRow,
-    )
-    from ..models.export_cdashig_scenario_variables_row import (
-        ExportCdashigScenarioVariablesRow,
-    )
+    from ..models.export_cdashig_domain_variables_row import ExportCdashigDomainVariablesRow
+    from ..models.export_cdashig_scenario_variables_row import ExportCdashigScenarioVariablesRow
 
 
 T = TypeVar("T", bound="ExportCdashigTable")
@@ -62,29 +53,21 @@ class ExportCdashigTable:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.export_cdashig_domain_variables_row import (
-            ExportCdashigDomainVariablesRow,
-        )
-        from ..models.export_cdashig_scenario_variables_row import (
-            ExportCdashigScenarioVariablesRow,
-        )
+        from ..models.export_cdashig_domain_variables_row import ExportCdashigDomainVariablesRow
+        from ..models.export_cdashig_scenario_variables_row import ExportCdashigScenarioVariablesRow
 
         d = dict(src_dict)
         domain_variables = []
         _domain_variables = d.pop("domain-variables", UNSET)
         for domain_variables_item_data in _domain_variables or []:
-            domain_variables_item = ExportCdashigDomainVariablesRow.from_dict(
-                domain_variables_item_data
-            )
+            domain_variables_item = ExportCdashigDomainVariablesRow.from_dict(domain_variables_item_data)
 
             domain_variables.append(domain_variables_item)
 
         scenario_variables = []
         _scenario_variables = d.pop("scenario-variables", UNSET)
         for scenario_variables_item_data in _scenario_variables or []:
-            scenario_variables_item = ExportCdashigScenarioVariablesRow.from_dict(
-                scenario_variables_item_data
-            )
+            scenario_variables_item = ExportCdashigScenarioVariablesRow.from_dict(scenario_variables_item_data)
 
             scenario_variables.append(scenario_variables_item)
 

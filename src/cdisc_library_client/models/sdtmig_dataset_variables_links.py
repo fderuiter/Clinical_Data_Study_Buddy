@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -14,9 +9,7 @@ from ..types import UNSET, Unset
 if TYPE_CHECKING:
     from ..models.sdtm_dataset_ref import SdtmDatasetRef
     from ..models.sdtmig_class_ref import SdtmigClassRef
-    from ..models.sdtmig_dataset_variable_ref_element import (
-        SdtmigDatasetVariableRefElement,
-    )
+    from ..models.sdtmig_dataset_variable_ref_element import SdtmigDatasetVariableRefElement
     from ..models.sdtmig_dataset_variables_ref import SdtmigDatasetVariablesRef
     from ..models.sdtmig_product_ref import SdtmigProductRef
 
@@ -94,9 +87,7 @@ class SdtmigDatasetVariablesLinks:
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.sdtm_dataset_ref import SdtmDatasetRef
         from ..models.sdtmig_class_ref import SdtmigClassRef
-        from ..models.sdtmig_dataset_variable_ref_element import (
-            SdtmigDatasetVariableRefElement,
-        )
+        from ..models.sdtmig_dataset_variable_ref_element import SdtmigDatasetVariableRefElement
         from ..models.sdtmig_dataset_variables_ref import SdtmigDatasetVariablesRef
         from ..models.sdtmig_product_ref import SdtmigProductRef
 
@@ -139,9 +130,7 @@ class SdtmigDatasetVariablesLinks:
         dataset_variables = []
         _dataset_variables = d.pop("datasetVariables", UNSET)
         for dataset_variables_item_data in _dataset_variables or []:
-            dataset_variables_item = SdtmigDatasetVariableRefElement.from_dict(
-                dataset_variables_item_data
-            )
+            dataset_variables_item = SdtmigDatasetVariableRefElement.from_dict(dataset_variables_item_data)
 
             dataset_variables.append(dataset_variables_item)
 

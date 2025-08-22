@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -13,9 +8,7 @@ from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.root_sdtmig_dataset_variable_ref import RootSdtmigDatasetVariableRef
-    from ..models.sdtmig_dataset_variable_ref_version import (
-        SdtmigDatasetVariableRefVersion,
-    )
+    from ..models.sdtmig_dataset_variable_ref_version import SdtmigDatasetVariableRefVersion
 
 
 T = TypeVar("T", bound="RootSdtmigDatasetVariableLinks")
@@ -57,12 +50,8 @@ class RootSdtmigDatasetVariableLinks:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.root_sdtmig_dataset_variable_ref import (
-            RootSdtmigDatasetVariableRef,
-        )
-        from ..models.sdtmig_dataset_variable_ref_version import (
-            SdtmigDatasetVariableRefVersion,
-        )
+        from ..models.root_sdtmig_dataset_variable_ref import RootSdtmigDatasetVariableRef
+        from ..models.sdtmig_dataset_variable_ref_version import SdtmigDatasetVariableRefVersion
 
         d = dict(src_dict)
         _self_ = d.pop("self", UNSET)
@@ -75,9 +64,7 @@ class RootSdtmigDatasetVariableLinks:
         versions = []
         _versions = d.pop("versions", UNSET)
         for versions_item_data in _versions or []:
-            versions_item = SdtmigDatasetVariableRefVersion.from_dict(
-                versions_item_data
-            )
+            versions_item = SdtmigDatasetVariableRefVersion.from_dict(versions_item_data)
 
             versions.append(versions_item)
 

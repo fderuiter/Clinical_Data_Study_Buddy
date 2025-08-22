@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -111,9 +106,7 @@ class SdtmDataset:
         dataset_variables = []
         _dataset_variables = d.pop("datasetVariables", UNSET)
         for dataset_variables_item_data in _dataset_variables or []:
-            dataset_variables_item = SdtmDatasetVariable.from_dict(
-                dataset_variables_item_data
-            )
+            dataset_variables_item = SdtmDatasetVariable.from_dict(dataset_variables_item_data)
 
             dataset_variables.append(dataset_variables_item)
 

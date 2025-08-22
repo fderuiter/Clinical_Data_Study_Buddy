@@ -16,10 +16,7 @@ def _get_kwargs(
 ) -> dict[str, Any]:
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/mdr/root/ct/{product_group}/codelists/{codelist}".format(
-            product_group=product_group,
-            codelist=codelist,
-        ),
+        "url": f"/mdr/root/ct/{product_group}/codelists/{codelist}",
     }
 
     return _kwargs

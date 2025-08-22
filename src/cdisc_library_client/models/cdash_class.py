@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -101,9 +96,7 @@ class CdashClass:
         cdash_model_fields = []
         _cdash_model_fields = d.pop("cdashModelFields", UNSET)
         for cdash_model_fields_item_data in _cdash_model_fields or []:
-            cdash_model_fields_item = CdashClassField.from_dict(
-                cdash_model_fields_item_data
-            )
+            cdash_model_fields_item = CdashClassField.from_dict(cdash_model_fields_item_data)
 
             cdash_model_fields.append(cdash_model_fields_item)
 

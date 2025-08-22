@@ -1,10 +1,5 @@
 from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -82,9 +77,7 @@ class SdtmDatasetVariablesLinks:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.sdtm_class_ref import SdtmClassRef
-        from ..models.sdtm_dataset_variable_ref_element import (
-            SdtmDatasetVariableRefElement,
-        )
+        from ..models.sdtm_dataset_variable_ref_element import SdtmDatasetVariableRefElement
         from ..models.sdtm_dataset_variables_ref import SdtmDatasetVariablesRef
         from ..models.sdtm_product_ref import SdtmProductRef
 
@@ -120,9 +113,7 @@ class SdtmDatasetVariablesLinks:
         dataset_variables = []
         _dataset_variables = d.pop("datasetVariables", UNSET)
         for dataset_variables_item_data in _dataset_variables or []:
-            dataset_variables_item = SdtmDatasetVariableRefElement.from_dict(
-                dataset_variables_item_data
-            )
+            dataset_variables_item = SdtmDatasetVariableRefElement.from_dict(dataset_variables_item_data)
 
             dataset_variables.append(dataset_variables_item)
 
