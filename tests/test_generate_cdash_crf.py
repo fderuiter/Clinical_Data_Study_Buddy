@@ -9,7 +9,7 @@ def test_help():
         text=True,
     )
     assert result.returncode == 0, result.stderr
-    assert "Generate Word CRF shells" in result.stdout
+    assert "Generate Word CRFs from CDASH metadata workbooks." in result.stdout
 
 
 def test_generate(tmp_path):
@@ -47,8 +47,11 @@ def test_generate(tmp_path):
     assert "Footnotes" in texts
     assert "[1]" in texts
 
+    admin = doc.tables[1].cell(0, 0).text.replace("\xa0", " ")
+    assert admin == "SECTION A  ADMINISTRATIVE"
     from zipfile import ZipFile
     with ZipFile(doc_path) as zf:
         xml = zf.read("word/document.xml").decode("utf-8")
         assert "w14:checkbox" in xml or "w14:date" in xml
         assert "Validate dependencies" in xml
+        assert xml.count("<w:bottom") > 0
