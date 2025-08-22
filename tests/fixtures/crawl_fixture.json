@@ -1,7 +1,7 @@
 {
-  "https://library.cdisc.org/api/mdr/cdashig": {
+  "https://library.cdisc.org/api/mdr/products/DataCollection": {
     "_links": {
-      "versions": [
+      "cdashig": [
         {"href": "https://library.cdisc.org/api/mdr/cdashig/2-2", "title": "CDASHIG 2-2"}
       ]
     }
@@ -14,23 +14,16 @@
     }
   },
   "https://library.cdisc.org/api/mdr/cdashig/2-2/domains/VS": {
-    "title": "Vital Signs",
-    "domain": "VS",
     "_links": {
       "scenarios": [
         {"href": "https://library.cdisc.org/api/mdr/cdashig/2-2/scenarios/VS.Generic"}
       ]
     },
-    "fields": [
-      {"cdash_variable": "VSORRES", "prompt": "Result", "datatype": "text"}
-    ]
+    "name": "VS",
+    "label": "Vital Signs"
   },
   "https://library.cdisc.org/api/mdr/cdashig/2-2/scenarios/VS.Generic": {
-    "title": "VS Generic Scenario",
-    "domain": "VS",
-    "scenario": "VS.Generic",
-    "fields": [
-      {"cdash_variable": "VSDTC", "prompt": "Date/Time", "datatype": "datetime"}
-    ]
+    "name": "VS.Generic",
+    "label": "Vital Signs Generic"
   }
 }

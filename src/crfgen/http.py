@@ -32,6 +32,11 @@ def cached_get(url: str, headers: dict[str, str], ttl_days: int = 30) -> Any:
 
     sess = _retry_session()
     r = sess.get(url, headers=headers, timeout=30)
-    r.raise_for_status()
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if r.status_code == 404:
+            raise RuntimeError(f"Resource not found: {url}") from e
+        raise
     fname.write_text(r.text)
     return r.json()
