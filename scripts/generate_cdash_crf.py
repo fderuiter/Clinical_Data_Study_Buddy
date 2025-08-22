@@ -27,12 +27,21 @@ or literal check‑boxes) but to deliver a genuinely usable CRF template that is
 visually much closer to the supplied design while remaining fully generated
 from the metadata.
 """
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
+import os
 import pathlib
 from typing import Dict, Tuple
 
 import pandas as pd
+from src.cdisc_library_client.api.cdash_implementation_guide_cdashig import (
+    get_mdr_cdashig_version_domains,
+    get_mdr_cdashig_version_domains_domain_fields,
+)
+from src.cdisc_library_client.client import AuthenticatedClient
 from docx import Document
 from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -205,27 +214,84 @@ def _style_header_cell(cell):
 ###############################################################################
 
 
-def load_ig(ig_path: str) -> pd.DataFrame:
-    """Load and normalise the *Variables* worksheet from a CDASH IG workbook."""
-    ig_df = pd.read_excel(ig_path, sheet_name="Variables", engine="openpyxl")
-    ig_df = ig_df[~ig_df["Domain"].isna()].copy()
+def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
+    """
+    Load and normalize CDASHIG variables from the CDISC Library API.
+    """
+    api_key = os.environ.get("CDISC_API_KEY")
+    if not api_key:
+        raise ValueError("CDISC_API_KEY environment variable not set.")
 
-    ig_df["Display Label"] = ig_df["Question Text"].fillna(
-        ig_df["CDASHIG Variable Label"]
+    client = AuthenticatedClient(base_url="https://library.cdisc.org/api", token=api_key)
+
+    all_variables = []
+
+    # Get all domains for the given CDASHIG version
+    domains_response = get_mdr_cdashig_version_domains.sync(
+        client=client, product="cdashig", version=ig_version, page_size=1000
     )
 
-    ig_df.rename(
-        columns={
-            "CDASHIG Variable": "Variable",
-            "Variable Order": "Order",
-            "Case Report Form Completion Instructions": "CRF Instructions",
-            "CDISC CT Codelist Submission Values(s), Subset Submission Value(s)": "CT Values",
-            "CDISC CT Codelist Code(s), Subset Codes(s)": "CT Codes",
-        },
-        inplace=True,
-    )
+    if not domains_response or not hasattr(domains_response, "items"):
+        print(f"Warning: No domains found for CDASHIG version {ig_version}")
+        return pd.DataFrame()
 
-    return ig_df
+    for domain_item in domains_response.items:
+        domain_name = domain_item.name
+        if not domain_name:
+            continue
+
+        # Get all fields for the given domain
+        page = 1
+        while True:
+            fields_response = get_mdr_cdashig_version_domains_domain_fields.sync(
+                client=client,
+                product="cdashig",
+                version=ig_version,
+                domain=domain_name,
+                page_size=1000,
+                page=page,
+            )
+
+            if (
+                not fields_response
+                or not hasattr(fields_response, "items")
+                or not fields_response.items
+            ):
+                break
+
+            for field in fields_response.items:
+                variable_data = {
+                    "Domain": domain_name,
+                    "Variable": field.name,
+                    "Order": field.ordinal,
+                    "Display Label": field.prompt or field.label,
+                    "CRF Instructions": field.completion_instructions,
+                    "Type": field.data_type,
+                    "CT Values": "; ".join(field.codelist.submission_value)
+                    if field.codelist and field.codelist.submission_value
+                    else None,
+                    "CT Codes": None,  # Not available in this endpoint
+                    "Implementation Notes": field.implementation_notes,
+                }
+                all_variables.append(variable_data)
+
+            if (
+                hasattr(fields_response, "_links")
+                and fields_response._links
+                and hasattr(fields_response._links, "next")
+                and fields_response._links.next
+            ):
+                page += 1
+            else:
+                break
+
+    df = pd.DataFrame(all_variables)
+    return df
+
+
+def load_ig(ig_version: str) -> pd.DataFrame:
+    """Load and normalise CDASHIG variables from the CDISC Library API."""
+    return get_cdashig_variables_from_api(ig_version)
 
 
 ###############################################################################
@@ -466,13 +532,10 @@ def build_domain_crf(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate Word CRF shells")
+    parser = argparse.ArgumentParser(description="Generate Word CRF shells from CDISC Library API")
     parser.add_argument(
-        "--model",
-        required=True,
-        help="Path to CDASH_Model_v1.3.xlsx (reserved for future use)",
+        "--ig-version", required=True, help="CDASHIG version (e.g., v2.3)"
     )
-    parser.add_argument("--ig", required=True, help="Path to CDASHIG_v2.3.xlsx")
     parser.add_argument(
         "--out", default="crfs", help="Directory for generated Word documents"
     )
@@ -487,7 +550,7 @@ def main() -> None:
     out_dir = pathlib.Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    ig_df = load_ig(args.ig)
+    ig_df = load_ig(args.ig_version)
 
     target_domains = [d.upper() for d in (args.domains or ig_df["Domain"].unique())]
     for dom in target_domains:
