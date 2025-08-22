@@ -8,3 +8,23 @@ build/
 artefacts/
 .env
 /tests/sample_output
+
+# Generated files and directories
+cli_output/
+output/
+crfs/
+test_artefacts/
+test_crfs/
+test_data/
+test_run/
+
+# Generated file types
+*.docx
+*.csv
+*.xlsx
+*.pdf
+*.rtf
+*.zip
+
+# Specific generated files
+crf.json

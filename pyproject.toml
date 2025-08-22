@@ -8,8 +8,9 @@ readme = "README.md"
 packages = [
     { from = "src", include = "cdisc_library_client" },
     { from = "src", include = "crfgen" },
-    { from = "src", include = "openfda_client" }
-    { from = "src", include = "protogen" }
+    { from = "src", include = "openfda_client" },
+    { from = "src", include = "protogen" },
+    { from = "src", include = "tfl" }
 ]
 
 [tool.poetry.dependencies]

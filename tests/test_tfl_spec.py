@@ -3,8 +3,8 @@ import pytest
 from click.testing import CliRunner
 from pydantic import ValidationError
 
-from src.tfl_models import TFLSpec
-from src.tfl_autonumber import AutoNumberer
+from src.tfl.models import TFLSpec
+from src.tfl.autonumber import AutoNumberer
 from src.crfgen.crfgen import app
 
 VALID_SPEC = """

@@ -1,5 +1,5 @@
 from typing import List, Dict
-from src.tfl_models import TFL, TFLSpec
+from .models import TFL, TFLSpec
 
 class AutoNumberer:
     """
