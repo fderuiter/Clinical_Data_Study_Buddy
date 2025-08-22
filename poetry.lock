@@ -1832,7 +1832,7 @@ files = [
     {file = "pypandoc-1.15.tar.gz", hash = "sha256:ea25beebe712ae41d63f7410c08741a3cab0e420f6703f95bc9b3a749192ce13"},
 ]
 
-
+[[package]]
 name = "pyparsing"
 version = "3.2.3"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -2397,4 +2397,4 @@ docs = ["jinja2", "sphinx", "sphinx_rtd_theme"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "802aa391de502f2860264df76131652cfb1227c7ec325eb8285a1d6bc1584460"
+content-hash = "7b3ffbfbba2fd252b2661585df3beab6ab91cdeed2aa718afd01826c88a926c9"

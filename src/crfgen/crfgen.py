@@ -1,11 +1,15 @@
 import click
+import yaml
 from rich.console import Console
 import os
+from pydantic import ValidationError
 
 from . import __version__
 from .exporter.registry import get as get_exporter
 from cdisc_library_client.harvest import harvest
 from protogen.protocol import StudyProtocol, generate_protocol_markdown
+from src.tfl_models import TFLSpec
+from src.tfl_migration import migrate_spec, TFLSpecMigrationError
 
 
 console = Console()
@@ -108,6 +112,26 @@ def protocol(therapeutic_area: str, treatment_arm: list[str], duration_weeks: in
     output_path = generate_protocol_markdown(study_protocol, output_dir)
 
     console.log(f"Protocol document generated at {output_path}")
+
+
+@app.command()
+@click.argument("spec_path", type=click.Path(exists=True, dir_okay=False, readable=True))
+def spec(spec_path: str):
+    """
+    Validate a TFL spec file.
+    """
+    console.log(f"Validating spec file: {spec_path}")
+    try:
+        with open(spec_path, "r") as f:
+            spec_data = yaml.safe_load(f)
+
+        spec_data = migrate_spec(spec_data)
+        TFLSpec(**spec_data)
+        console.log("[green]Spec file is valid.[/green]")
+    except (yaml.YAMLError, TFLSpecMigrationError, ValidationError) as e:
+        console.log(f"[red]Spec file is invalid:[/red]")
+        console.log(e)
+        raise click.Abort()
 
 
 def main():
