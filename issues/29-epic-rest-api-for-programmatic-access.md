@@ -1,0 +1,16 @@
+---
+title: "Epic: REST API for Programmatic Access"
+type: "Epic"
+parent: "19-initiative-utility-and-supporting-features.md"
+state: "backlog"
+labels:
+  - "api"
+  - "utility"
+assignees: []
+---
+
+### Description
+
+Expose all generation features through a well-documented REST API to allow for programmatic access and integration with other tools.
+
+This item was migrated from `TODO.old.md` (section 15.3).

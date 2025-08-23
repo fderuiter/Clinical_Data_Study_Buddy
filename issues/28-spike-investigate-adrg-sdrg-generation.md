@@ -1,0 +1,17 @@
+---
+title: "Spike: Investigate ADRG/SDRG Generation"
+type: "Spike"
+parent: "18-initiative-document-template-generators.md"
+state: "backlog"
+labels:
+  - "investigation"
+  - "adrg"
+  - "sdrg"
+assignees: []
+---
+
+### Description
+
+Investigate the purpose and feasibility of generating Analysis Data Reviewer's Guide (ADRG) and Study Data Reviewer's Guide (SDRG) documents.
+
+This item was migrated from `TODO.old.md` (section 15.2).

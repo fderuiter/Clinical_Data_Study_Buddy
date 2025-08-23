@@ -1,0 +1,16 @@
+---
+title: "Epic: Generate Blank CRFs"
+type: "Epic"
+parent: "18-initiative-document-template-generators.md"
+state: "backlog"
+labels:
+  - "document-generation"
+  - "crf-generation"
+assignees: []
+---
+
+### Description
+
+Implement functionality to generate blank Case Report Forms for SDTM annotation practice.
+
+This item was migrated from `TODO.old.md` (section 15.2).

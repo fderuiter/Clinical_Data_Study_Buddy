@@ -1,0 +1,16 @@
+---
+title: "Epic: Generate Specification Templates"
+type: "Epic"
+parent: "18-initiative-document-template-generators.md"
+state: "backlog"
+labels:
+  - "document-generation"
+  - "specification"
+assignees: []
+---
+
+### Description
+
+Implement functionality to generate Excel-based specification templates for SDTM and ADaM.
+
+This item was migrated from `TODO.old.md` (section 15.2).

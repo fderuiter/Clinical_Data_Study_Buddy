@@ -1,0 +1,15 @@
+---
+title: "Epic: Implement Core Dataset Generator"
+type: "Epic"
+parent: "17-initiative-dataset-generation-ui.md"
+state: "backlog"
+labels:
+  - "dataset-generation"
+assignees: []
+---
+
+### Description
+
+Implement the core functionality to generate synthetic, CDISC-compliant datasets for SDTM, ADaM, and SEND. This includes support for various output formats like CSV, SAS, and XPT.
+
+This item was migrated from `TODO.old.md` (section 15.1).

@@ -1,0 +1,16 @@
+---
+title: "Initiative: Utility and Supporting Features"
+type: "Initiative"
+parent: "16-theme-feature-expansion-clinical-data-generation.md"
+state: "backlog"
+labels:
+  - "utility"
+  - "api"
+assignees: []
+---
+
+### Description
+
+This Initiative covers the work required to build supporting infrastructure for the generation features, including a REST API for programmatic access and integration with the CDISC Rules Engine for validation. It corresponds to section 15.3 of the Feature Expansion plan in `TODO.old.md`.
+
+This item was migrated from `TODO.old.md`.

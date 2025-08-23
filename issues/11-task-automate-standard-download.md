@@ -1,0 +1,16 @@
+---
+title: "Task: Automate the download and storage of CDISC data standards"
+type: "Task"
+parent: "07-epic-transition-to-cdisc-api.md"
+state: "todo"
+labels:
+  - "data-standards"
+  - "automation"
+assignees: []
+---
+
+### Description
+
+Automate the download and storage of CDISC data standards from the CDISC website or API.
+
+This item was migrated from `TODO.md`.
