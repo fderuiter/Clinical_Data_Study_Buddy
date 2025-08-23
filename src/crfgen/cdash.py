@@ -1,37 +1,3 @@
-#!/usr/bin/env python
-"""
-Generate MS‑Word CRF shells from CDASH metadata workbooks
--------------------------------------------------------
-This **rewrite** produces a layout that more closely resembles the dark, sectioned
-mock‑up supplied in the screenshot:
-
-*   Landscape orientation, dark background header/footer bands, white text.
-*   A two‑row page header with room for study‑level information plus the CRF
-    title (Domain description written‑out as *Assessment*, *Concomitant / Prior
-    Medications*, etc.).
-*   Automatic page numbering in the footer (right aligned) and a version label
-    (left aligned) just like the mock‑up.
-*   Distinct colour‑banded *SECTION A ADMINISTRATIVE* & *SECTION B <DOMAIN>*
-    table headers.
-*   Six data columns – Variable | Label / Question | Type | Controlled
-    Terminology | Data Entry | Instructions – identical to the original script
-    but with shading and stronger typographic hierarchy.
-*   A helper routine to shade table cells (python‑docx still lacks a high‑level
-    API for this).
-*   A consolidated mapping of CDASH domain codes → “[category, full title]” so
-    we can replace cryptic two‑letter codes with human‑friendly names wherever
-    appropriate.
-
-The goal is *not* to pixel‑match the example (python‑docx cannot create shapes
-or literal check‑boxes) but to deliver a genuinely usable CRF template that is
-visually much closer to the supplied design while remaining fully generated
-from the metadata.
-"""
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-import argparse
 import os
 import pathlib
 from typing import Dict, Tuple, List, Any
@@ -223,9 +189,9 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
     """
     Load and normalize CDASHIG variables from the CDISC Library API.
     """
-    api_key = os.environ.get("CDISC_API_KEY")
+    api_key = os.environ.get("CDISC_PRIMARY_KEY")
     if not api_key:
-        raise ValueError("CDISC_API_KEY environment variable not set.")
+        raise ValueError("CDISC_PRIMARY_KEY environment variable not set.")
 
     client = AuthenticatedClient(base_url="https://library.cdisc.org/api", token=api_key)
 
@@ -233,15 +199,14 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
 
     # Get all domains for the given CDASHIG version
     domains_response = get_mdr_cdashig_version_domains.sync(
-        client=client, product="cdashig", version=ig_version, page_size=1000
+        client=client, version=ig_version
     )
-
-    if not domains_response or not hasattr(domains_response, "items"):
+    if not domains_response or not domains_response.field_links or not domains_response.field_links.domains:
         print(f"Warning: No domains found for CDASHIG version {ig_version}")
         return pd.DataFrame()
 
-    for domain_item in domains_response.items:
-        domain_name = domain_item.name
+    for domain_item in domains_response.field_links.domains:
+        domain_name = domain_item.href.split("/")[-1]
         if not domain_name:
             continue
 
@@ -250,45 +215,44 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
         while True:
             fields_response = get_mdr_cdashig_version_domains_domain_fields.sync(
                 client=client,
-                product="cdashig",
                 version=ig_version,
                 domain=domain_name,
-                page_size=1000,
-                page=page,
             )
-
             if (
                 not fields_response
-                or not hasattr(fields_response, "items")
-                or not fields_response.items
+                or not fields_response.field_links
+                or not fields_response.field_links.fields
             ):
                 break
 
-            for field in fields_response.items:
+            from src.cdisc_library_client.api.cdash_implementation_guide_cdashig import get_mdr_cdashig_version_domains_domain_fields_field
+            for field_ref in fields_response.field_links.fields:
+                field_name = field_ref.href.split("/")[-1]
+                field_details = get_mdr_cdashig_version_domains_domain_fields_field.sync(
+                    client=client,
+                    version=ig_version,
+                    domain=domain_name,
+                    field=field_name,
+                )
+                if not field_details:
+                    continue
+
                 variable_data = {
                     "Domain": domain_name,
-                    "Variable": field.name,
-                    "Order": field.ordinal,
-                    "Display Label": field.prompt or field.label,
-                    "CRF Instructions": field.completion_instructions,
-                    "Type": field.data_type,
-                    "CT Values": "; ".join(field.codelist.submission_value)
-                    if field.codelist and field.codelist.submission_value
+                    "Variable": field_details.name,
+                    "Order": field_details.ordinal,
+                    "Display Label": field_details.prompt or field_details.label,
+                    "CRF Instructions": field_details.completion_instructions,
+                    "Type": field_details.simple_datatype,
+                    "CT Values": "; ".join(field_details.additional_properties.get("codelistSubmissionValues", []))
+                    if field_details.additional_properties and field_details.additional_properties.get("codelistSubmissionValues")
                     else None,
                     "CT Codes": None,  # Not available in this endpoint
-                    "Implementation Notes": field.implementation_notes,
+                    "Implementation Notes": field_details.implementation_notes,
                 }
                 all_variables.append(variable_data)
 
-            if (
-                hasattr(fields_response, "_links")
-                and fields_response._links
-                and hasattr(fields_response._links, "next")
-                and fields_response._links.next
-            ):
-                page += 1
-            else:
-                break
+            break
 
     df = pd.DataFrame(all_variables)
     return df
@@ -552,67 +516,3 @@ def build_domain_crf(
     out_path = out_dir / f"{domain}_{safe_title}_CRF.docx"
     document.save(out_path)
     print(f"\u2713 Saved {out_path.relative_to(out_dir.parent)}")
-
-
-###############################################################################
-# CLI entry‑point
-###############################################################################
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate Word CRF shells from CDISC Library API")
-    parser.add_argument(
-        "--ig-version", required=True, help="CDASHIG version (e.g., v2.3)"
-    )
-    parser.add_argument(
-        "--out", default="crfs", help="Directory for generated Word documents"
-    )
-    parser.add_argument(
-        "--domains",
-        nargs="*",
-        metavar="DOMAIN",
-        help="Optional domain whitelist (e.g. AE CM VS)",
-    )
-    parser.add_argument(
-        "--config", default="crf_config.yaml", help="Path to the configuration file."
-    )
-    parser.add_argument(
-        "--openfda-drug-name", help="Drug name to fetch adverse events from OpenFDA."
-    )
-    parser.add_argument(
-        "--openfda-max-results", type=int, default=20, help="Max adverse events to fetch from OpenFDA."
-    )
-
-    args = parser.parse_args()
-    out_dir = pathlib.Path(args.out)
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    config = {}
-    config_path = pathlib.Path(args.config)
-    if config_path.exists():
-        with open(config_path, "r") as f:
-            config = yaml.safe_load(f)
-    else:
-        print(f"Warning: Config file not found at {config_path}. Using default values.")
-
-    fda_adverse_events = None
-    if args.openfda_drug_name:
-        print(f"Fetching adverse events for {args.openfda_drug_name} from OpenFDA...")
-        fda_adverse_events = populate_ae_from_fda(
-            args.openfda_drug_name, max_results=args.openfda_max_results
-        )
-        print(f"Found {len(fda_adverse_events)} suggested adverse event terms.")
-
-    ig_df = load_ig(args.ig_version)
-
-    target_domains = [d.upper() for d in (args.domains or ig_df["Domain"].unique())]
-    for dom in target_domains:
-        dom_df = ig_df[ig_df["Domain"] == dom]
-        if dom_df.empty:
-            print(f"\u26a0 Domain {dom} not found in IG – skipped")
-            continue
-        build_domain_crf(dom_df, dom, out_dir, config, fda_adverse_events=fda_adverse_events)
-
-
-if __name__ == "__main__":
-    main()

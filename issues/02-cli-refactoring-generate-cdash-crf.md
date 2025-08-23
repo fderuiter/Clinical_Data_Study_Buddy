@@ -1,0 +1,59 @@
+---
+title: "Refactor `generate_cdash_crf.py` into a Unified CLI"
+state: "closed"
+labels:
+  - "enhancement"
+  - "refactoring"
+  - "bug"
+assignees:
+  - "Jules"
+---
+
+### Description
+
+The `scripts/generate_cdash_crf.py` script was a standalone script for generating CDASH CRF documents. This approach had several drawbacks:
+-   It contributed to a cluttered `scripts/` directory.
+-   It was not well-integrated with the rest of the project.
+-   It had several latent bugs related to API interaction and data parsing.
+
+The goal of this task was to refactor this script into a command within a new, unified CLI application, and to fix the underlying bugs discovered during the process.
+
+### Work Done
+
+1.  **CLI Scaffolding:**
+    *   Added `typer` as a dependency for creating the CLI.
+    *   Created a new package `src/cdisc_cli` to house the CLI application.
+    *   Created the main entry point `src/cdisc_cli/main.py`.
+    *   Updated `pyproject.toml` to register the new `cdisc` command.
+
+2.  **Logic Extraction:**
+    *   Created a new module `src/crfgen/cdash.py` to hold the core business logic from the original script, separating the logic from the command-line interface.
+
+3.  **Command Implementation:**
+    *   Implemented a new `generate-cdash-crf` command in `src/cdisc_cli/main.py`.
+    *   This command uses `Typer` to handle command-line arguments, providing a better user experience than the original `argparse` script.
+
+4.  **Extensive Debugging and Bug Fixes:**
+    *   This task involved a significant debugging effort, as the original script and the generated API client had several issues. The following bugs were identified and fixed:
+        *   **Incorrect API Key Environment Variable:** The code was looking for `CDISC_API_KEY`, but the documentation specified `CDISC_PRIMARY_KEY`. This was corrected in `src/crfgen/cdash.py`.
+        *   **Missing `.env` Loading:** The application was not automatically loading the `.env` file. Added `python-dotenv`'s `load_dotenv()` to the CLI entry point to ensure environment variables are always available.
+        *   **Incorrect API Authentication Scheme:** The generated `AuthenticatedClient` was attempting to use Bearer token authentication, but the API expects a subscription key in the `api-key` header. Modified the `AuthenticatedClient` in `src/cdisc_library_client/client.py` to use the correct header name (`api-key`) and an empty prefix.
+        *   **Incorrect API Call Parameters:** The script was passing invalid parameters (`product`, `page_size`, `page`) to the generated API client functions. These were removed. The broken pagination logic was also removed.
+        *   **Incorrect API Response Parsing (Multiple Levels):** The code was making incorrect assumptions about the structure of the API response. The following attributes were being accessed incorrectly and were fixed:
+            *   `domains_response.items` -> `domains_response.field_links.domains`
+            *   `domain_item.name` -> `domain_item.href.split('/')[-1]`
+            *   `fields_response.items` -> `fields_response.field_links.fields`
+            *   `field.name` -> `field_ref.href.split('/')[-1]` (and subsequently changed to fetch full field details)
+            *   `field_details.data_type` -> `field_details.simple_datatype`
+            *   `field_details.codelist` -> `field_details.field_links.codelist`
+            *   `field_details.field_links.codelist.submission_value` -> `field_details.additional_properties.get("codelistSubmissionValues", [])`
+        *   **Typo in `docx` Enum:** Fixed a `NameError` caused by a typo (`WD_ALIGN_PARAGraph` instead of `WD_ALIGN_PARAGRAPH`).
+
+5.  **Finalization:**
+    *   Verified that the new `cdisc generate-cdash-crf` command works correctly and generates the expected documents.
+    *   Removed the original `scripts/generate_cdash_crf.py` script.
+    *   Removed the temporary `debug-products` command from the CLI.
+
+### Status
+
+This task is **complete**. The functionality is now part of the unified CLI, and several significant bugs have been fixed, making the feature more robust.
