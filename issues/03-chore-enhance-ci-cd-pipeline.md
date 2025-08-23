@@ -1,6 +1,10 @@
 ---
-title: "Enhance CI/CD Pipeline with PR Checks"
-state: "open"
+title: "Chore: Enhance CI/CD Pipeline with PR Checks"
+type: "Chore"
+parent: "00-epic-initial-codebase-refactoring.md"
+dependencies:
+  - "02-task-cli-refactoring.md"
+state: "todo"
 labels:
   - "enhancement"
   - "ci-cd"

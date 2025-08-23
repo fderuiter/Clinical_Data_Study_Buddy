@@ -1,6 +1,7 @@
 ---
-title: "Documentation Overhaul"
-state: "open"
+title: "Epic: Documentation Overhaul"
+type: "Epic"
+state: "todo"
 labels:
   - "enhancement"
   - "documentation"

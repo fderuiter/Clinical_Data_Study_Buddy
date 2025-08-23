@@ -1,85 +1,139 @@
-# Contributor Guide: Working on Issues
+# Contributor Guide: An Agile Framework for Issues
 
-This document outlines the structure of the issue files in this directory and provides best practices for tackling the tasks they describe. The goal is to maintain a clear, consistent, and effective workflow for all contributors.
+This document outlines a metadata-driven system for managing our work, inspired by Agile methodologies. Every work item, from a high-level strategic goal to a small technical task, is a Markdown file in this directory. The relationships between them are defined by metadata in each file's YAML frontmatter.
 
-## Issue File Structure
+## The Hierarchy of Work
 
-Each issue is a Markdown file with a consistent structure, designed to provide all necessary context at a glance.
+Work is broken down into a clear hierarchy. An item's position in this hierarchy is defined by its `type`.
 
-### YAML Frontmatter
+| Level | Type | Description | Timeframe |
+| :--- | :--- | :--- | :--- |
+| **Highest** | `Theme` | A high-level strategic business goal. | Quarters / Years |
+| | `Initiative` | A collection of epics to achieve a theme. | Months / Quarters |
+| | `Epic` | A large feature or body of work. | Weeks / Months |
+| | `User Story`| A small piece of user-facing functionality. | Days / Weeks |
+| | `Task` | A specific technical action for the dev team. | Hours / Days |
+| **Lowest** | `Sub-task` | A granular step within a task. | Minutes / Hours |
 
-Every issue file begins with a YAML frontmatter block that contains key metadata:
+### Other Work Types
+
+Some work doesn't fit neatly into the hierarchy but is equally important.
+
+| Type | Description |
+| :--- | :--- |
+| `Bug` | An error or flaw in the existing product. |
+| `Spike` | A research task to investigate a technical question. Usually time-boxed. |
+| `Chore` | Work necessary for codebase health (e.g., refactoring, CI/CD improvements). |
+
+---
+
+## YAML Frontmatter Structure
+
+The metadata for each work item is defined in a YAML block at the top of the file.
 
 ```yaml
 ---
-title: "A concise, descriptive title of the task"
-state: "open" | "in-progress" | "closed"
+title: "A concise, descriptive title"
+type: "Theme" | "Initiative" | "Epic" | "User Story" | "Task" | "Sub-task" | "Bug" | "Spike" | "Chore"
+parent: "optional-path/to/parent-file.md"
+dependencies:
+  - "optional-path/to/dependency-1.md"
+  - "optional-path/to/dependency-2.md"
+state: "backlog" | "todo" | "in-progress" | "in-review" | "done" | "closed"
 labels:
-  - "bug"
-  - "enhancement"
-  - "refactoring"
-  - "documentation"
+  - "frontend"
+  - "backend"
+  - "priority-high"
 assignees:
   - "GitHubUsername"
 ---
 ```
 
--   **`title`**: A brief and clear summary of the task.
--   **`state`**: The current status of the issue.
--   **`labels`**: A list of labels to categorize the issue.
--   **`assignees`**: The person or people responsible for the task.
+### Key Fields Explained
 
-### Issue Body
+-   **`type`** (Required): The most important field. It defines the item's level in the Agile hierarchy.
+-   **`parent`** (Optional): The filename of the parent work item. This is how the hierarchy is built. For example, the `parent` of a `Task` should be a `User Story`. A `Theme` would have no `parent`.
+-   **`dependencies`** (Optional): A list of filenames for work items that must be completed *before* this one can start. This allows for creating a task graph that is independent of the hierarchy.
+-   **`state`**: The current status of the work item.
+-   **`labels`**: For categorizing work (e.g., by team, component, priority).
+-   **`assignees`**: The person or people responsible.
 
-The body of the issue is divided into three main sections:
+### `User Story` Format
 
-1.  **`### Description`**
-    This section provides a detailed explanation of the problem or task. It should answer the "what" and "why" of the issue, giving enough context for a developer to understand the goals without needing to seek additional information.
+When an item has `type: User Story`, its description in the Markdown body **must** follow this format:
+> As a **[type of user]**, I want **[to perform some action]** so that **[I can achieve some goal]**.
 
-2.  **`### Work Done`**
-    This section is a chronological log of the work performed to resolve the issue. It should be a clear and detailed account of the steps taken, including:
-    -   Code changes (e.g., "Refactored the `Foo` class into a `Bar` service").
-    -   Dependencies added or removed.
-    -   Configuration changes.
-    -   Bugs fixed, with details on the root cause and the solution.
-    -   Verification steps (e.g., "Ran the test suite and confirmed all tests pass").
+---
 
-3.  **`### Status`**
-    This section provides a final summary of the outcome. For a completed task, it should confirm that the issue is resolved and the goals have been met.
+## Example in Practice
 
-## Principal Developer Best Practices
+Here's how the hierarchy might look for a fictional project.
 
-To ensure high-quality contributions, please follow these best practices when working on issues.
+**File: `00-theme-improve-customer-retention.md`**
+```yaml
+---
+title: "Improve Customer Retention"
+type: "Theme"
+state: "backlog"
+---
+```
 
-### 1. Understand the "Definition of Done"
+**File: `01-initiative-launch-loyalty-program.md`**
+```yaml
+---
+title: "Launch a Customer Loyalty Program"
+type: "Initiative"
+parent: "00-theme-improve-customer-retention.md"
+state: "backlog"
+---
+```
 
-Before writing any code, make sure you have a clear understanding of what a successful outcome looks like. The "Definition of Done" for most tasks includes:
--   The primary requirements of the issue are met.
--   The code is well-documented, clean, and follows project conventions.
--   Relevant tests have been added or updated.
--   All existing tests pass.
--   The "Work Done" section of the issue is updated with a clear summary of your changes.
+**File: `02-epic-build-rewards-system.md`**
+```yaml
+---
+title: "Build a Points-Based Rewards System"
+type: "Epic"
+parent: "01-initiative-launch-loyalty-program.md"
+state: "todo"
+---
+```
 
-### 2. Plan Your Approach
+**File: `03-story-view-points-balance.md`**
+```yaml
+---
+title: "View Points Balance"
+type: "User Story"
+parent: "02-epic-build-rewards-system.md"
+state: "todo"
+assignees:
+  - "Jules"
+---
 
-For non-trivial tasks, take a moment to plan your implementation. Think about:
--   Which files will you need to modify?
--   Are there any existing components you can reuse?
--   What is the best way to structure your code for maintainability and clarity?
+As a **registered customer**, I want **to see my current points balance on my profile page** so that **I know how close I am to a reward**.
+```
 
-### 3. Work in Small, Atomic Commits
+**File: `04-task-create-api-endpoint.md`**
+```yaml
+---
+title: "Create API endpoint for points balance"
+type: "Task"
+parent: "03-story-view-points-balance.md"
+state: "in-progress"
+assignees:
+  - "Jules"
+---
+```
 
-Avoid creating a single, massive commit for a large task. Instead, break your work into small, logical, and "atomic" commits. Each commit should represent a single, complete thought or change. This makes your work easier to review and understand.
-
-### 4. Verify Your Work
-
-Never assume your changes work as expected. Always verify them by:
--   **Running tests:** The project's test suite is your first line of defense against regressions.
--   **Manual testing:** For CLI tools or other user-facing features, run the code manually to ensure it behaves as expected.
--   **Reading your own code:** A final read-through can often catch typos or logical errors.
-
-### 5. Document Clearly
-
-Update the "Work Done" section of the issue file as you complete the task. This is not just for others; it's a valuable log for your future self. Be specific and concise. Instead of "fixed a bug," write "Fixed a `NameError` in `src/crfgen/cdash.py` caused by a typo in an enum." This level of detail is invaluable for future maintenance and debugging.
-
-By following these guidelines, you'll contribute effectively to the project and help us maintain a high-quality, stable, and easy-to-understand codebase.
+**File: `05-task-add-points-to-ui.md`**
+```yaml
+---
+title: "Add points balance to profile page UI"
+type: "Task"
+parent: "03-story-view-points-balance.md"
+dependencies:
+  - "04-task-create-api-endpoint.md"
+state: "todo"
+assignees:
+  - "Jules"
+---
+```
