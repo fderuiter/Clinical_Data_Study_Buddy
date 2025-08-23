@@ -1,6 +1,8 @@
 ---
-title: "Repository Restructuring and Cleanup"
-state: "closed"
+title: "Task: Repository Restructuring and Cleanup"
+type: "Task"
+parent: "00-epic-initial-codebase-refactoring.md"
+state: "done"
 labels:
   - "enhancement"
   - "refactoring"
