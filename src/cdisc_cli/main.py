@@ -22,7 +22,9 @@ import cdisc_generators.crfgen.exporter.xlsx  # noqa
 from cdisc_generators.crfgen.exporter import registry as reg
 from cdisc_generators.crfgen.schema import Form
 from cdisc_generators.analysisgen.generator import AnalysisGenerator
+from cdisc_generators.analysisgen.sas_generator import SASGenerator
 from cdisc_generators.data_generator import DataGenerator
+from cdisc_generators.tfl.tfl_shell_generator import TFLShellGenerator
 from cdisc_generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
 import pandas as pd
 from pathlib import Path
@@ -47,6 +49,46 @@ def main():
     # This callback will run before any command.
     # You can use it for common setup.
     pass
+
+
+@app.command()
+def generate_tfl_shell(
+    spec: str = typer.Option(..., "--spec", help="TFL specification"),
+    output_file: pathlib.Path = typer.Option(..., "--output-file", help="Path to the output file")
+):
+    """
+    Generates a TFL shell document.
+    """
+    generator = TFLShellGenerator(spec)
+    shell = generator.generate()
+
+    try:
+        with open(output_file, 'w') as f:
+            f.write(shell)
+        console.print(f"Successfully generated TFL shell in {output_file}")
+    except IOError as e:
+        console.print(f"Error writing to file: {e}", style="bold red")
+
+
+@app.command()
+def generate_sas_code(
+    dataset: str = typer.Option(..., "--dataset", help="Source dataset (e.g., ADSL)"),
+    output_type: str = typer.Option(..., "--output-type", help="Type of analysis output (e.g., Demographics)"),
+    treatment_var: str = typer.Option(..., "--treatment-var", help="Treatment variable (e.g., TRT01A)"),
+    output_file: pathlib.Path = typer.Option(..., "--output-file", help="Path to the output file")
+):
+    """
+    Generates analysis code in SAS.
+    """
+    generator = SASGenerator(dataset, output_type, treatment_var)
+    code = generator.generate()
+
+    try:
+        with open(output_file, 'w') as f:
+            f.write(code)
+        console.print(f"Successfully generated SAS code in {output_file}")
+    except IOError as e:
+        console.print(f"Error writing to file: {e}", style="bold red")
 
 
 @app.command()
@@ -116,10 +158,10 @@ def download_standard(
         sys.exit(1)
 
 
-from cdisc_generators.raw_dataset_package import generate_raw_dataset_package as gen_raw_pkg
+from cdisc_generators.edc_raw_dataset_package_generator import EDCRawDatasetPackageGenerator
 
 @app.command()
-def generate_raw_dataset_package(
+def generate_edc_raw_dataset_package(
     num_subjects: int = typer.Option(50, "--num-subjects", help="Number of subjects (10-200)"),
     therapeutic_area: str = typer.Option("Oncology", "--therapeutic-area", help="Therapeutic area for the study"),
     domains: List[str] = typer.Option(..., "--domains", help="List of domains to include (e.g., DM AE VS LB)"),
@@ -130,7 +172,7 @@ def generate_raw_dataset_package(
     """
     Generate an EDC Raw Dataset Package.
     """
-    gen_raw_pkg(
+    generator = EDCRawDatasetPackageGenerator(
         num_subjects=num_subjects,
         therapeutic_area=therapeutic_area,
         domains=domains,
@@ -138,6 +180,7 @@ def generate_raw_dataset_package(
         output_dir=output_dir,
         output_format=output_format,
     )
+    generator.generate()
     console.print(f"EDC Raw Dataset Package generated successfully in {output_dir}")
 
 
@@ -244,13 +287,10 @@ def generate_cdash_crf(
         build_domain_crf(dom_df, dom, out_dir, config, fda_adverse_events=fda_adverse_events)
 
 
-from cdisc_generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
+from cdisc_generators.study_protocols_generator import StudyProtocolsGenerator
 
-protocol_app = typer.Typer()
-app.add_typer(protocol_app, name="protocol")
-
-@protocol_app.command("generate")
-def protocol_generate(
+@app.command()
+def generate_study_protocols(
     therapeutic_area: str = typer.Option(..., "--therapeutic-area", help="The therapeutic area of the study."),
     treatment_arms: List[str] = typer.Option(..., "--treatment-arm", help="A treatment arm of the study. Can be specified multiple times."),
     duration_weeks: int = typer.Option(..., "--duration-weeks", help="The duration of the study in weeks."),
@@ -260,14 +300,14 @@ def protocol_generate(
     """
     Generates a study protocol.
     """
-    output_dir.mkdir(parents=True, exist_ok=True)
-    protocol = StudyProtocol(
+    generator = StudyProtocolsGenerator(
         therapeutic_area=therapeutic_area,
         treatment_arms=treatment_arms,
         duration_weeks=duration_weeks,
-        phase=phase
+        phase=phase,
+        output_dir=str(output_dir)
     )
-    generate_protocol_markdown(protocol, str(output_dir))
+    generator.generate()
     console.print(f"Protocol documents generated in {output_dir}")
 
 
@@ -307,13 +347,10 @@ def sdrg_generate(
     console.print(f"SDRG document generated at: {output_path}")
 
 
-from cdisc_generators.spec import generate_template, generate_dataset, validate
+from cdisc_generators.specification_templates_generator import SpecificationTemplatesGenerator
 
-spec_app = typer.Typer()
-app.add_typer(spec_app, name="spec")
-
-@spec_app.command("generate-template")
-def spec_generate_template(
+@app.command()
+def generate_specification_templates(
     product: str = typer.Option(..., "--product", help="The CDISC product (e.g., sdtmig, adamig)."),
     version: str = typer.Option(..., "--version", help="The version of the product (e.g., 3-3)."),
     domains: List[str] = typer.Option(..., "--domains", help="A list of domains to include in the specification (e.g., DM AE VS)."),
@@ -322,7 +359,14 @@ def spec_generate_template(
     """
     Generate Excel-based specification templates for CDISC datasets.
     """
-    generate_template(product, version, domains, str(output_dir))
+    generator = SpecificationTemplatesGenerator(product, version, domains, str(output_dir))
+    generator.generate()
+
+
+from cdisc_generators.spec import generate_dataset, validate
+
+spec_app = typer.Typer()
+app.add_typer(spec_app, name="spec")
 
 @spec_app.command("generate-dataset")
 def spec_generate_dataset(
