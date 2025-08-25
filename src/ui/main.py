@@ -15,7 +15,10 @@ templates = Jinja2Templates(directory=os.path.join(project_root, "src/ui/templat
 
 
 from pydantic import BaseModel
-from cdisc_generators.synthetic_data import generate_and_download_synthetic_data
+from cdisc_generators.data_generator import DataGenerator
+from cdisc_library_client.harvest import harvest
+from cdisc_generators.crfgen.utils import get_api_key
+import pandas as pd
 from cdisc_generators.raw_dataset_package import generate_raw_dataset_package
 import pathlib
 from typing import List
@@ -44,15 +47,20 @@ async def generate_synthetic_data_endpoint(request: SyntheticDataRequest):
     output_dir = pathlib.Path("output/ui_generated_data")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    file_path = generate_and_download_synthetic_data(
-        dataset_type=request.dataset_type,
-        domain=request.domain,
-        num_subjects=request.num_subjects,
-        therapeutic_area=request.therapeutic_area,
-        data_format=request.data_format,
-        output_dir=output_dir,
-    )
-    return {"message": "Dataset generated successfully", "file_path": file_path}
+    api_key = get_api_key()
+    forms = harvest(api_key, ig_filter=request.dataset_type)
+    domain_form = next((f for f in forms if f.domain == request.domain), None)
+    if not domain_form:
+        return {"message": f"Domain {request.domain} not found"}
+
+    generator = DataGenerator(domain_form)
+    dataset = generator.generate(request.num_subjects)
+
+    output_file = output_dir / f"{request.domain}.csv"
+    df = pd.DataFrame(dataset)
+    df.to_csv(output_file, index=False)
+
+    return {"message": "Dataset generated successfully", "file_path": str(output_file)}
 
 
 @app.post("/api/generate-raw-dataset-package")

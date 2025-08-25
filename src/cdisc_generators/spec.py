@@ -10,8 +10,9 @@ from cdisc_library_client.api.sdtm_implementation_guide_sdtmig import (
 from cdisc_library_client.api.analysis_data_model_and_implementation_guide_a_da_m_and_a_da_mig import (
     get_mdr_adam_product_datastructures_structure,
 )
-from cdisc_dataset_generator_client.client import CDISCDataSetGeneratorClient
 from dotenv import load_dotenv
+from cdisc_generators.data_generator import DataGenerator
+from cdisc_generators.crfgen.schema import Form, FieldDef
 
 
 def get_client():
@@ -100,44 +101,34 @@ def generate_template(
 
 def generate_dataset(spec_path: str, output_dir: str):
     path = Path(spec_path)
-    filename = path.stem
-    try:
-        product, version, _ = filename.split("_", 2)
-    except ValueError:
-        print(
-            "Invalid spec filename format. Expected '<product>_<version>_spec.xlsx'."
-        )
-        return
-
     workbook = openpyxl.load_workbook(path)
     domains = workbook.sheetnames
-
-    client = CDISCDataSetGeneratorClient()
 
     for domain in domains:
         if domain.lower() == "metadata":
             continue
         print(f"Generating dataset for domain {domain}...")
-        try:
-            dataset_type = "SDTM" if "sdtm" in product.lower() else product.upper()
 
-            result = client.generate_dataset(
-                dataset_type=dataset_type,
-                domain=domain,
-                num_subjects=50,
-                therapeutic_area="Oncology",
-                format="csv",
+        spec_df = pd.read_excel(path, sheet_name=domain)
+        fields = []
+        for _, row in spec_df.iterrows():
+            fields.append(
+                FieldDef(
+                    oid=row["Variable Name"],
+                    prompt=row["Variable Label"],
+                    datatype=row["Data Type"],
+                    cdash_var=row["Variable Name"],
+                )
             )
-            download_url = result["download_url"]
-            output_filename = result["filename"]
-            output_path = os.path.join(output_dir, output_filename)
 
-            print(f"Downloading dataset to {output_path}...")
-            client.download_file(download_url, output_path)
-            print(f"Dataset for domain {domain} downloaded successfully.")
+        form_data = Form(title=domain, domain=domain, fields=fields)
+        generator = DataGenerator(form_data)
+        dataset = generator.generate(num_subjects=50)
 
-        except Exception as e:
-            print(f"Could not generate dataset for domain {domain}: {e}")
+        output_path = Path(output_dir) / f"{domain}.csv"
+        df = pd.DataFrame(dataset)
+        df.to_csv(output_path, index=False)
+        print(f"Dataset for domain {domain} generated successfully at {output_path}")
 
 def validate(spec_path: str, dataset_path: str):
     spec_path = Path(spec_path)
