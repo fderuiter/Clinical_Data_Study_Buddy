@@ -23,10 +23,27 @@ def render_odm(forms: Sequence[Form], out_dir: Path):
     study.MetaDataVersion.append(mdv)
 
     for f in forms:
-        # TODO: The "Repeating" attribute is required by odmlib.
-        # The information is not available in the Form model, so it's hardcoded to "No".
-        # This should be revisited if the crawler can fetch this information.
         formdef = ODM.FormDef(OID=f"F.{f.domain}", Name=f.title, Repeating="No")
+        item_group_def = ODM.ItemGroupDef(OID=f"IG.{f.domain}", Name=f.title, Repeating="No")
+        for field in f.fields:
+            item_def = ODM.ItemDef(
+                OID=f"IT.{field.oid}",
+                Name=field.prompt,
+                DataType=field.datatype,
+            )
+            if field.range_check:
+                range_check = ODM.RangeCheck(Comparator="EQ")
+                for check_value in field.range_check:
+                    item = ODM.CheckValue()
+                    item.text = check_value
+                    range_check.CheckValue.append(item)
+                item_def.RangeCheck.append(range_check)
+            mdv.ItemDef.append(item_def)
+            item_ref = ODM.ItemRef(ItemOID=f"IT.{field.oid}", Mandatory="No")
+            item_group_def.ItemRef.append(item_ref)
+
+        mdv.ItemGroupDef.append(item_group_def)
+        formdef.ItemGroupRef.append(ODM.ItemGroupRef(ItemGroupOID=f"IG.{f.domain}", Mandatory="No"))
         mdv.FormDef.append(formdef)
 
     out_dir.mkdir(exist_ok=True, parents=True)

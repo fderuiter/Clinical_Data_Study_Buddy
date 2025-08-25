@@ -8,6 +8,7 @@ import sys
 import yaml
 from cdisc_library_client.harvest import harvest
 from cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators.standard_downloader import download_standard as download_standard_func
 from cdisc_generators.crfgen.cdash import build_domain_crf, load_ig
 from cdisc_generators.crfgen.populators import populate_ae_from_fda
 import cdisc_generators.crfgen.exporter.csv  # noqa
@@ -21,8 +22,9 @@ import cdisc_generators.crfgen.exporter.xlsx  # noqa
 from cdisc_generators.crfgen.exporter import registry as reg
 from cdisc_generators.crfgen.schema import Form
 from cdisc_generators.analysisgen.generator import AnalysisGenerator
-from cdisc_dataset_generator_client.client import CDISCDataSetGeneratorClient
+from cdisc_generators.data_generator import DataGenerator
 from cdisc_generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
+import pandas as pd
 from pathlib import Path
 import os
 
@@ -96,6 +98,24 @@ def build(
         fn(forms, outdir)
 
 
+@app.command()
+def download_standard(
+    standard: str = typer.Option(..., "--standard", "-s", help="The standard to download (e.g., sdtmig, adamig)."),
+    version: str = typer.Option(..., "--version", "-v", help="The version of the standard (e.g., 3-3)."),
+    output_dir: pathlib.Path = typer.Option(".", "--output-dir", "-o", help="The directory to save the downloaded files.")
+):
+    """
+    Download a CDISC data standard from the CDISC Library.
+    """
+    console.print(f"Downloading {standard} version {version} to {output_dir}...")
+    try:
+        download_standard_func(standard, version, output_dir)
+        console.print("✅  Download complete.")
+    except Exception as e:
+        console.print(f"ERROR: {e}", style="bold red")
+        sys.exit(1)
+
+
 from cdisc_generators.raw_dataset_package import generate_raw_dataset_package as gen_raw_pkg
 
 @app.command()
@@ -121,30 +141,33 @@ def generate_raw_dataset_package(
     console.print(f"EDC Raw Dataset Package generated successfully in {output_dir}")
 
 
-from cdisc_generators.synthetic_data import generate_and_download_synthetic_data
-
 @app.command()
 def generate_synthetic_data(
-    dataset_type: str = typer.Option(..., "--dataset-type", help="Type of dataset to generate (SDTM, ADaM, SEND)"),
-    domain: str = typer.Option(..., "--domain", help="Domain for the dataset"),
-    num_subjects: int = typer.Option(50, "--num-subjects", help="Number of subjects"),
-    therapeutic_area: str = typer.Option("Oncology", "--therapeutic-area", help="Therapeutic area"),
-    format: str = typer.Option("csv", "--format", help="Output format (csv, json, xpt)"),
-    output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="Directory to save the downloaded file")
+    standard: str = typer.Option(..., "--standard", help="The standard to generate data for (e.g., sdtmig)."),
+    version: str = typer.Option(..., "--version", help="The version of the standard (e.g., 3-3)."),
+    domain: str = typer.Option(..., "--domain", help="The domain to generate data for (e.g., DM)."),
+    num_subjects: int = typer.Option(50, "--num-subjects", help="Number of subjects."),
+    output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="Directory to save the file."),
 ):
     """
     Generate synthetic CDISC datasets.
     """
-    console.print(f"Generating {dataset_type} dataset for domain {domain}...")
-    output_path = generate_and_download_synthetic_data(
-        dataset_type=dataset_type,
-        domain=domain,
-        num_subjects=num_subjects,
-        therapeutic_area=therapeutic_area,
-        data_format=format,
-        output_dir=output_dir,
-    )
-    console.print(f"Dataset downloaded successfully to {output_path}")
+    console.print(f"Generating synthetic data for {standard} {version} domain {domain}...")
+    api_key = get_api_key()
+    forms = harvest(api_key, ig_filter=version)
+    domain_form = next((f for f in forms if f.domain == domain), None)
+    if not domain_form:
+        console.print(f"ERROR: Domain {domain} not found in {standard} {version}", style="bold red")
+        sys.exit(1)
+
+    generator = DataGenerator(domain_form)
+    dataset = generator.generate(num_subjects)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_file = output_dir / f"{domain}.csv"
+    df = pd.DataFrame(dataset)
+    df.to_csv(output_file, index=False)
+    console.print(f"✅  Saved dataset -> {output_file}")
 
 
 @app.command()

@@ -12,10 +12,12 @@ from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
 )
 from cdisc_library_client.api.default import get_mdr_products_data_collection
 
-from cdisc_generators.crfgen.schema import Form
+from cdisc_generators.crfgen.schema import Form, FieldDef
 
 
 class CrfGen:
+    """A class for harvesting CRF data from the CDISC Library API."""
+
     def __init__(self, api_key: str, ig_filter: Optional[str] = None):
         self.api_key = api_key
         self.ig_filter = ig_filter
@@ -24,6 +26,8 @@ class CrfGen:
     def _get_client(self) -> AuthenticatedClient:
         """
         Get an authenticated client for the CDISC Library API.
+
+        This method sets up an httpx client with appropriate headers, timeouts, and retries.
         """
         transport = httpx.HTTPTransport(retries=5)
         client = AuthenticatedClient(
@@ -38,7 +42,12 @@ class CrfGen:
         return client
 
     def harvest(self) -> List[Form]:
-        """Pull CDASH IG -> domains -> scenarios and convert to Form objects."""
+        """
+        Pull CDASH IG -> domains -> scenarios and convert to Form objects.
+
+        This method iterates through the CDASH Implementation Guides, their domains,
+        and scenarios, fetching the data for each and converting them into Form objects.
+        """
         products = get_mdr_products_data_collection.sync(client=self.client)
         cdashig_links = products.additional_properties["_links"]["cdashig"]
         forms: list[Form] = []
@@ -58,27 +67,36 @@ class CrfGen:
         return forms
 
     def _form_from_api(self, data: dict) -> Form:
-        """Convert a CDISC Library API response into a Form object."""
+        """
+        Convert a CDISC Library API response for a domain or scenario into a Form object.
+
+        This method maps the fields from the API response to the attributes of the
+        Form and FieldDef pydantic models.
+        """
+        fields = []
+        for f in data.get("fields", []):
+            field_def = FieldDef(
+                oid=f.get("name"),
+                prompt=f.get("label"),
+                datatype=f.get("fieldType"),
+                cdash_var=f.get("name"),
+                range_check=f.get("rangeCheck"),
+            )
+            fields.append(field_def)
+
         return Form(
-            name=data.get("name"),
-            ig_name=data.get("igName"),
-            ig_version=data.get("igVersion"),
+            title=data.get("name"),
             domain=data.get("domain"),
             scenario=data.get("scenario"),
-            fields=[
-                {
-                    "name": f.get("name"),
-                    "label": f.get("label"),
-                    "field_type": f.get("fieldType"),
-                    "terminology": f.get("terminology"),
-                    "instructions": f.get("instructions"),
-                }
-                for f in data.get("fields", [])
-            ],
+            fields=fields,
         )
 
 
 def harvest(api_key: str, ig_filter: str | None = None) -> List[Form]:
-    """Pull CDASH IG -> domains -> scenarios and convert to Form objects."""
+    """
+    A high-level function to pull CDASH IG -> domains -> scenarios and convert to Form objects.
+
+    This function is a convenient wrapper around the CrfGen class.
+    """
     crfgen = CrfGen(api_key, ig_filter)
     return crfgen.harvest()

@@ -1,7 +1,10 @@
 import os
 import pathlib
 from typing import List
-from cdisc_dataset_generator_client.client import CDISCDataSetGeneratorClient
+import pandas as pd
+from cdisc_library_client.harvest import harvest
+from cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators.data_generator import DataGenerator
 from cdisc_generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
 
 
@@ -31,28 +34,26 @@ def generate_raw_dataset_package(
     print(f"  Output Format: {output_format}")
     print(f"  Output Directory: {output_dir}")
 
-    client = CDISCDataSetGeneratorClient()
+    api_key = get_api_key()
+    forms = harvest(api_key)
+
     temp_dir = pathlib.Path(output_dir) / "temp_datasets"
     os.makedirs(temp_dir, exist_ok=True)
 
     for domain in domains:
         print(f"Generating {domain} dataset...")
-        try:
-            result = client.generate_dataset(
-                dataset_type="SDTM",
-                domain=domain,
-                num_subjects=num_subjects,
-                therapeutic_area=therapeutic_area,
-                format=output_format,
-            )
-            download_url = result["download_url"]
-            filename = result["filename"]
-            output_path = temp_dir / filename
-            print(f"Downloading dataset to {output_path}...")
-            client.download_file(download_url, str(output_path))
-            print(f"{domain} dataset downloaded successfully.")
-        except Exception as e:
-            print(f"Error generating dataset for domain {domain}: {e}")
+        domain_form = next((f for f in forms if f.domain == domain), None)
+        if not domain_form:
+            print(f"Warning: Domain {domain} not found in CDISC Library. Skipping.")
+            continue
+
+        generator = DataGenerator(domain_form)
+        dataset = generator.generate(num_subjects)
+
+        output_file = temp_dir / f"{domain}.csv"
+        df = pd.DataFrame(dataset)
+        df.to_csv(output_file, index=False)
+        print(f"{domain} dataset generated successfully.")
 
     if study_story != "none":
         apply_study_story(study_story, temp_dir, num_subjects, domains, output_format)

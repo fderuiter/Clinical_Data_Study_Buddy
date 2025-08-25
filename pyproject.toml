@@ -12,7 +12,6 @@ packages = [
     { from = "src/cdisc_generators", include = "tfl" },
     { from = "src", include = "cdisc_cli" },
     { from = "src/clients", include = "cdisc_library_client" },
-    { from = "src/clients", include = "cdisc_dataset_generator_client" },
     { from = "src/clients", include = "openfda_client" },
 ]
 

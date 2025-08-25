@@ -34,6 +34,36 @@ class AnalysisGenerator:
                 dataset=self.dataset,
                 treatment_var=self.treatment_var
             )
+        elif self.output_type.lower() == 'disposition':
+            return sas_templates.DISPOSITION_TABLE_TEMPLATE.format(
+                dataset=self.dataset,
+                treatment_var=self.treatment_var
+            )
+        elif self.output_type.lower() == 'exposure':
+            return sas_templates.EXPOSURE_TABLE_TEMPLATE.format(
+                dataset=self.dataset,
+                treatment_var=self.treatment_var
+            )
+        elif self.output_type.lower() == 'teae_summary':
+            return sas_templates.TEAE_SUMMARY_TABLE_TEMPLATE.format(
+                dataset=self.dataset,
+                treatment_var=self.treatment_var
+            )
+        elif self.output_type.lower() == 'teae_by_soc_pt':
+            return sas_templates.TEAE_BY_SOC_PT_TABLE_TEMPLATE.format(
+                dataset=self.dataset,
+                treatment_var=self.treatment_var
+            )
+        elif self.output_type.lower() == 'lab_shift':
+            return sas_templates.LAB_SHIFT_TABLE_TEMPLATE.format(
+                dataset=self.dataset,
+                treatment_var=self.treatment_var
+            )
+        elif self.output_type.lower() == 'vs_change':
+            return sas_templates.VS_CHANGE_TABLE_TEMPLATE.format(
+                dataset=self.dataset,
+                treatment_var=self.treatment_var
+            )
         else:
             return "/* SAS code for this output type is not yet implemented. */"
 

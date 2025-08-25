@@ -31,12 +31,19 @@ ALLOWED_DT = {"text", "integer", "float", "date", "datetime", "boolean"}
 
 
 class FieldDef(BaseModel):
+    """
+    A definition for a field in a CRF form.
+
+    This class represents a single field (or question) in a Case Report Form.
+    It is based on the CDISC CDASH standard.
+    """
     oid: str
     prompt: str
     datatype: DataType
     cdash_var: str
     codelist: Optional[Codelist] = None
     control: Optional[Literal["radio", "checkbox"]] = None
+    range_check: Optional[dict] = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -50,6 +57,12 @@ class FieldDef(BaseModel):
 
 
 class Form(BaseModel):
+    """
+    A definition for a CRF form.
+
+    This class represents a Case Report Form, which is a collection of fields.
+    It is based on the CDISC CDASH standard.
+    """
     title: str
     domain: str
     scenario: Optional[str] = None
