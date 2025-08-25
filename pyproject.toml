@@ -35,6 +35,8 @@ pyyaml = "^6.0"
 httpx-cache = "^0.13.0"
 tenacity = "^8.2.3"
 typer = {extras = ["all"], version = "^0.16.1"}
+fastapi = "^0.116.1"
+uvicorn = "^0.35.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"

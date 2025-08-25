@@ -96,6 +96,8 @@ def build(
         fn(forms, outdir)
 
 
+from cdisc_generators.raw_dataset_package import generate_raw_dataset_package as gen_raw_pkg
+
 @app.command()
 def generate_raw_dataset_package(
     num_subjects: int = typer.Option(50, "--num-subjects", help="Number of subjects (10-200)"),
@@ -108,43 +110,18 @@ def generate_raw_dataset_package(
     """
     Generate an EDC Raw Dataset Package.
     """
-    console.print("Generating EDC Raw Dataset Package...")
-    console.print(f"  Number of Subjects: {num_subjects}")
-    console.print(f"  Therapeutic Area: {therapeutic_area}")
-    console.print(f"  Domains: {', '.join(domains)}")
-    console.print(f"  Study Story: {study_story}")
-    console.print(f"  Output Format: {output_format}")
-    console.print(f"  Output Directory: {output_dir}")
+    gen_raw_pkg(
+        num_subjects=num_subjects,
+        therapeutic_area=therapeutic_area,
+        domains=domains,
+        study_story=study_story,
+        output_dir=output_dir,
+        output_format=output_format,
+    )
+    console.print(f"EDC Raw Dataset Package generated successfully in {output_dir}")
 
-    client = CDISCDataSetGeneratorClient()
-    temp_dir = Path(output_dir) / "temp_datasets"
-    os.makedirs(temp_dir, exist_ok=True)
 
-    for domain in domains:
-        console.print(f"Generating {domain} dataset...")
-        try:
-            result = client.generate_dataset(
-                dataset_type="SDTM",
-                domain=domain,
-                num_subjects=num_subjects,
-                therapeutic_area=therapeutic_area,
-                format=output_format,
-            )
-            download_url = result["download_url"]
-            filename = result["filename"]
-            output_path = temp_dir / filename
-            console.print(f"Downloading dataset to {output_path}...")
-            client.download_file(download_url, str(output_path))
-            console.print(f"{domain} dataset downloaded successfully.")
-        except Exception as e:
-            console.print(f"Error generating dataset for domain {domain}: {e}", style="bold red")
-
-    if study_story != "none":
-        apply_study_story(study_story, temp_dir, num_subjects, domains, output_format)
-
-    generate_define_xml(temp_dir, domains)
-    package_datasets(temp_dir, output_dir)
-
+from cdisc_generators.synthetic_data import generate_and_download_synthetic_data
 
 @app.command()
 def generate_synthetic_data(
@@ -158,24 +135,16 @@ def generate_synthetic_data(
     """
     Generate synthetic CDISC datasets.
     """
-    client = CDISCDataSetGeneratorClient()
     console.print(f"Generating {dataset_type} dataset for domain {domain}...")
-    result = client.generate_dataset(
+    output_path = generate_and_download_synthetic_data(
         dataset_type=dataset_type,
         domain=domain,
         num_subjects=num_subjects,
         therapeutic_area=therapeutic_area,
-        format=format,
+        data_format=format,
+        output_dir=output_dir,
     )
-    console.print("Dataset generated successfully.")
-
-    download_url = result["download_url"]
-    filename = result["filename"]
-    output_path = os.path.join(output_dir, filename)
-
-    console.print(f"Downloading dataset to {output_path}...")
-    client.download_file(download_url, output_path)
-    console.print("Dataset downloaded successfully.")
+    console.print(f"Dataset downloaded successfully to {output_path}")
 
 
 @app.command()
