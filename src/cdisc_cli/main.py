@@ -7,33 +7,24 @@ import json
 import sys
 import yaml
 from cdisc_library_client.harvest import harvest
-from crfgen.utils import get_api_key
-from src.crfgen.cdash import build_domain_crf, load_ig
-from crfgen.populators import populate_ae_from_fda
-import crfgen.exporter.csv  # noqa
-import crfgen.exporter.docx  # noqa
-import crfgen.exporter.latex  # noqa
-import crfgen.exporter.pdf  # noqa
-import crfgen.exporter.rtf  # noqa
-import crfgen.exporter.markdown  # noqa
-import crfgen.exporter.odm  # noqa
-import crfgen.exporter.xlsx  # noqa
-from crfgen.exporter import registry as reg
-from crfgen.schema import Form
-from analysisgen.generator import AnalysisGenerator
-from src.cdisc_dataset_generator_client.client import CDISCDataSetGeneratorClient
-import os
-import zipfile
+from cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators.crfgen.cdash import build_domain_crf, load_ig
+from cdisc_generators.crfgen.populators import populate_ae_from_fda
+import cdisc_generators.crfgen.exporter.csv  # noqa
+import cdisc_generators.crfgen.exporter.docx  # noqa
+import cdisc_generators.crfgen.exporter.latex  # noqa
+import cdisc_generators.crfgen.exporter.pdf  # noqa
+import cdisc_generators.crfgen.exporter.rtf  # noqa
+import cdisc_generators.crfgen.exporter.markdown  # noqa
+import cdisc_generators.crfgen.exporter.odm  # noqa
+import cdisc_generators.crfgen.exporter.xlsx  # noqa
+from cdisc_generators.crfgen.exporter import registry as reg
+from cdisc_generators.crfgen.schema import Form
+from cdisc_generators.analysisgen.generator import AnalysisGenerator
+from cdisc_dataset_generator_client.client import CDISCDataSetGeneratorClient
+from cdisc_generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
 from pathlib import Path
-import pandas as pd
-import random
-import shutil
-import httpx
-from odmlib import odm_parser as P
-from odmlib import odm_loader as L
-from odmlib.define_2_1 import model as DEF
-from odmlib.odm_1_3_2 import model as ODM
-from src.cdisc_library_client.client import AuthenticatedClient
+import os
 
 
 load_dotenv()
@@ -105,158 +96,6 @@ def build(
         fn(forms, outdir)
 
 
-def _generate_define_xml(temp_dir, domains):
-    console.print("Generating define.xml...")
-
-    # Create the basic ODM structure
-    root = ODM.ODM(
-        FileOID="cdisc.com/Foundational/CDISC_ODM_2_0_0/define-2-1/2025-08-22/EDC_Raw_Dataset",
-        CreationDateTime="2025-08-22T14:00:00",
-        AsOfDateTime="2025-08-22T14:00:00",
-        FileType="Snapshot",
-        Originator="CDISC Dataset Generator",
-        SourceSystem="CDISC Dataset Generator",
-        SourceSystemVersion="0.1.0"
-    )
-    study = ODM.Study(OID="CDISC_STUDY.CDISC.TA.1")
-    study.GlobalVariables = ODM.GlobalVariables()
-    study.GlobalVariables.StudyName = ODM.StudyName(_content="CDISC TA Study")
-    study.GlobalVariables.StudyDescription = ODM.StudyDescription(_content="A study in the TA therapeutic area")
-    study.GlobalVariables.ProtocolName = ODM.ProtocolName(_content="CDISC-TA-1")
-    root.Study.append(study)
-
-    meta_data_version = DEF.MetaDataVersion(
-        OID="MDV.CDISC_STUDY.CDISC.TA.1.SDTM.1.0",
-        Name="CDISC TA Study SDTM 1.0",
-        Description="Metadata for the CDISC TA Study",
-        DefineVersion="2.1.0"
-    )
-    study.MetaDataVersion.append(meta_data_version)
-
-    # Instantiate the CDISC Library client
-    api_key = os.environ.get("CDISC_API_KEY")
-    if not api_key:
-        console.print("Warning: CDISC_API_KEY environment variable not set. Cannot fetch metadata.", style="yellow")
-        # Create an empty define.xml
-        define_xml_path = temp_dir / "define.xml"
-        with open(define_xml_path, "w") as f:
-            f.write("<ODM></ODM>")
-        return
-
-    client = AuthenticatedClient(
-        base_url="https://library.cdisc.org/api",
-        token=api_key,
-        headers={"Accept": "application/json"},
-        auth_header_name="api-key",
-        prefix="",
-        timeout=30.0,
-    )
-
-    sdtmig_version = "3-3" # Using a recent version as a default
-
-    for domain in domains:
-        domain_file = next(temp_dir.glob(f"sdtm_{domain.lower()}*.csv"), None)
-        if not domain_file:
-            continue
-
-        # Create ItemGroupDef for the domain
-        item_group_class = DEF.Class(Name="SPECIAL PURPOSE")
-        item_group = DEF.ItemGroupDef(
-            OID=f"IG.{domain.upper()}",
-            Name=domain.upper(),
-            Repeating="Yes",
-            IsReferenceData="No",
-            SASDatasetName=domain.upper(),
-            Purpose="Tabulation",
-            Structure="One record per subject",
-            Class=item_group_class
-        )
-        meta_data_version.ItemGroupDef.append(item_group)
-
-        # Get variable names from the CSV header
-        df = pd.read_csv(domain_file)
-        variables = list(df.columns)
-
-        for var_name in variables:
-            # Get variable metadata from CDISC Library using direct API call
-            try:
-                url = f"https://library.cdisc.org/products/sdtmig/{sdtmig_version}/datasets/{domain.upper()}/variables/{var_name}"
-                headers = {"api-key": api_key, "Accept": "application/json"}
-                response = httpx.get(url, headers=headers, timeout=60.0, follow_redirects=True)
-                response.raise_for_status()
-                variable_metadata = response.json()
-
-                if variable_metadata:
-                    item_def = DEF.ItemDef(
-                        OID=f"IT.{domain.upper()}.{var_name}",
-                        Name=var_name,
-                        DataType=variable_metadata.get("datatype"),
-                        Length=variable_metadata.get("length"),
-                        SASFieldName=var_name
-                    )
-                    item_def.Description = DEF.Description()
-                    item_def.Description.TranslatedText.append(
-                        ODM.TranslatedText(_content=variable_metadata.get("label"), lang="en")
-                    )
-                    item_group.ItemRef.append(DEF.ItemRef(ItemOID=item_def.OID, OrderNumber=variables.index(var_name) + 1, Mandatory="No"))
-                    meta_data_version.ItemDef.append(item_def)
-                else:
-                    console.print(f"  - Could not find metadata for variable {var_name} in domain {domain}", style="yellow")
-            except httpx.HTTPStatusError as e:
-                console.print(f"  - Error fetching metadata for variable {var_name} in domain {domain}: {e.response.status_code}", style="yellow")
-            except Exception as e:
-                console.print(f"  - Error fetching metadata for variable {var_name} in domain {domain}: {e}", style="yellow")
-
-
-    # Write the file
-    define_xml_path = temp_dir / "define.xml"
-    root.write_xml(str(define_xml_path))
-    console.print("define.xml generated.")
-
-def _package_datasets(temp_dir, output_dir):
-    zip_filename = Path(output_dir) / "edc_raw_datasets.zip"
-    console.print(f"Packaging datasets into {zip_filename}...")
-    with zipfile.ZipFile(zip_filename, 'w') as zipf:
-        for file in temp_dir.glob("*"):
-            zipf.write(file, file.name)
-    console.print("Packaging complete.")
-
-    # Clean up the temporary directory
-    console.print("Cleaning up temporary files...")
-    shutil.rmtree(temp_dir)
-    console.print("Cleanup complete.")
-
-def _apply_study_story(study_story, temp_dir, num_subjects, domains, file_format):
-    if study_story == "high_dropout":
-        console.print("Applying 'high_dropout' study story...")
-        dropout_rate = 0.3
-        num_dropouts = int(num_subjects * dropout_rate)
-
-        # Assuming DM is always present and contains the full subject list
-        dm_file = next(temp_dir.glob("sdtm_dm*.csv"), None)
-        if not dm_file:
-            console.print("Warning: DM domain not found. Cannot apply high dropout story.", style="yellow")
-            return
-
-        if file_format == 'csv':
-            dm_df = pd.read_csv(dm_file)
-            all_subject_ids = dm_df["USUBJID"].unique()
-            dropout_subject_ids = random.sample(list(all_subject_ids), num_dropouts)
-
-            for domain in domains:
-                if domain.upper() == "DM":
-                    continue  # Don't remove subjects from DM
-
-                domain_file = next(temp_dir.glob(f"sdtm_{domain.lower()}*.csv"), None)
-                if domain_file:
-                    df = pd.read_csv(domain_file)
-                    df = df[~df["USUBJID"].isin(dropout_subject_ids)]
-                    df.to_csv(domain_file, index=False)
-                    console.print(f"  - Applied dropout to {domain} domain.")
-        else:
-            console.print(f"Warning: High dropout story not implemented for '{file_format}' format yet.", style="yellow")
-
-
 @app.command()
 def generate_raw_dataset_package(
     num_subjects: int = typer.Option(50, "--num-subjects", help="Number of subjects (10-200)"),
@@ -301,10 +140,10 @@ def generate_raw_dataset_package(
             console.print(f"Error generating dataset for domain {domain}: {e}", style="bold red")
 
     if study_story != "none":
-        _apply_study_story(study_story, temp_dir, num_subjects, domains, output_format)
+        apply_study_story(study_story, temp_dir, num_subjects, domains, output_format)
 
-    _generate_define_xml(temp_dir, domains)
-    _package_datasets(temp_dir, output_dir)
+    generate_define_xml(temp_dir, domains)
+    package_datasets(temp_dir, output_dir)
 
 
 @app.command()
@@ -411,6 +250,127 @@ def generate_cdash_crf(
             console.print(f"Domain {dom} not found in IG – skipped", style="yellow")
             continue
         build_domain_crf(dom_df, dom, out_dir, config, fda_adverse_events=fda_adverse_events)
+
+
+from cdisc_generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
+
+protocol_app = typer.Typer()
+app.add_typer(protocol_app, name="protocol")
+
+@protocol_app.command("generate")
+def protocol_generate(
+    therapeutic_area: str = typer.Option(..., "--therapeutic-area", help="The therapeutic area of the study."),
+    treatment_arms: List[str] = typer.Option(..., "--treatment-arm", help="A treatment arm of the study. Can be specified multiple times."),
+    duration_weeks: int = typer.Option(..., "--duration-weeks", help="The duration of the study in weeks."),
+    phase: int = typer.Option(..., "--phase", help="The phase of the study."),
+    output_dir: pathlib.Path = typer.Option("my_protocol", "--output-dir", help="The directory to save the generated protocol documents.")
+):
+    """
+    Generates a study protocol.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    protocol = StudyProtocol(
+        therapeutic_area=therapeutic_area,
+        treatment_arms=treatment_arms,
+        duration_weeks=duration_weeks,
+        phase=phase
+    )
+    generate_protocol_markdown(protocol, str(output_dir))
+    console.print(f"Protocol documents generated in {output_dir}")
+
+
+from cdisc_generators.adrg import generate_adrg
+
+adrg_app = typer.Typer()
+app.add_typer(adrg_app, name="adrg")
+
+@adrg_app.command("generate")
+def adrg_generate(
+    crf_json_path: pathlib.Path = typer.Option(..., "--crf", help="Path to the canonical crf.json file."),
+    study_config_path: pathlib.Path = typer.Option(..., "--config", help="Path to the study-specific config file."),
+    output_path: pathlib.Path = typer.Option(..., "--out", help="Path to the output Word document.")
+):
+    """
+    Generates an Analysis Data Reviewer's Guide (ADRG) document.
+    """
+    generate_adrg(crf_json_path, study_config_path, output_path)
+    console.print(f"ADRG document generated at: {output_path}")
+
+
+from cdisc_generators.sdrg import generate_sdrg
+
+sdrg_app = typer.Typer()
+app.add_typer(sdrg_app, name="sdrg")
+
+@sdrg_app.command("generate")
+def sdrg_generate(
+    crf_json_path: pathlib.Path = typer.Option(..., "--crf", help="Path to the canonical crf.json file."),
+    study_config_path: pathlib.Path = typer.Option(..., "--config", help="Path to the study-specific config file."),
+    output_path: pathlib.Path = typer.Option(..., "--out", help="Path to the output Word document.")
+):
+    """
+    Generates a Study Data Reviewer's Guide (SDRG) document.
+    """
+    generate_sdrg(crf_json_path, study_config_path, output_path)
+    console.print(f"SDRG document generated at: {output_path}")
+
+
+from cdisc_generators.spec import generate_template, generate_dataset, validate
+
+spec_app = typer.Typer()
+app.add_typer(spec_app, name="spec")
+
+@spec_app.command("generate-template")
+def spec_generate_template(
+    product: str = typer.Option(..., "--product", help="The CDISC product (e.g., sdtmig, adamig)."),
+    version: str = typer.Option(..., "--version", help="The version of the product (e.g., 3-3)."),
+    domains: List[str] = typer.Option(..., "--domains", help="A list of domains to include in the specification (e.g., DM AE VS)."),
+    output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="The directory to save the generated Excel file.")
+):
+    """
+    Generate Excel-based specification templates for CDISC datasets.
+    """
+    generate_template(product, version, domains, str(output_dir))
+
+@spec_app.command("generate-dataset")
+def spec_generate_dataset(
+    spec_file: pathlib.Path = typer.Option(..., "--spec-file", help="Path to the Excel specification file (e.g., sdtmig_3-3_spec.xlsx)."),
+    output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="The directory to save the generated dataset files.")
+):
+    """
+    Generate a synthetic dataset from an Excel specification file.
+    """
+    generate_dataset(str(spec_file), str(output_dir))
+
+@spec_app.command("validate")
+def spec_validate(
+    spec_file: pathlib.Path = typer.Option(..., "--spec-file", help="Path to the Excel specification file."),
+    dataset_file: pathlib.Path = typer.Option(..., "--dataset-file", help="Path to the dataset file (e.g., a CSV).")
+):
+    """
+    Validate a dataset against an Excel specification file.
+    """
+    validate(str(spec_file), str(dataset_file))
+
+
+from cdisc_generators.openfda import populate_crf
+
+openfda_app = typer.Typer()
+app.add_typer(openfda_app, name="openfda")
+
+@openfda_app.command("populate-crf")
+def openfda_populate_crf(
+    drug_name: str = typer.Option(..., "--drug-name", help="The name of the drug to search for."),
+    domain: str = typer.Option(..., "--domain", help="The domain to populate (AE or LABEL)."),
+    max_results: int = typer.Option(10, "--max-results", help="The maximum number of records to return (for AE domain)."),
+    start_date: str = typer.Option(None, "--start-date", help="Start date for filtering (YYYYMMDD)."),
+    end_date: str = typer.Option(None, "--end-date", help="End date for filtering (YYYYMMDD)."),
+    output_format: str = typer.Option("csv", "--output-format", help="The output format (csv or json).")
+):
+    """
+    Populate CRF data from openFDA.
+    """
+    populate_crf(drug_name, domain, max_results, start_date, end_date, output_format)
 
 
 if __name__ == "__main__":

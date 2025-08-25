@@ -3,10 +3,10 @@ from typing import Sequence
 
 from jinja2 import Environment, FileSystemLoader
 
-from ..schema import Form
+from cdisc_generators.crfgen.schema import Form
 from .registry import register
 
-env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
+env = Environment(loader=FileSystemLoader("src/cdisc_generators/crfgen/templates"))
 
 
 @register("tex")

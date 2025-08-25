@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from openfda_client import client
-from crfgen.populators import populate_ae_from_fda, populate_label_from_fda
+from cdisc_generators.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
 
 class TestOpenFDAClient(unittest.TestCase):
 

@@ -4,12 +4,12 @@ from typing import Dict, Tuple, List, Any
 import yaml
 
 import pandas as pd
-from src.cdisc_library_client.api.cdash_implementation_guide_cdashig import (
+from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
     get_mdr_cdashig_version_domains,
     get_mdr_cdashig_version_domains_domain_fields,
 )
-from src.cdisc_library_client.client import AuthenticatedClient
-from crfgen.populators import populate_ae_from_fda
+from cdisc_library_client.client import AuthenticatedClient
+from cdisc_generators.crfgen.populators import populate_ae_from_fda
 from docx import Document
 from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -225,7 +225,7 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
             ):
                 break
 
-            from src.cdisc_library_client.api.cdash_implementation_guide_cdashig import get_mdr_cdashig_version_domains_domain_fields_field
+            from cdisc_library_client.api.cdash_implementation_guide_cdashig import get_mdr_cdashig_version_domains_domain_fields_field
             for field_ref in fields_response.field_links.fields:
                 field_name = field_ref.href.split("/")[-1]
                 field_details = get_mdr_cdashig_version_domains_domain_fields_field.sync(

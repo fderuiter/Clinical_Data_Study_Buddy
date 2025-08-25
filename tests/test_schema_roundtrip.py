@@ -1,6 +1,6 @@
 import pathlib
 
-from crfgen.schema import FieldDef, Form, dump_forms, load_forms
+from cdisc_generators.crfgen.schema import FieldDef, Form, dump_forms, load_forms
 
 
 def test_roundtrip(tmp_path: pathlib.Path):

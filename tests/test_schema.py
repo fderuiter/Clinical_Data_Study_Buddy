@@ -1,6 +1,6 @@
 import json
 
-from crfgen.schema import Form
+from cdisc_generators.crfgen.schema import Form
 
 
 def test_fixture_loads():

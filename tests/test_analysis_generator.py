@@ -1,11 +1,5 @@
 import unittest
-import sys
-import os
-
-# Add src to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-
-from analysisgen.generator import AnalysisGenerator
+from cdisc_generators.analysisgen.generator import AnalysisGenerator
 
 class TestAnalysisGenerator(unittest.TestCase):
 
