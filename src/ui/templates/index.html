@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDISC Data Generator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>CDISC Data Generator</h1>
+
+        <div class="generator-section">
+            <h2>Generate Synthetic Dataset</h2>
+            <form id="synthetic-data-form">
+                <div class="form-group">
+                    <label for="dataset_type">Dataset Type:</label>
+                    <select id="dataset_type" name="dataset_type" required>
+                        <option value="SDTM">SDTM</option>
+                        <option value="ADaM">ADaM</option>
+                        <option value="SEND">SEND</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="domain">Domain:</label>
+                    <input type="text" id="domain" name="domain" value="DM" required>
+                </div>
+                <div class="form-group">
+                    <label for="num_subjects">Number of Subjects:</label>
+                    <input type="number" id="num_subjects" name="num_subjects" value="50" required>
+                </div>
+                <div class="form-group">
+                    <label for="therapeutic_area">Therapeutic Area:</label>
+                    <input type="text" id="therapeutic_area" name="therapeutic_area" value="Oncology" required>
+                </div>
+                <div class="form-group">
+                    <label for="data_format">Data Format:</label>
+                    <select id="data_format" name="data_format" required>
+                        <option value="csv">CSV</option>
+                        <option value="json">JSON</option>
+                        <option value="xpt">XPT</option>
+                    </select>
+                </div>
+                <button type="submit">Generate</button>
+            </form>
+        </div>
+
+        <div class="generator-section">
+            <h2>Generate Raw Dataset Package</h2>
+            <form id="raw-dataset-form">
+                <div class="form-group">
+                    <label for="raw_num_subjects">Number of Subjects:</label>
+                    <input type="number" id="raw_num_subjects" name="num_subjects" value="20" required>
+                </div>
+                <div class="form-group">
+                    <label for="raw_therapeutic_area">Therapeutic Area:</label>
+                    <input type="text" id="raw_therapeutic_area" name="therapeutic_area" value="Oncology" required>
+                </div>
+                <div class="form-group">
+                    <label for="raw_domains">Domains (comma-separated):</label>
+                    <input type="text" id="raw_domains" name="domains" value="DM,AE,VS" required>
+                </div>
+                <div class="form-group">
+                    <label for="raw_study_story">Study Story:</label>
+                    <select id="raw_study_story" name="study_story" required>
+                        <option value="none">None</option>
+                        <option value="high_dropout">High Dropout</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="raw_output_format">Data Format:</label>
+                    <select id="raw_output_format" name="output_format" required>
+                        <option value="csv">CSV</option>
+                        <option value="json">JSON</option>
+                        <option value="xpt">XPT</option>
+                    </select>
+                </div>
+                <button type="submit">Generate Package</button>
+            </form>
+        </div>
+
+        <div id="results-section">
+            <h2>Results</h2>
+            <pre id="results-output"></pre>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -50,6 +50,17 @@ Follow these steps to set up the project and generate your first set of CRF arti
     ```bash
     open artefacts/VS.docx
     ```
+
+## Web UI (New)
+
+This project also includes a web-based user interface for generating datasets.
+
+To run the UI, use the following command:
+```bash
+poetry run uvicorn src.ui.main:app --reload
+```
+
+Then, open your web browser and navigate to `http://127.0.0.1:8000`.
 ## Development Setup
 
 This project uses [Poetry](https://python-poetry.org/) for dependency management. Setup scripts are provided for different operating systems.

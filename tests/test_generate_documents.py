@@ -3,11 +3,8 @@ import sys
 import json
 import unittest
 
-# Add the scripts directory to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'scripts')))
-
-from generate_adrg import generate_adrg
-from generate_sdrg import generate_sdrg
+from cdisc_generators.adrg import generate_adrg
+from cdisc_generators.sdrg import generate_sdrg
 
 class TestGenerateDocuments(unittest.TestCase):
     def setUp(self):
