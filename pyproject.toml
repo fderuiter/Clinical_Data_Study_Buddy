@@ -6,12 +6,14 @@ authors = ["You <you@example.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 packages = [
-    { from = "src", include = "cdisc_library_client" },
-    { from = "src", include = "crfgen" },
-    { from = "src", include = "openfda_client" },
-    { from = "src", include = "protogen" },
-    { from = "src", include = "tfl" },
-    { from = "src", include = "cdisc_cli" }
+    { from = "src/cdisc_crf_generator", include = "crfgen" },
+    { from = "src/cdisc_crf_generator", include = "protogen" },
+    { from = "src/cdisc_crf_generator", include = "analysisgen" },
+    { from = "src/cdisc_crf_generator", include = "tfl" },
+    { from = "src", include = "cdisc_cli" },
+    { from = "src/clients", include = "cdisc_library_client" },
+    { from = "src/clients", include = "cdisc_dataset_generator_client" },
+    { from = "src/clients", include = "openfda_client" },
 ]
 
 [tool.poetry.dependencies]
@@ -50,7 +52,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
-skip = ["src/cdisc_library_client"]
+skip = ["src/clients/cdisc_library_client"]
 
 [tool.poetry.scripts]
 cdisc = "cdisc_cli.main:app"
