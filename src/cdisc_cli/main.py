@@ -8,6 +8,7 @@ import sys
 import yaml
 from cdisc_library_client.harvest import harvest
 from cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators.standard_downloader import download_standard as download_standard_func
 from cdisc_generators.crfgen.cdash import build_domain_crf, load_ig
 from cdisc_generators.crfgen.populators import populate_ae_from_fda
 import cdisc_generators.crfgen.exporter.csv  # noqa
@@ -94,6 +95,24 @@ def build(
         fn = reg.get(fmt)
         console.print(f"[build] Rendering {fmt} → {outdir}")
         fn(forms, outdir)
+
+
+@app.command()
+def download_standard(
+    standard: str = typer.Option(..., "--standard", "-s", help="The standard to download (e.g., sdtmig, adamig)."),
+    version: str = typer.Option(..., "--version", "-v", help="The version of the standard (e.g., 3-3)."),
+    output_dir: pathlib.Path = typer.Option(".", "--output-dir", "-o", help="The directory to save the downloaded files.")
+):
+    """
+    Download a CDISC data standard from the CDISC Library.
+    """
+    console.print(f"Downloading {standard} version {version} to {output_dir}...")
+    try:
+        download_standard_func(standard, version, output_dir)
+        console.print("✅  Download complete.")
+    except Exception as e:
+        console.print(f"ERROR: {e}", style="bold red")
+        sys.exit(1)
 
 
 from cdisc_generators.raw_dataset_package import generate_raw_dataset_package as gen_raw_pkg
