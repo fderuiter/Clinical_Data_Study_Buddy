@@ -1,4 +1,3 @@
-import argparse
 import json
 from docx import Document
 
@@ -59,12 +58,3 @@ def generate_adrg(crf_json_path, study_config_path, output_path):
     # Save the document
     document.save(output_path)
     print(f"ADRG document generated at: {output_path}")
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate an Analysis Data Reviewer\'s Guide (ADRG).')
-    parser.add_argument('--crf', required=True, help='Path to the canonical crf.json file.')
-    parser.add_argument('--config', required=True, help='Path to the study-specific config file.')
-    parser.add_argument('--out', required=True, help='Path to the output Word document.')
-    args = parser.parse_args()
-
-    generate_adrg(args.crf, args.config, args.out)

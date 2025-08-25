@@ -1,6 +1,6 @@
-# CDISC CRF Generator
+# CDISC Generators
 
-![Weekly Sync Status](https://github.com/fderuiter/cdisc_crf_generator/actions/workflows/weekly-sync.yml/badge.svg)
+![Weekly Sync Status](https://github.com/fderuiter/cdisc_generators/actions/workflows/weekly-sync.yml/badge.svg)
 
 This project provides tools for generating Case Report Forms (CRFs) using metadata from the CDISC Library.
 
@@ -17,8 +17,8 @@ Follow these steps to set up the project and generate your first set of CRF arti
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/fderuiter/cdisc_crf_generator.git
-    cd cdisc_crf_generator
+    git clone https://github.com/fderuiter/cdisc_generators.git
+    cd cdisc_generators
     ```
 
 2.  **Set up the environment:**
@@ -36,13 +36,13 @@ Follow these steps to set up the project and generate your first set of CRF arti
 4.  **Fetch the canonical CRF data:**
     This command crawls the CDISC Library and creates a canonical `crf.json` file.
     ```bash
-    poetry run scripts/build_canonical.py -o crf.json
+    poetry run cdisc build-canonical -o crf.json
     ```
 
 5.  **Generate all CRF artifacts:**
     This command reads the `crf.json` file and generates the CRF documents in multiple formats (Markdown, DOCX, CSV, etc.) inside the `artefacts/` directory.
     ```bash
-    poetry run scripts/build.py --source crf.json --outdir artefacts
+    poetry run cdisc build --source crf.json --outdir artefacts
     ```
 
 6.  **View the generated files:**
@@ -118,27 +118,14 @@ Once inside the dev container, you'll have a fully configured environment with a
 
 ## Generating CDASH CRFs
 
-The repository includes `scripts/generate_cdash_crf.py` which converts the
-official CDASH workbooks into Word documents—one per domain.  The script now
-adds extra metadata from the IG such as variable type, controlled terminology
-and completion instructions.  Generated CRFs use a consistent landscape layout
-with protocol information in the header and versioned footers with page numbers.
-`pandas`, `python-docx` and `openpyxl` are already listed in the project
-dependencies.
+The repository includes a command to convert the official CDASH workbooks into Word documents—one per domain.  The command now adds extra metadata from the IG such as variable type, controlled terminology and completion instructions.  Generated CRFs use a consistent landscape layout with protocol information in the header and versioned footers with page numbers.
 
 ```bash
-python scripts/generate_cdash_crf.py \
-    --model CDASH_Model_v1.3.xlsx \
-    --ig CDASHIG_v2.3.xlsx \
-    --out ./crfs
+poetry run cdisc generate-cdash-crf --ig-version v2.3 --out ./crfs
 
 # To build only specific domains
-python scripts/generate_cdash_crf.py --model CDASH_Model_v1.3.xlsx \
-    --ig CDASHIG_v2.3.xlsx --domains AE CM
+poetry run cdisc generate-cdash-crf --ig-version v2.3 --domains AE CM --out ./crfs
 ```
-
-Edit `build_domain_crf()` in the script to customise the table layout or add
-study branding or adjust fonts and orientation if needed.
 
 ## Generating Analysis Code
 
@@ -146,10 +133,10 @@ This project can also generate analysis code in SAS and R for various outputs.
 
 ### Quickstart
 
-To generate an analysis script, run the `scripts/generate_analysis.py` script with the desired parameters. For example, to generate a SAS script for a demographics table from the ADSL dataset, run the following command:
+To generate an analysis script, use the `generate-analysis` command. For example, to generate a SAS script for a demographics table from the ADSL dataset, run the following command:
 
 ```bash
-python scripts/generate_analysis.py \
+poetry run cdisc generate-analysis \
     --language sas \
     --dataset ADSL \
     --output-type demographics \
@@ -159,28 +146,16 @@ python scripts/generate_analysis.py \
 
 This will generate a SAS file named `demog_table.sas` in the current directory.
 
-### Options
-
-The following options are available for the `generate_analysis.py` script:
-
-| Option          | Description                                    | Default |
-| --------------- | ---------------------------------------------- | ------- |
-| `--language`    | Language for the generated code (sas or r)     |         |
-| `--dataset`     | Source dataset (e.g., ADSL)                    |         |
-| `--output-type` | Type of analysis output (e.g., Demographics)   |         |
-| `--treatment-var`| Treatment variable (e.g., TRT01A)              |         |
-| `--output-file` | Path to the output file                        |         |
-
 ## Generating Synthetic Datasets
 
 In addition to generating CRFs from the CDISC Library, this project can also generate synthetic CDISC-compliant datasets using the cdiscdataset.com API.
 
 ### Quickstart
 
-To generate a synthetic dataset, run the `scripts/generate_synthetic_data.py` script with the desired parameters. For example, to generate an SDTM dataset for the DM domain, run the following command:
+To generate a synthetic dataset, use the `generate-synthetic-data` command. For example, to generate an SDTM dataset for the DM domain, run the following command:
 
 ```bash
-python scripts/generate_synthetic_data.py \
+poetry run cdisc generate-synthetic-data \
     --dataset-type SDTM \
     --domain DM \
     --num-subjects 100 \
@@ -189,50 +164,24 @@ python scripts/generate_synthetic_data.py \
 
 This will generate a CSV file in the `synthetic_data` directory.
 
-### Options
-
-The following options are available for the `generate_synthetic_data.py` script:
-
-| Option             | Description                                  | Default    |
-| ------------------ | -------------------------------------------- | ---------- |
-| `--dataset-type`   | Type of dataset to generate (SDTM, ADaM, SEND) |            |
-| `--domain`         | Domain for the dataset                       |            |
-| `--num-subjects`   | Number of subjects                           | 50         |
-| `--therapeutic-area` | Therapeutic area                             | "Oncology" |
-| `--format`         | Output format (csv, json, xpt)               | "csv"      |
-| `--output-dir`     | Directory to save the downloaded file        | "."        |
-
 
 ## Generating EDC Raw Dataset Package
 
-This project includes a script to generate a complete package of raw EDC datasets for a clinical study. The script, `scripts/generate_raw_dataset_package.py`, generates a ZIP file containing multiple datasets with consistent subjects across all domains. It also includes a draft `define.xml` file (currently with limited metadata).
+This project includes a command to generate a complete package of raw EDC datasets for a clinical study. The command, `generate-raw-dataset-package`, generates a ZIP file containing multiple datasets with consistent subjects across all domains. It also includes a draft `define.xml` file (currently with limited metadata).
 
 ### Quickstart
 
-To generate a raw dataset package, run the `scripts/generate_raw_dataset_package.py` script with the desired parameters. For example, to generate a package with DM, VS, and LB domains for 10 subjects in the Oncology therapeutic area, run the following command:
+To generate a raw dataset package, use the `generate-raw-dataset-package` command. For example, to generate a package with DM, VS, and LB domains for 10 subjects in the Oncology therapeutic area, run the following command:
 
 ```bash
-poetry run python scripts/generate_raw_dataset_package.py \
+poetry run cdisc generate-raw-dataset-package \
     --num-subjects 10 \
-    --domains DM VS LB \
+    --domains DM --domains VS --domains LB \
     --therapeutic-area Oncology \
     --output-dir ./raw_dataset_package
 ```
 
 This will generate a `edc_raw_datasets.zip` file in the `raw_dataset_package` directory.
-
-### Options
-
-The following options are available for the `generate_raw_dataset_package.py` script:
-
-| Option             | Description                                  | Default    |
-| ------------------ | -------------------------------------------- | ---------- |
-| `--num-subjects`   | Number of subjects (10-200)                  | 50         |
-| `--therapeutic-area` | Therapeutic area for the study               | "Oncology" |
-| `--domains`        | List of domains to include (e.g., DM AE VS)  | (required) |
-| `--study-story`    | Study story to simulate (none, high_dropout) | "none"     |
-| `--output-format`  | Output format for datasets (csv, json, xpt)  | "csv"      |
-| `--output-dir`     | Directory to save the generated package      | "."        |
 
 ## Generating Study Protocols
 
@@ -240,10 +189,10 @@ This project can also generate study protocol documents. This feature is useful 
 
 ### Quickstart
 
-To generate a study protocol, use the `protocol` command:
+To generate a study protocol, use the `protocol generate` command:
 
 ```bash
-poetry run crfgen protocol \
+poetry run cdisc protocol generate \
     --therapeutic-area "Oncology" \
     --treatment-arm "Drug A + Placebo" \
     --treatment-arm "Drug B + Placebo" \
@@ -254,18 +203,6 @@ poetry run crfgen protocol \
 
 This will generate a `protocol.md` file and a `gantt_chart.png` file in the `my_protocol` directory.
 
-### Options
-
-The following options are available for the `protocol` command:
-
-| Option                | Description                                                 |
-| --------------------- | ----------------------------------------------------------- |
-| `--therapeutic-area`  | **Required.** The therapeutic area of the study.            |
-| `--treatment-arm`     | **Required.** A treatment arm of the study. Can be specified multiple times. |
-| `--duration-weeks`    | **Required.** The duration of the study in weeks.           |
-| `--phase`             | **Required.** The phase of the study.                       |
-| `--output-dir`        | The directory to save the generated protocol documents.     |
-
 ## Specification Management
 
 This project provides tools to generate and validate dataset specifications.
@@ -275,7 +212,7 @@ This project provides tools to generate and validate dataset specifications.
 You can generate an Excel-based specification template for a given CDISC product and version.
 
 ```bash
-make generate-spec ARGS="--product sdtmig --version 3-3 --domains DM AE VS"
+poetry run cdisc spec generate-template --product sdtmig --version 3-3 --domains DM --domains AE --domains VS
 ```
 
 This will create a file named `sdtmig_3-3_spec.xlsx` with sheets for the DM, AE, and VS domains.
@@ -285,7 +222,7 @@ This will create a file named `sdtmig_3-3_spec.xlsx` with sheets for the DM, AE,
 Once you have a specification file, you can generate a synthetic dataset from it.
 
 ```bash
-make generate-dataset ARGS="--spec-file sdtmig_3-3_spec.xlsx"
+poetry run cdisc spec generate-dataset --spec-file sdtmig_3-3_spec.xlsx
 ```
 
 This will generate CSV files for each domain (sheet) in the specification file.
@@ -295,20 +232,20 @@ This will generate CSV files for each domain (sheet) in the specification file.
 You can also validate an existing dataset against a specification file.
 
 ```bash
-make validate-dataset ARGS="--spec-file sdtmig_3-3_spec.xlsx --dataset-file sdtm_dm_20250822_215518.csv"
+poetry run cdisc spec validate --spec-file sdtmig_3-3_spec.xlsx --dataset-file sdtm_dm_20250822_215518.csv
 ```
 
 This will check for missing/extra columns and data type mismatches.
 
 ## Generating Reviewer's Guides
 
-This project includes scripts to generate an Analysis Data Reviewer's Guide (ADRG) and a Study Data Reviewer's Guide (SDRG). These guides are based on the PHUSE templates and are intended for FDA submissions.
+This project includes commands to generate an Analysis Data Reviewer's Guide (ADRG) and a Study Data Reviewer's Guide (SDRG). These guides are based on the PHUSE templates and are intended for FDA submissions.
 
 ### Prerequisites
 
 Before generating the reviewer's guides, you need to have a `crf.json` file and a `study_config.json` file.
 
-- The `crf.json` file can be generated by running `scripts/build_canonical.py`.
+- The `crf.json` file can be generated by running `poetry run cdisc build-canonical`.
 - The `study_config.json` file should be created manually and should contain study-specific information. See the example below:
 
 ```json
@@ -321,10 +258,10 @@ Before generating the reviewer's guides, you need to have a `crf.json` file and 
 
 ### Generating the ADRG
 
-To generate the ADRG, run the `scripts/generate_adrg.py` script:
+To generate the ADRG, use the `adrg generate` command:
 
 ```bash
-python scripts/generate_adrg.py \
+poetry run cdisc adrg generate \
     --crf crf.json \
     --config study_config.json \
     --out adrg.docx
@@ -332,10 +269,10 @@ python scripts/generate_adrg.py \
 
 ### Generating the SDRG
 
-To generate the SDRG, run the `scripts/generate_sdrg.py` script:
+To generate the SDRG, use the `sdrg generate` command:
 
 ```bash
-python scripts/generate_sdrg.py \
+poetry run cdisc sdrg generate \
     --crf crf.json \
     --config study_config.json \
     --out sdrg.docx
@@ -347,10 +284,10 @@ This project includes features to integrate data from [open.fda.gov](https://ope
 
 ### Populating CRFs with Adverse Event Data
 
-You can automatically populate the Adverse Events (AE) CRF with suggested terms for a specific drug. The `generate_cdash_crf.py` script has a new option to support this:
+You can automatically populate the Adverse Events (AE) CRF with suggested terms for a specific drug. The `generate-cdash-crf` command has a new option to support this:
 
 ```bash
-python scripts/generate_cdash_crf.py \
+poetry run cdisc generate-cdash-crf \
     --ig-version v2.3 \
     --domains AE \
     --openfda-drug-name "Aspirin" \
@@ -359,15 +296,15 @@ python scripts/generate_cdash_crf.py \
 
 This will fetch the top 50 most frequently reported adverse events for Aspirin from OpenFDA and add them to a separate table in the generated `AE_Adverse_Events_CRF.docx` document, providing a useful reference for common adverse events.
 
-### Standalone OpenFDA Script
+### Standalone OpenFDA Command
 
-For more advanced queries, you can use the standalone `populate_crf_from_fda.py` script. This script allows you to fetch adverse events or drug labeling information and output it in various formats.
+For more advanced queries, you can use the `openfda populate-crf` command. This command allows you to fetch adverse events or drug labeling information and output it in various formats.
 
 **Examples:**
 
 Fetch adverse events for a drug and save as JSON:
 ```bash
-python scripts/populate_crf_from_fda.py \
+poetry run cdisc openfda populate-crf \
     --drug-name "Ibuprofen" \
     --domain AE \
     --max-results 100 \
@@ -376,7 +313,7 @@ python scripts/populate_crf_from_fda.py \
 
 Fetch drug label information for a drug:
 ```bash
-python scripts/populate_crf_from_fda.py \
+poetry run cdisc openfda populate-crf \
     --drug-name "Tylenol" \
     --domain LABEL
 ```

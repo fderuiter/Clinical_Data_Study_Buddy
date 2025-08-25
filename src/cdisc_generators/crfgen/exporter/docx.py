@@ -3,8 +3,8 @@ from typing import Sequence
 
 import docx
 
-from crfgen.schema import Form
-from crfgen.style.style import apply_styles
+from cdisc_generators.crfgen.schema import Form
+from cdisc_generators.crfgen.style.style import apply_styles
 from .registry import register
 
 

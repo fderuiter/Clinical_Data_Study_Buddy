@@ -4,7 +4,7 @@ from typing import Sequence
 
 import pypandoc
 
-from crfgen.schema import Form
+from cdisc_generators.crfgen.schema import Form
 from .docx import export_docx
 from .registry import register
 
