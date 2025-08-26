@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from ui.main import app
+from cdisc_generators_api.ui.main import app
 
 
 @pytest.fixture
@@ -14,7 +14,7 @@ def test_read_root(client):
     assert "<h1>CDISC Data Generator</h1>" in response.text
 
 
-from cdisc_generators.crfgen.schema import Form, FieldDef
+from cdisc_generators_api.cdisc_generators.crfgen.schema import Form, FieldDef
 
 def test_generate_synthetic_data_endpoint(client, mocker):
     mock_form = Form(
@@ -22,13 +22,13 @@ def test_generate_synthetic_data_endpoint(client, mocker):
         domain="DM",
         fields=[FieldDef(oid="USUBJID", prompt="Subject ID", datatype="text", cdash_var="USUBJID")],
     )
-    mock_get_api_key = mocker.patch("ui.main.get_api_key", return_value="test-key")
-    mock_harvest = mocker.patch("ui.main.harvest", return_value=[mock_form])
+    mock_get_api_key = mocker.patch("cdisc_generators_api.ui.main.get_api_key", return_value="test-key")
+    mock_harvest = mocker.patch("cdisc_generators_api.ui.main.harvest", return_value=[mock_form])
 
     mock_dataset = [{"USUBJID": "SUBJ-001"}]
     mock_generator_instance = mocker.Mock()
     mock_generator_instance.generate.return_value = mock_dataset
-    mock_generator_class = mocker.patch("ui.main.DataGenerator", return_value=mock_generator_instance)
+    mock_generator_class = mocker.patch("cdisc_generators_api.ui.main.DataGenerator", return_value=mock_generator_instance)
 
     request_data = {
         "dataset_type": "SDTM",
@@ -50,7 +50,7 @@ def test_generate_synthetic_data_endpoint(client, mocker):
 
 def test_generate_raw_dataset_package_endpoint(client, mocker):
     mock_generate = mocker.patch(
-        "ui.main.generate_raw_dataset_package",
+        "cdisc_generators_api.ui.main.generate_raw_dataset_package",
     )
 
     request_data = {
@@ -79,7 +79,7 @@ def test_generate_analysis_code_endpoint(client, mocker):
     mock_generator_instance = mocker.Mock()
     mock_generator_instance.generate_code.return_value = "/* SAS code */"
     mock_generator_class = mocker.patch(
-        "ui.main.AnalysisGenerator", return_value=mock_generator_instance
+        "cdisc_generators_api.ui.main.AnalysisGenerator", return_value=mock_generator_instance
     )
 
     request_data = {

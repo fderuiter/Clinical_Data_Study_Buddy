@@ -1,6 +1,6 @@
 import logging
 from typing import List, Dict, Any
-from openfda_client import client
+from cdisc_generators_api.openfda_client import client
 
 logger = logging.getLogger(__name__)
 

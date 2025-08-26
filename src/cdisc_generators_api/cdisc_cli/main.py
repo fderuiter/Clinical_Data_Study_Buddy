@@ -7,25 +7,25 @@ import json
 import sys
 import yaml
 from cdisc_library_client.harvest import harvest
-from cdisc_generators.crfgen.utils import get_api_key
-from cdisc_generators.standard_downloader import download_standard as download_standard_func
-from cdisc_generators.crfgen.cdash import build_domain_crf, load_ig
-from cdisc_generators.crfgen.populators import populate_ae_from_fda
-import cdisc_generators.crfgen.exporter.csv  # noqa
-import cdisc_generators.crfgen.exporter.docx  # noqa
-import cdisc_generators.crfgen.exporter.latex  # noqa
-import cdisc_generators.crfgen.exporter.pdf  # noqa
-import cdisc_generators.crfgen.exporter.rtf  # noqa
-import cdisc_generators.crfgen.exporter.markdown  # noqa
-import cdisc_generators.crfgen.exporter.odm  # noqa
-import cdisc_generators.crfgen.exporter.xlsx  # noqa
-from cdisc_generators.crfgen.exporter import registry as reg
-from cdisc_generators.crfgen.schema import Form
-from cdisc_generators.analysisgen.generator import AnalysisGenerator
-from cdisc_generators.analysisgen.sas_generator import SASGenerator
-from cdisc_generators.data_generator import DataGenerator
-from cdisc_generators.tfl.tfl_shell_generator import TFLShellGenerator
-from cdisc_generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
+from cdisc_generators_api.cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators_api.cdisc_generators.standard_downloader import download_standard as download_standard_func
+from cdisc_generators_api.cdisc_generators.crfgen.cdash import build_domain_crf, load_ig
+from cdisc_generators_api.cdisc_generators.crfgen.populators import populate_ae_from_fda
+import cdisc_generators_api.cdisc_generators.crfgen.exporter.csv  # noqa
+import cdisc_generators_api.cdisc_generators.crfgen.exporter.docx  # noqa
+import cdisc_generators_api.cdisc_generators.crfgen.exporter.latex  # noqa
+import cdisc_generators_api.cdisc_generators.crfgen.exporter.pdf  # noqa
+import cdisc_generators_api.cdisc_generators.crfgen.exporter.rtf  # noqa
+import cdisc_generators_api.cdisc_generators.crfgen.exporter.markdown  # noqa
+import cdisc_generators_api.cdisc_generators.crfgen.exporter.odm  # noqa
+import cdisc_generators_api.cdisc_generators.crfgen.exporter.xlsx  # noqa
+from cdisc_generators_api.cdisc_generators.crfgen.exporter import registry as reg
+from cdisc_generators_api.cdisc_generators.crfgen.schema import Form
+from cdisc_generators_api.cdisc_generators.analysisgen.generator import AnalysisGenerator
+from cdisc_generators_api.cdisc_generators.analysisgen.sas_generator import SASGenerator
+from cdisc_generators_api.cdisc_generators.data_generator import DataGenerator
+from cdisc_generators_api.cdisc_generators.tfl.tfl_shell_generator import TFLShellGenerator
+from cdisc_generators_api.cdisc_generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
 import pandas as pd
 from pathlib import Path
 import os
@@ -158,7 +158,7 @@ def download_standard(
         sys.exit(1)
 
 
-from cdisc_generators.edc_raw_dataset_package_generator import EDCRawDatasetPackageGenerator
+from cdisc_generators_api.cdisc_generators.edc_raw_dataset_package_generator import EDCRawDatasetPackageGenerator
 
 @app.command()
 def generate_edc_raw_dataset_package(
@@ -287,7 +287,7 @@ def generate_cdash_crf(
         build_domain_crf(dom_df, dom, out_dir, config, fda_adverse_events=fda_adverse_events)
 
 
-from cdisc_generators.study_protocols_generator import StudyProtocolsGenerator
+from cdisc_generators_api.cdisc_generators.study_protocols_generator import StudyProtocolsGenerator
 
 @app.command()
 def generate_study_protocols(
@@ -311,7 +311,7 @@ def generate_study_protocols(
     console.print(f"Protocol documents generated in {output_dir}")
 
 
-from cdisc_generators.adrg import generate_adrg
+from cdisc_generators_api.cdisc_generators.adrg import generate_adrg
 
 adrg_app = typer.Typer()
 app.add_typer(adrg_app, name="adrg")
@@ -329,7 +329,7 @@ def adrg_generate(
     console.print(f"ADRG document generated at: {output_path}")
 
 
-from cdisc_generators.sdrg import generate_sdrg
+from cdisc_generators_api.cdisc_generators.sdrg import generate_sdrg
 
 sdrg_app = typer.Typer()
 app.add_typer(sdrg_app, name="sdrg")
@@ -347,7 +347,7 @@ def sdrg_generate(
     console.print(f"SDRG document generated at: {output_path}")
 
 
-from cdisc_generators.specification_templates_generator import SpecificationTemplatesGenerator
+from cdisc_generators_api.cdisc_generators.specification_templates_generator import SpecificationTemplatesGenerator
 
 @app.command()
 def generate_specification_templates(
@@ -363,7 +363,7 @@ def generate_specification_templates(
     generator.generate()
 
 
-from cdisc_generators.spec import generate_dataset, validate
+from cdisc_generators_api.cdisc_generators.spec import generate_dataset, validate
 
 spec_app = typer.Typer()
 app.add_typer(spec_app, name="spec")
@@ -389,7 +389,7 @@ def spec_validate(
     validate(str(spec_file), str(dataset_file))
 
 
-from cdisc_generators.openfda import populate_crf
+from cdisc_generators_api.cdisc_generators.openfda import populate_crf
 
 openfda_app = typer.Typer()
 app.add_typer(openfda_app, name="openfda")

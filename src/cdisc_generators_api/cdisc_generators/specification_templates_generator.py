@@ -1,7 +1,7 @@
 import os
 from openpyxl import Workbook
 from cdisc_library_client.harvest import harvest
-from cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators_api.cdisc_generators.crfgen.utils import get_api_key
 
 
 class SpecificationTemplatesGenerator:

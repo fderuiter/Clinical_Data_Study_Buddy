@@ -7,20 +7,20 @@ import os
 app = FastAPI()
 
 # Get the absolute path to the project root
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 # Mount static files and templates using absolute paths
-app.mount("/static", StaticFiles(directory=os.path.join(project_root, "src/ui/static")), name="static")
-templates = Jinja2Templates(directory=os.path.join(project_root, "src/ui/templates"))
+app.mount("/static", StaticFiles(directory=os.path.join(project_root, "src/cdisc_generators_api/ui/static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(project_root, "templates/ui"))
 
 
 from pydantic import BaseModel
-from cdisc_generators.data_generator import DataGenerator
+from cdisc_generators_api.cdisc_generators.data_generator import DataGenerator
 from cdisc_library_client.harvest import harvest
-from cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators_api.cdisc_generators.crfgen.utils import get_api_key
 import pandas as pd
-from cdisc_generators.raw_dataset_package import generate_raw_dataset_package
-from cdisc_generators.analysisgen.generator import AnalysisGenerator
+from cdisc_generators_api.cdisc_generators.raw_dataset_package import generate_raw_dataset_package
+from cdisc_generators_api.cdisc_generators.analysisgen.generator import AnalysisGenerator
 import pathlib
 from typing import List
 

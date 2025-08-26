@@ -1,5 +1,5 @@
 import os
-from cdisc_generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
+from cdisc_generators_api.cdisc_generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
 
 
 class StudyProtocolsGenerator:

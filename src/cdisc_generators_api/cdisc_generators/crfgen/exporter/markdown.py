@@ -3,11 +3,11 @@ from typing import Sequence
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cdisc_generators.crfgen.schema import Form
+from cdisc_generators_api.cdisc_generators.crfgen.schema import Form
 from .registry import register
 
 env = Environment(
-    loader=FileSystemLoader("src/cdisc_generators/crfgen/templates"),
+    loader=FileSystemLoader("templates/crfgen"),
     autoescape=select_autoescape(),
 )
 

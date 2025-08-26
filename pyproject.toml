@@ -6,13 +6,8 @@ authors = ["You <you@example.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 packages = [
-    { from = "src/cdisc_generators", include = "crfgen" },
-    { from = "src/cdisc_generators", include = "protogen" },
-    { from = "src/cdisc_generators", include = "analysisgen" },
-    { from = "src/cdisc_generators", include = "tfl" },
-    { from = "src", include = "cdisc_cli" },
-    { from = "src/clients", include = "cdisc_library_client" },
-    { from = "src/clients", include = "openfda_client" },
+    { include = "cdisc_generators_api", from = "src" },
+    { include = "cdisc_library_client", from = "src" }
 ]
 
 [tool.poetry.dependencies]
@@ -56,7 +51,7 @@ profile = "black"
 skip = ["src/clients/cdisc_library_client"]
 
 [tool.poetry.scripts]
-cdisc = "cdisc_cli.main:app"
+cdisc = "cdisc_generators_api.cdisc_cli.main:app"
 
 [tool.pytest.ini_options]
 pythonpath = [

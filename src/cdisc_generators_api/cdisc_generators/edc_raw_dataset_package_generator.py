@@ -3,9 +3,9 @@ import pathlib
 from typing import List
 import pandas as pd
 from cdisc_library_client.harvest import harvest
-from cdisc_generators.crfgen.utils import get_api_key
-from cdisc_generators.data_generator import DataGenerator
-from cdisc_generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
+from cdisc_generators_api.cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators_api.cdisc_generators.data_generator import DataGenerator
+from cdisc_generators_api.cdisc_generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
 
 
 class EDCRawDatasetPackageGenerator:

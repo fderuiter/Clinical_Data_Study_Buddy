@@ -3,7 +3,7 @@ from typing import Sequence
 
 import odmlib.odm_1_3_2.model as ODM
 
-from cdisc_generators.crfgen.schema import Form
+from cdisc_generators_api.cdisc_generators.crfgen.schema import Form
 from .registry import register
 
 

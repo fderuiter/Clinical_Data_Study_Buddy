@@ -3,8 +3,8 @@ import sys
 import json
 import unittest
 
-from cdisc_generators.adrg import generate_adrg
-from cdisc_generators.sdrg import generate_sdrg
+from cdisc_generators_api.cdisc_generators.adrg import generate_adrg
+from cdisc_generators_api.cdisc_generators.sdrg import generate_sdrg
 
 class TestGenerateDocuments(unittest.TestCase):
     def setUp(self):

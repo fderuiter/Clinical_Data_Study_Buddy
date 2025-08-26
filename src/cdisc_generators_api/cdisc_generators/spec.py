@@ -11,8 +11,8 @@ from cdisc_library_client.api.analysis_data_model_and_implementation_guide_a_da_
     get_mdr_adam_product_datastructures_structure,
 )
 from dotenv import load_dotenv
-from cdisc_generators.data_generator import DataGenerator
-from cdisc_generators.crfgen.schema import Form, FieldDef
+from cdisc_generators_api.cdisc_generators.data_generator import DataGenerator
+from cdisc_generators_api.cdisc_generators.crfgen.schema import Form, FieldDef
 
 
 def get_client():

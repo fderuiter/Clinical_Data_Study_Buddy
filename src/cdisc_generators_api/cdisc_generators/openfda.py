@@ -1,7 +1,7 @@
 import csv
 import sys
 import json
-from cdisc_generators.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
+from cdisc_generators_api.cdisc_generators.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
 
 def output_csv(data, writer):
     if not data:

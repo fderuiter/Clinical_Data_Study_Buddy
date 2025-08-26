@@ -1,7 +1,7 @@
 import pandas as pd
 from unittest.mock import patch
 from typer.testing import CliRunner
-from cdisc_cli.main import app
+from cdisc_generators_api.cdisc_cli.main import app
 from docx import Document
 from zipfile import ZipFile
 
@@ -13,7 +13,7 @@ def test_help():
     assert "Generate Word CRF shells" in result.stdout
 
 
-@patch("cdisc_cli.main.load_ig")
+@patch("cdisc_generators_api.cdisc_cli.main.load_ig")
 def test_generate(mock_load_ig, tmp_path):
     out_dir = tmp_path / "out"
     mock_df = pd.DataFrame([
@@ -69,8 +69,8 @@ def test_generate(mock_load_ig, tmp_path):
     assert len(table.columns) == 6
 
 
-@patch("cdisc_cli.main.populate_ae_from_fda")
-@patch("cdisc_cli.main.load_ig")
+@patch("cdisc_generators_api.cdisc_cli.main.populate_ae_from_fda")
+@patch("cdisc_generators_api.cdisc_cli.main.load_ig")
 def test_generate_with_openfda(mock_load_ig, mock_populate_ae, tmp_path):
     out_dir = tmp_path / "out"
     mock_df = pd.DataFrame([

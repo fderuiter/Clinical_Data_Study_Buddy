@@ -4,7 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 import os
 from datetime import date, timedelta
 
-from cdisc_generators.protogen.gantt import generate_gantt_chart
+from cdisc_generators_api.cdisc_generators.protogen.gantt import generate_gantt_chart
 
 class StudyProtocol(BaseModel):
     therapeutic_area: str
@@ -28,7 +28,7 @@ def generate_protocol_markdown(protocol: StudyProtocol, output_dir: str):
     generate_gantt_chart(tasks, gantt_chart_path)
 
     # Render markdown template
-    env = Environment(loader=FileSystemLoader("src/cdisc_generators/protogen/templates"))
+    env = Environment(loader=FileSystemLoader("templates/protogen"))
     template = env.get_template("protocol.md.j2")
     markdown_content = template.render(protocol=protocol)
 

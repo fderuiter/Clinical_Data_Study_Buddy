@@ -2,7 +2,7 @@ import csv
 from pathlib import Path
 from typing import Sequence
 
-from cdisc_generators.crfgen.schema import Form
+from cdisc_generators_api.cdisc_generators.crfgen.schema import Form
 
 from .registry import register
 

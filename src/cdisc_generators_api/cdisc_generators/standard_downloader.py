@@ -7,7 +7,7 @@ from cdisc_library_client.api.sdtm_implementation_guide_sdtmig import (
     get_mdr_sdtmig_version_classes,
     get_mdr_sdtmig_version_datasets,
 )
-from cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators_api.cdisc_generators.crfgen.utils import get_api_key
 
 
 def _get_client() -> AuthenticatedClient:
