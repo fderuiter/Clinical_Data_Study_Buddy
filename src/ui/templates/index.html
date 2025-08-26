@@ -79,6 +79,40 @@
             </form>
         </div>
 
+        <div class="generator-section">
+            <h2>Generate Analysis Code</h2>
+            <form id="analysis-code-form">
+                <div class="form-group">
+                    <label for="language">Language:</label>
+                    <select id="language" name="language" required>
+                        <option value="sas">SAS</option>
+                        <option value="r">R</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dataset_path">Dataset Path:</label>
+                    <input type="text" id="dataset_path" name="dataset_path" placeholder="e.g., output/ui_generated_data/DM.csv" required>
+                </div>
+                <div class="form-group">
+                    <label for="output_type">Output Type:</label>
+                    <select id="output_type" name="output_type" required>
+                        <option value="demographics">Demographics</option>
+                        <option value="disposition">Disposition</option>
+                        <option value="exposure">Exposure</option>
+                        <option value="teae_summary">TEAE Summary</option>
+                        <option value="teae_by_soc_pt">TEAE by SOC/PT</option>
+                        <option value="lab_shift">Lab Shift Table</option>
+                        <option value="vs_change">Vital Signs Change</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="treatment_var">Treatment Variable:</label>
+                    <input type="text" id="treatment_var" name="treatment_var" value="ARM" required>
+                </div>
+                <button type="submit">Generate Code</button>
+            </form>
+        </div>
+
         <div id="results-section">
             <h2>Results</h2>
             <pre id="results-output"></pre>
