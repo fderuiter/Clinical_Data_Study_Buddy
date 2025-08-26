@@ -73,3 +73,32 @@ def test_generate_raw_dataset_package_endpoint(client, mocker):
     call_args = mock_generate.call_args[1]
     assert call_args["num_subjects"] == 20
     assert call_args["domains"] == ["DM", "AE", "VS"]
+
+
+def test_generate_analysis_code_endpoint(client, mocker):
+    mock_generator_instance = mocker.Mock()
+    mock_generator_instance.generate_code.return_value = "/* SAS code */"
+    mock_generator_class = mocker.patch(
+        "ui.main.AnalysisGenerator", return_value=mock_generator_instance
+    )
+
+    request_data = {
+        "language": "sas",
+        "dataset_path": "testing/test_data/DM.csv",
+        "output_type": "demographics",
+        "treatment_var": "ARM",
+    }
+
+    response = client.post("/api/generate-analysis-code", json=request_data)
+
+    assert response.status_code == 200
+    assert response.json()["message"] == "Analysis code generated successfully"
+    assert response.json()["file_path"] == "output/ui_generated_data/analysis.sas"
+
+    mock_generator_class.assert_called_once_with(
+        language="sas",
+        dataset="testing/test_data/DM.csv",
+        output_type="demographics",
+        treatment_var="ARM",
+    )
+    mock_generator_instance.generate_code.assert_called_once()
