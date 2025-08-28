@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typer.testing import CliRunner
-from cdisc_generators_api.cdisc_cli.main import app
+from cdisc_data_symphony.cli.main import app
 
 runner = CliRunner()
 
@@ -11,7 +11,7 @@ def test_download_standard(mocker):
     and creates the expected output file.
     """
     mock_get_client = mocker.patch(
-        "cdisc_generators_api.core.download_service._get_client"
+        "cdisc_data_symphony.core.download_service._get_client"
     )
     mock_sdtmig_version = {
         "_links": {

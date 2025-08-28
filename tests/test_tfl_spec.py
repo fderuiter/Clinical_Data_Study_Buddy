@@ -3,8 +3,8 @@ import pytest
 from click.testing import CliRunner
 from pydantic import ValidationError
 
-from cdisc_generators_api.cdisc_generators.tfl.models import TFLSpec
-from cdisc_generators_api.cdisc_generators.tfl.autonumber import AutoNumberer
+from cdisc_data_symphony.generators.tfl.models import TFLSpec
+from cdisc_data_symphony.generators.tfl.autonumber import AutoNumberer
 # from src.crfgen.crfgen import app
 
 VALID_SPEC = """

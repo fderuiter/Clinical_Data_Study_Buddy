@@ -1,5 +1,5 @@
 import unittest
-from cdisc_generators_api.cdisc_generators.analysisgen.generator import AnalysisGenerator
+from cdisc_data_symphony.generators.analysisgen.generator import AnalysisGenerator
 
 class TestAnalysisGenerator(unittest.TestCase):
 

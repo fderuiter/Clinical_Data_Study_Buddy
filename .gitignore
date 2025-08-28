@@ -18,3 +18,7 @@ artefacts/
 
 # Archives
 *.tar.gz
+
+# Coverage reports
+.coverage
+coverage.xml

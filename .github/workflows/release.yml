@@ -29,10 +29,10 @@ jobs:
       - name: Generate CRF JSON
         env:
           CDISC_API_KEY: ${{ secrets.CDISC_API_KEY }}
-        run: poetry run scripts/build_canonical.py -o crf.json
+        run: poetry run build-canonical -o crf.json
 
       - name: Build all formats
-        run: poetry run scripts/build.py --outdir artefacts
+        run: poetry run build --outdir artefacts
 
       - name: Archive artefacts
         run: zip -r artefacts.zip artefacts/
