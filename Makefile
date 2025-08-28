@@ -1,47 +1,57 @@
 # Makefile for cdisc-crf-generator
 
 # Phony targets
-.PHONY: init clean build-json build-all test fmt docs
+.PHONY: init clean build-json build-all test fmt docs help
 
 # Default target
 all: build-all
 
-init:
+help:
+	@echo "Makefile for cdisc-crf-generator"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make <target>"
+	@echo ""
+	@echo "Targets:"
+	@echo "  init              Install dependencies"
+	@echo "  clean             Remove generated files"
+	@echo "  update-spec       Download the latest CDISC Library spec"
+	@echo "  generate-client   Generate the CDISC Library client"
+	@echo "  update-sdk        Update the spec and generate the client"
+	@echo "  build-json        Build the canonical JSON from the spec using the CLI"
+	@echo "  build-all         Build all artifacts from the canonical JSON using the CLI"
+	@echo "  test              Run tests"
+	@echo "  fmt               Format the code"
+	@echo "  docs              Serve the documentation"
+
+
+init: ## Install dependencies
 	poetry install
 
-clean:
+clean: ## Remove generated files
 	rm -rf artefacts/ crf.json
 
-update-spec:
-	poetry run python scripts/download_spec.py
+update-spec: ## Download the latest CDISC Library spec
+	poetry run python build_scripts/download_spec.py
 
-generate-client:
-	poetry run python scripts/generate_client.py
+generate-client: ## Generate the CDISC Library client
+	poetry run python build_scripts/generate_client.py
 
-update-sdk: update-spec generate-client
+update-sdk: update-spec generate-client ## Update the spec and generate the client
 
-build-json:
-	poetry run scripts/build_canonical.py -o crf.json
+build-json: ## Build the canonical JSON from the spec
+	poetry run cdisc build build-canonical
 
-build-all:
-	poetry run scripts/build.py --source crf.json --outdir artefacts
+build-all: ## Build all artifacts from the canonical JSON
+	poetry run cdisc build
 
-test:
+test: ## Run tests
 	poetry run pytest
 
-generate-spec:
-	poetry run python scripts/generate_spec_template.py
-
-generate-dataset:
-	poetry run python scripts/generate_dataset_from_spec.py
-
-validate-dataset:
-	poetry run python scripts/validate_dataset.py
-
-fmt:
+fmt: ## Format the code
 	poetry run black .
 	poetry run ruff check . --fix
 	poetry run isort .
 
-docs:
+docs: ## Serve the documentation
 	poetry run mkdocs serve

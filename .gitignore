@@ -15,3 +15,6 @@ artefacts/
 /test_crfs/
 /test_data/
 /test_run/
+
+# Archives
+*.tar.gz
