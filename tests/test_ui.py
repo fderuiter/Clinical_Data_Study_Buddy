@@ -14,21 +14,11 @@ def test_read_root(client):
     assert "<h1>CDISC Data Generator</h1>" in response.text
 
 
-from cdisc_generators_api.cdisc_generators.crfgen.schema import Form, FieldDef
-
 def test_generate_synthetic_data_endpoint(client, mocker):
-    mock_form = Form(
-        title="DM",
-        domain="DM",
-        fields=[FieldDef(oid="USUBJID", prompt="Subject ID", datatype="text", cdash_var="USUBJID")],
+    mock_create_synthetic_data = mocker.patch(
+        "cdisc_generators_api.ui.services.data_generation_service.create_synthetic_data",
+        return_value="output/ui_generated_data/DM.csv",
     )
-    mock_get_api_key = mocker.patch("cdisc_generators_api.ui.main.get_api_key", return_value="test-key")
-    mock_harvest = mocker.patch("cdisc_generators_api.ui.main.harvest", return_value=[mock_form])
-
-    mock_dataset = [{"USUBJID": "SUBJ-001"}]
-    mock_generator_instance = mocker.Mock()
-    mock_generator_instance.generate.return_value = mock_dataset
-    mock_generator_class = mocker.patch("cdisc_generators_api.ui.main.DataGenerator", return_value=mock_generator_instance)
 
     request_data = {
         "dataset_type": "SDTM",
@@ -41,16 +31,20 @@ def test_generate_synthetic_data_endpoint(client, mocker):
     response = client.post("/api/generate-synthetic-data", json=request_data)
 
     assert response.status_code == 200
-    assert response.json()["message"] == "Dataset generated successfully"
+    assert response.json() == {
+        "message": "Dataset generated successfully",
+        "file_path": "output/ui_generated_data/DM.csv",
+    }
 
-    mock_harvest.assert_called_once()
-    mock_generator_class.assert_called_once_with(mock_form)
-    mock_generator_instance.generate.assert_called_once_with(1)
+    mock_create_synthetic_data.assert_called_once_with(
+        "SDTM", "DM", 1, "Oncology", "csv"
+    )
 
 
 def test_generate_raw_dataset_package_endpoint(client, mocker):
-    mock_generate = mocker.patch(
-        "cdisc_generators_api.ui.main.generate_raw_dataset_package",
+    mock_create_raw_dataset_package = mocker.patch(
+        "cdisc_generators_api.ui.services.data_generation_service.create_raw_dataset_package",
+        return_value="output/ui_generated_data/edc_raw_datasets.zip",
     )
 
     request_data = {
@@ -69,17 +63,15 @@ def test_generate_raw_dataset_package_endpoint(client, mocker):
         "file_path": "output/ui_generated_data/edc_raw_datasets.zip",
     }
 
-    mock_generate.assert_called_once()
-    call_args = mock_generate.call_args[1]
-    assert call_args["num_subjects"] == 20
-    assert call_args["domains"] == ["DM", "AE", "VS"]
+    mock_create_raw_dataset_package.assert_called_once_with(
+        20, "Oncology", ["DM", "AE", "VS"], "none", "csv"
+    )
 
 
 def test_generate_analysis_code_endpoint(client, mocker):
-    mock_generator_instance = mocker.Mock()
-    mock_generator_instance.generate_code.return_value = "/* SAS code */"
-    mock_generator_class = mocker.patch(
-        "cdisc_generators_api.ui.main.AnalysisGenerator", return_value=mock_generator_instance
+    mock_create_analysis_code = mocker.patch(
+        "cdisc_generators_api.ui.services.analysis_service.create_analysis_code",
+        return_value="output/ui_generated_data/analysis.sas",
     )
 
     request_data = {
@@ -92,13 +84,11 @@ def test_generate_analysis_code_endpoint(client, mocker):
     response = client.post("/api/generate-analysis-code", json=request_data)
 
     assert response.status_code == 200
-    assert response.json()["message"] == "Analysis code generated successfully"
-    assert response.json()["file_path"] == "output/ui_generated_data/analysis.sas"
+    assert response.json() == {
+        "message": "Analysis code generated successfully",
+        "file_path": "output/ui_generated_data/analysis.sas",
+    }
 
-    mock_generator_class.assert_called_once_with(
-        language="sas",
-        dataset="testing/test_data/DM.csv",
-        output_type="demographics",
-        treatment_var="ARM",
+    mock_create_analysis_code.assert_called_once_with(
+        "sas", "testing/test_data/DM.csv", "demographics", "ARM"
     )
-    mock_generator_instance.generate_code.assert_called_once()

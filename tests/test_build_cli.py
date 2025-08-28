@@ -7,13 +7,14 @@ from unittest.mock import patch
 runner = CliRunner()
 
 @pytest.mark.parametrize("fmt", [["md"], ["csv"], ["md", "csv"]])
-@patch("cdisc_generators_api.cdisc_cli.main.get_api_key")
-@patch("cdisc_generators_api.cdisc_cli.main.harvest")
+@patch("cdisc_generators_api.cdisc_cli.commands.build.get_api_key")
+@patch("cdisc_generators_api.cdisc_cli.commands.build.harvest")
 def test_build_cli(mock_harvest, mock_get_api_key, tmp_path: pathlib.Path, fmt):
     mock_get_api_key.return_value = "test_key"
     mock_harvest.return_value = []
 
     cmd = [
+        "build",
         "build",
         "--source",
         "tests/.data/sample_crf.json",

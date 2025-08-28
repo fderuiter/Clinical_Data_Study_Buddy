@@ -8,12 +8,12 @@ from zipfile import ZipFile
 runner = CliRunner()
 
 def test_help():
-    result = runner.invoke(app, ["generate-cdash-crf", "--help"])
+    result = runner.invoke(app, ["generate", "cdash-crf", "--help"])
     assert result.exit_code == 0
     assert "Generate Word CRF shells" in result.stdout
 
 
-@patch("cdisc_generators_api.cdisc_cli.main.load_ig")
+@patch("cdisc_generators_api.core.generation_service.load_ig")
 def test_generate(mock_load_ig, tmp_path):
     out_dir = tmp_path / "out"
     mock_df = pd.DataFrame([
@@ -41,7 +41,7 @@ def test_generate(mock_load_ig, tmp_path):
     ])
     mock_load_ig.return_value = mock_df
 
-    result = runner.invoke(app, ["generate-cdash-crf", "--ig-version", "v2.3", "--out", str(out_dir), "--domains", "AE"])
+    result = runner.invoke(app, ["generate", "cdash-crf", "--ig-version", "v2.3", "--out", str(out_dir), "--domains", "AE"])
     assert result.exit_code == 0, result.stdout
 
     doc_path = out_dir / "AE_Adverse_Events_CRF.docx"
@@ -69,8 +69,8 @@ def test_generate(mock_load_ig, tmp_path):
     assert len(table.columns) == 6
 
 
-@patch("cdisc_generators_api.cdisc_cli.main.populate_ae_from_fda")
-@patch("cdisc_generators_api.cdisc_cli.main.load_ig")
+@patch("cdisc_generators_api.core.generation_service.populate_ae_from_fda")
+@patch("cdisc_generators_api.core.generation_service.load_ig")
 def test_generate_with_openfda(mock_load_ig, mock_populate_ae, tmp_path):
     out_dir = tmp_path / "out"
     mock_df = pd.DataFrame([
@@ -79,7 +79,7 @@ def test_generate_with_openfda(mock_load_ig, mock_populate_ae, tmp_path):
     mock_load_ig.return_value = mock_df
     mock_populate_ae.return_value = [{"reaction_term": "Headache"}, {"reaction_term": "Nausea"}]
 
-    result = runner.invoke(app, ["generate-cdash-crf", "--ig-version", "v2.3", "--out", str(out_dir), "--domains", "AE", "--openfda-drug-name", "TestDrug"])
+    result = runner.invoke(app, ["generate", "cdash-crf", "--ig-version", "v2.3", "--out", str(out_dir), "--domains", "AE", "--openfda-drug-name", "TestDrug"])
     assert result.exit_code == 0, result.stdout
 
     doc_path = out_dir / "AE_Adverse_Events_CRF.docx"
