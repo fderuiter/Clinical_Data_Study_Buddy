@@ -15,6 +15,7 @@ python = ">=3.11,<4.0"
 openapi-python-client = "^0.25"
 jinja2 = "^3.1"
 pydantic = "^2.7"
+pydantic-settings = "^2.3.4"
 requests = "^2.32"
 pandas = "^2.2"
 openpyxl = "^3.1"
@@ -52,6 +53,9 @@ skip = ["src/clients/cdisc_library_client"]
 
 [tool.poetry.scripts]
 cdisc = "cdisc_generators_api.cdisc_cli.main:app"
+update-issue-links = "build_scripts.update_issue_links:main"
+generate-diagram = "build_scripts.diagram:main"
+read-excel = "build_scripts.read_excel:main"
 
 [tool.pytest.ini_options]
 pythonpath = [

@@ -13,8 +13,12 @@ def read_excel(filepath):
         print(f"Error: File not found at {filepath}")
         sys.exit(1)
 
-if __name__ == "__main__":
+def main():
     if len(sys.argv) > 1:
         read_excel(sys.argv[1])
     else:
         print("Usage: python read_excel.py <path_to_excel_file>")
+
+
+if __name__ == "__main__":
+    main()

@@ -134,5 +134,14 @@ ax.add_patch(
 
 plt.tight_layout()
 
+
+def main(output_path: str = "output/diagram.png"):
+    """
+    Saves the diagram to the specified path.
+    """
+    plt.savefig(output_path)
+    print(f"Diagram saved to {output_path}")
+
+
 if __name__ == "__main__":
-    plt.show()
+    main()
