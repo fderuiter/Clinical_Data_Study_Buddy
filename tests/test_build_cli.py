@@ -1,14 +1,14 @@
 import pathlib
 from typer.testing import CliRunner
 import pytest
-from cdisc_generators_api.cdisc_cli.main import app
+from cdisc_data_symphony.cli.main import app
 from unittest.mock import patch
 
 runner = CliRunner()
 
 @pytest.mark.parametrize("fmt", [["md"], ["csv"], ["md", "csv"]])
-@patch("cdisc_generators_api.cdisc_cli.commands.build.get_api_key")
-@patch("cdisc_generators_api.cdisc_cli.commands.build.harvest")
+@patch("cdisc_data_symphony.cli.commands.build.get_api_key")
+@patch("cdisc_data_symphony.cli.commands.build.harvest")
 def test_build_cli(mock_harvest, mock_get_api_key, tmp_path: pathlib.Path, fmt):
     mock_get_api_key.return_value = "test_key"
     mock_harvest.return_value = []

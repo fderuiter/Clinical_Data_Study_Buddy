@@ -24,9 +24,14 @@ jobs:
     - name: Install dependencies
       run: poetry install
 
+    - name: Run linter
+      run: |
+        poetry run ruff check .
+        poetry run ruff format --check .
+
     - name: Run tests and report coverage
       run: |
-        poetry run pytest --cov=src/cdisc_generators_api --cov-report=xml
+        poetry run pytest --cov=src/cdisc_data_symphony --cov-report=xml
         poetry run coverage-comment-action --coverage-path coverage.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

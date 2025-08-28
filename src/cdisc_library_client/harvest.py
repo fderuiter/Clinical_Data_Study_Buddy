@@ -12,7 +12,7 @@ from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
 )
 from cdisc_library_client.api.default import get_mdr_products_data_collection
 
-from cdisc_generators_api.cdisc_generators.crfgen.schema import Form, FieldDef
+from cdisc_data_symphony.generators.crfgen.schema import Form, FieldDef
 
 
 class CrfGen:
