@@ -1,6 +1,6 @@
 import pytest
 
-from cdisc_generators.crfgen.utils import get_api_key
+from cdisc_generators_api.cdisc_generators.crfgen.utils import get_api_key
 from cdisc_library_client.harvest import harvest
 
 reason = ""

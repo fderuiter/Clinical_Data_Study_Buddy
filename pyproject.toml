@@ -6,13 +6,8 @@ authors = ["You <you@example.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 packages = [
-    { from = "src/cdisc_generators", include = "crfgen" },
-    { from = "src/cdisc_generators", include = "protogen" },
-    { from = "src/cdisc_generators", include = "analysisgen" },
-    { from = "src/cdisc_generators", include = "tfl" },
-    { from = "src", include = "cdisc_cli" },
-    { from = "src/clients", include = "cdisc_library_client" },
-    { from = "src/clients", include = "openfda_client" },
+    { include = "cdisc_generators_api", from = "src" },
+    { include = "cdisc_library_client", from = "src" }
 ]
 
 [tool.poetry.dependencies]
@@ -24,7 +19,7 @@ requests = "^2.32"
 pandas = "^2.2"
 openpyxl = "^3.1"
 python-docx = "^1.1"
-odmlib = {git = "https://github.com/swhume/odmlib.git", rev = "57b8ae069b1d6783cf73b8860b85dee6be0853ed"}
+odmlib = "^0.1.4"
 httpx = "^0.23.0"
 docx2pdf = "^0.1.8"
 pypandoc = "^1.11"
@@ -56,7 +51,7 @@ profile = "black"
 skip = ["src/clients/cdisc_library_client"]
 
 [tool.poetry.scripts]
-cdisc = "cdisc_cli.main:app"
+cdisc = "cdisc_generators_api.cdisc_cli.main:app"
 
 [tool.pytest.ini_options]
 pythonpath = [

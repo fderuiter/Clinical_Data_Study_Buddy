@@ -1,5 +1,5 @@
-from cdisc_generators.data_generator import DataGenerator
-from cdisc_generators.crfgen.schema import Form, FieldDef, Codelist
+from cdisc_generators_api.cdisc_generators.data_generator import DataGenerator
+from cdisc_generators_api.cdisc_generators.crfgen.schema import Form, FieldDef, Codelist
 
 def test_generate():
     """
