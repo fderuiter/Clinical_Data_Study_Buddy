@@ -13,7 +13,7 @@ FINAL_CLIENT_DIR = Path("src/cdisc_library_client")
 # This is based on the title in the OpenAPI spec.
 GENERATED_CLIENT_DIR = Path("cdisc-library-api-client")
 
-OPENAPI_SPEC = Path("openapi/cdisc-library.json")
+OPENAPI_SPEC = Path("docs/openapi/cdisc-library.json")
 
 
 def generate_client():

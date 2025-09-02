@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader
 from cdisc_data_symphony.generators.crfgen.schema import Form
 from .registry import register
 
-env = Environment(loader=FileSystemLoader("templates/crfgen"))
+env = Environment(loader=FileSystemLoader("src/cdisc_data_symphony/templates/crfgen"))
 
 
 @register("tex")

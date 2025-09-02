@@ -3,7 +3,7 @@ name = "cdisc-generators"
 version = "0.1.0"
 description = "Generate CRFs from CDISC Library"
 authors = ["You <you@example.com>"]
-license = "Apache-2.0"
+license = "MIT"
 readme = "README.md"
 packages = [
     { include = "cdisc_data_symphony", from = "src" },
