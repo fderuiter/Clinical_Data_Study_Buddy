@@ -1,16 +1,132 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
-*.egg-info/
-.dist/
+*.pyc
+*.pyo
+*.pyd
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
 build/
-.venv/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Virtualenv
+.venv
+venv/
+VENV/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyderworkspace
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# Cache files
 .cache/
-artefacts/
+.mypy_cache/
+.pytest_cache/
+
+# Poetry
+# We want to commit the lock file to ensure reproducible installs
+# poetry.lock
+
+# IDE settings
+.idea/
+.vscode/
+
+# Output folder
+output/
+
+# Test artifacts
+tests/fixtures/test_run/edc_raw_datasets.zip
+tests/fixtures/test_run/unzipped/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment variables
 .env
-/tests/sample_output
 
 # Generated files and directories
-/output/
 /test_artefacts/
 /test_crfs/
 /test_data/
@@ -18,7 +134,3 @@ artefacts/
 
 # Archives
 *.tar.gz
-
-# Coverage reports
-.coverage
-coverage.xml

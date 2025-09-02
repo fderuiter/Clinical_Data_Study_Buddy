@@ -11,7 +11,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 
 # Mount static files and templates using absolute paths
 app.mount("/static", StaticFiles(directory=os.path.join(project_root, "src/cdisc_data_symphony/web/static")), name="static")
-templates = Jinja2Templates(directory=os.path.join(project_root, "templates/ui"))
+templates = Jinja2Templates(directory=os.path.join(project_root, "src/cdisc_data_symphony/templates/ui"))
 
 
 from cdisc_data_symphony.web.routers import data_generation, analysis

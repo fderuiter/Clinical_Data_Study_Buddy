@@ -28,7 +28,7 @@ def generate_protocol_markdown(protocol: StudyProtocol, output_dir: str):
     generate_gantt_chart(tasks, gantt_chart_path)
 
     # Render markdown template
-    env = Environment(loader=FileSystemLoader("templates/protogen"))
+    env = Environment(loader=FileSystemLoader("src/cdisc_data_symphony/templates/protogen"))
     template = env.get_template("protocol.md.j2")
     markdown_content = template.render(protocol=protocol)
 
