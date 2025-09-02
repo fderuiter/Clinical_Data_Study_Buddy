@@ -1,7 +1,6 @@
 import os
 from cdisc_data_symphony.generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
 
-
 class StudyProtocolsGenerator:
     def __init__(self, therapeutic_area, treatment_arms, duration_weeks, phase, output_dir):
         self.therapeutic_area = therapeutic_area
