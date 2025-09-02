@@ -54,11 +54,11 @@ The `build_scripts` directory has been renamed to `scripts`. This directory shou
 
 ### 3. `examples/` Directory
 
-A new `examples/` directory has been created to store example data, configuration files, and usage examples. The contents of the `data/` directory should be moved here to make it clear that they are not required for the application to run.
+The `examples/` directory stores example data, configuration files, and usage examples. These files are not required for the application to run.
 
 ### 4. `issues/` Directory
 
-The `issues/` directory has been removed. It is recommended to use a dedicated issue tracker like GitHub Issues to manage tasks, bugs, and feature requests. This provides a better workflow for collaboration and tracking progress.
+The `issues/` directory has been removed. Project management is now handled through GitHub Issues.
 
 ## Next Steps
 

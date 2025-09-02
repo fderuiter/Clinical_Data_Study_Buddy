@@ -51,7 +51,7 @@ async def main():
     """
     An example of how to use the download_and_extract function.
     """
-    await download_and_extract("device/udi", "data/openfda")
+    await download_and_extract("device/udi", "examples/openfda")
 
 if __name__ == "__main__":
     asyncio.run(main())
