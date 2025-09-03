@@ -26,23 +26,6 @@ def tfl_shell(
 
 
 @generate_app.command()
-def sas_code(
-    dataset: str = typer.Option(..., "--dataset", help="Source dataset (e.g., ADSL)"),
-    output_type: str = typer.Option(..., "--output-type", help="Type of analysis output (e.g., Demographics)"),
-    treatment_var: str = typer.Option(..., "--treatment-var", help="Treatment variable (e.g., TRT01A)"),
-    output_file: pathlib.Path = typer.Option(..., "--output-file", help="Path to the output file")
-):
-    """
-    Generates analysis code in SAS.
-    """
-    try:
-        generation_service.generate_sas_code(dataset, output_type, treatment_var, output_file)
-        console.print(f"Successfully generated SAS code in {output_file}")
-    except Exception as e:
-        console.print(f"Error: {e}", style="bold red")
-
-
-@generate_app.command()
 def edc_raw_dataset_package(
     num_subjects: int = typer.Option(50, "--num-subjects", help="Number of subjects (10-200)"),
     therapeutic_area: str = typer.Option("Oncology", "--therapeutic-area", help="Therapeutic area for the study"),

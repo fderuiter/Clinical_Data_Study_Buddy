@@ -42,22 +42,6 @@ def generate_tfl_shell(spec: str, output_file: pathlib.Path):
         f.write(shell)
 
 
-def generate_sas_code(dataset: str, output_type: str, treatment_var: str, output_file: pathlib.Path):
-    """
-    Generates analysis code in SAS.
-
-    Args:
-        dataset (str): The source dataset (e.g., "ADSL").
-        output_type (str): The type of analysis output (e.g., "Demographics").
-        treatment_var (str): The treatment variable (e.g., "TRT01A").
-        output_file (pathlib.Path): The path to the output file where the SAS code will be saved.
-    """
-    generator = AnalysisGenerator("sas", dataset, output_type, treatment_var)
-    code = generator.generate_code()
-    with open(output_file, 'w') as f:
-        f.write(code)
-
-
 def generate_edc_raw_dataset_package(num_subjects: int, therapeutic_area: str, domains: List[str], study_story: str, output_dir: pathlib.Path, output_format: str):
     """
     Generates an EDC (Electronic Data Capture) Raw Dataset Package.
