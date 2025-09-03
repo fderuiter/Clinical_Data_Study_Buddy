@@ -186,12 +186,15 @@ def validate(spec_path: str, dataset_path: str):
     spec_path = Path(spec_path)
     dataset_path = Path(dataset_path)
 
-    try:
-        _, domain, _ = dataset_path.stem.split("_", 2)
-        domain = domain.upper()
-    except ValueError:
+    dataset_stem = dataset_path.stem
+    parts = dataset_stem.split("_")
+    if len(parts) == 3:  # product_domain_ts
+        domain = parts[1].upper()
+    elif len(parts) == 1:  # domain
+        domain = parts[0].upper()
+    else:
         print(
-            f"Invalid dataset filename format: {dataset_path.name}. Expected '<product>_<domain>_<timestamp>.csv'."
+            f"Invalid dataset filename format: {dataset_path.name}. Expected '<product>_<domain>_<timestamp>.csv' or '<domain>.csv'."
         )
         return
 
