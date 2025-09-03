@@ -1,3 +1,11 @@
+"""
+This module provides functionalities for working with CDISC dataset specifications.
+
+It includes functions to:
+- Generate an Excel-based specification template from the CDISC Library.
+- Generate a synthetic dataset from a specification template.
+- Validate a dataset against its corresponding specification template.
+"""
 import os
 from pathlib import Path
 import json
@@ -16,6 +24,18 @@ from cdisc_data_symphony.generators.crfgen.schema import Form, FieldDef
 
 
 def get_client():
+    """
+    Creates and returns an authenticated client for the CDISC Library API.
+
+    This function loads environment variables, retrieves the API key, and
+    initializes an AuthenticatedClient.
+
+    Returns:
+        AuthenticatedClient: An authenticated client for the CDISC Library API.
+
+    Raises:
+        ValueError: If the CDISC Library API key is not found in the environment variables.
+    """
     load_dotenv()
     api_key = os.environ.get("CDISC_PRIMARY_KEY")
     if not api_key:
@@ -30,6 +50,18 @@ def get_client():
 def generate_template(
     product: str, version: str, domains: list[str], output_dir: str
 ):
+    """
+    Generates an Excel-based specification template for CDISC datasets.
+
+    This function fetches metadata from the CDISC Library for the specified product,
+    version, and domains, and then creates an Excel spreadsheet with the specification.
+
+    Args:
+        product (str): The CDISC product (e.g., "sdtmig", "adamig").
+        version (str): The version of the product (e.g., "3-3").
+        domains (list[str]): A list of domains to include in the specification.
+        output_dir (str): The directory where the generated Excel file will be saved.
+    """
     client = get_client()
     workbook = openpyxl.Workbook()
     workbook.remove(workbook.active)
@@ -100,6 +132,16 @@ def generate_template(
 
 
 def generate_dataset(spec_path: str, output_dir: str):
+    """
+    Generates a synthetic dataset from a specification template.
+
+    This function reads an Excel-based specification template, and for each domain
+    (sheet) in the template, it generates a synthetic CSV dataset.
+
+    Args:
+        spec_path (str): The path to the Excel specification template.
+        output_dir (str): The directory where the generated CSV files will be saved.
+    """
     path = Path(spec_path)
     workbook = openpyxl.load_workbook(path)
     domains = workbook.sheetnames
@@ -131,6 +173,16 @@ def generate_dataset(spec_path: str, output_dir: str):
         print(f"Dataset for domain {domain} generated successfully at {output_path}")
 
 def validate(spec_path: str, dataset_path: str):
+    """
+    Validates a dataset against a specification template.
+
+    This function checks a given dataset (in CSV format) against an Excel-based
+    specification template to ensure that the dataset conforms to the spec.
+
+    Args:
+        spec_path (str): The path to the Excel specification template.
+        dataset_path (str): The path to the CSV dataset to be validated.
+    """
     spec_path = Path(spec_path)
     dataset_path = Path(dataset_path)
 

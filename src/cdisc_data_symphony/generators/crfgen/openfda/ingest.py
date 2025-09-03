@@ -1,3 +1,8 @@
+"""
+This module provides functionality for ingesting bulk data from the OpenFDA
+download portal. It can download and extract zip files for various
+OpenFDA endpoints.
+"""
 import asyncio
 import httpx
 import os
@@ -23,8 +28,12 @@ async def download_and_extract(endpoint: str, output_dir: str):
     Downloads and extracts a bulk data zip file from the openFDA download portal.
 
     Args:
-        endpoint: The endpoint to download data for.
-        output_dir: The directory to store the extracted data.
+        endpoint (str): The OpenFDA endpoint to download data for (e.g., "device/udi").
+        output_dir (str): The directory where the extracted data will be stored.
+
+    Raises:
+        ValueError: If the specified endpoint is not valid.
+        httpx.HTTPStatusError: If the download request fails.
     """
     if endpoint not in DOWNLOAD_LINKS:
         raise ValueError(f"Invalid endpoint: {endpoint}")
@@ -50,6 +59,9 @@ async def download_and_extract(endpoint: str, output_dir: str):
 async def main():
     """
     An example of how to use the download_and_extract function.
+
+    This function demonstrates downloading the "device/udi" endpoint data
+    to the "examples/openfda" directory.
     """
     await download_and_extract("device/udi", "examples/openfda")
 

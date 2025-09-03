@@ -1,3 +1,11 @@
+"""
+This module defines a command-line interface (CLI) for generating various
+clinical study artifacts, including CRFs, study protocols, and for validating
+TFL specification files.
+
+Note: This file appears to be misplaced and might be better suited for the
+`src/cdisc_data_symphony/cli/commands` directory.
+"""
 import click
 import yaml
 from rich.console import Console
@@ -7,9 +15,9 @@ from pydantic import ValidationError
 from . import __version__
 from .exporter.registry import get as get_exporter
 from cdisc_library_client.harvest import harvest
-from protogen.protocol import StudyProtocol, generate_protocol_markdown
-from src.tfl.models import TFLSpec
-from src.tfl.migration import migrate_spec, TFLSpecMigrationError
+from cdisc_data_symphony.generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
+from cdisc_data_symphony.generators.tfl.models import TFLSpec
+from cdisc_data_symphony.generators.tfl.migration import migrate_spec, TFLSpecMigrationError
 
 
 console = Console()
@@ -18,6 +26,9 @@ console = Console()
 @click.group()
 @click.version_option(__version__)
 def app():
+    """
+    A CLI for generating clinical study artifacts.
+    """
     ...
 
 @app.command()
@@ -76,7 +87,19 @@ def generate(
     domains: list[str],
 ):
     """
-    Generate CRF from a CDISC standard
+    Generates a CRF from a specified CDISC standard.
+
+    Args:
+        api_key (str): The API key for the CDISC Library.
+        ig_filter (str): A filter for the IG by name.
+        cache_path (str): The path to the cache file.
+        style_path (str): The path to the style file.
+        template_path (str): The path to the template file.
+        log_path (str): The path to the log file.
+        output_path (str): The path for the output file.
+        standard (str): The CDISC standard to use.
+        version (str): The version of the standard.
+        domains (list[str]): A list of domains to include.
     """
     crf = harvest(api_key, ig_filter)
     exporter = get_exporter(output_path, style_path, template_path)
@@ -95,7 +118,14 @@ def generate(
 @click.option("--output-dir", default="output", help="Output directory for the protocol documents.")
 def protocol(therapeutic_area: str, treatment_arm: list[str], duration_weeks: int, phase: int, output_dir: str):
     """
-    Generate a study protocol document.
+    Generates a study protocol document.
+
+    Args:
+        therapeutic_area (str): The therapeutic area of the study.
+        treatment_arm (list[str]): A list of treatment arms for the study.
+        duration_weeks (int): The duration of the study in weeks.
+        phase (int): The phase of the study.
+        output_dir (str): The directory to save the generated protocol documents.
     """
     console.log(f"Generating study protocol in {output_dir}...")
     os.makedirs(output_dir, exist_ok=True)
@@ -118,7 +148,10 @@ def protocol(therapeutic_area: str, treatment_arm: list[str], duration_weeks: in
 @click.argument("spec_path", type=click.Path(exists=True, dir_okay=False, readable=True))
 def spec(spec_path: str):
     """
-    Validate a TFL spec file.
+    Validates a TFL (Tables, Figures, and Listings) specification file.
+
+    Args:
+        spec_path (str): The path to the TFL specification file to validate.
     """
     console.log(f"Validating spec file: {spec_path}")
     try:
@@ -135,6 +168,9 @@ def spec(spec_path: str):
 
 
 def main():
+    """
+    The main entry point for the CLI application.
+    """
     app()
 
 if __name__ == "__main__":

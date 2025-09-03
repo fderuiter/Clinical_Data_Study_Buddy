@@ -1,3 +1,7 @@
+"""
+This module provides the functionality to export CRF (Case Report Form) data
+to LaTeX (.tex) files using Jinja2 templates.
+"""
 from pathlib import Path
 from typing import Sequence
 
@@ -11,6 +15,16 @@ env = Environment(loader=FileSystemLoader("src/cdisc_data_symphony/templates/crf
 
 @register("tex")
 def render_tex(forms: Sequence[Form], out_dir: Path):
+    """
+    Renders a sequence of Form objects to .tex files.
+
+    This function uses a Jinja2 template to generate a LaTeX file for each
+    form in the sequence.
+
+    Args:
+        forms (Sequence[Form]): A sequence of Form objects to be rendered.
+        out_dir (Path): The output directory where the .tex files will be saved.
+    """
     out_dir.mkdir(exist_ok=True, parents=True)
     tpl = env.get_template("latex.j2")
     for f in forms:

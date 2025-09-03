@@ -1,3 +1,7 @@
+"""
+This module provides the functionality to export CRF (Case Report Form) data
+to a PDF file. It leverages the DOCX exporter and pandoc for the conversion.
+"""
 import tempfile
 from pathlib import Path
 from typing import Sequence
@@ -12,10 +16,16 @@ from .registry import register
 @register("pdf")
 def export_pdf(forms: Sequence[Form], outdir: Path, style: dict = None) -> None:
     """
-    Exports the given forms to a PDF document.
+    Exports a sequence of Form objects to a PDF document.
 
-    This function first generates a DOCX file in a temporary location,
+    This function first generates a .docx file in a temporary location,
     and then converts it to PDF using pandoc.
+
+    Args:
+        forms (Sequence[Form]): A sequence of Form objects to be exported.
+        outdir (Path): The output directory where the PDF file will be saved.
+        style (dict, optional): A dictionary defining the styles to be applied
+                                to the intermediate .docx document. Defaults to None.
     """
     with tempfile.NamedTemporaryFile(suffix=".docx") as tmp:
         docx_path = tmp.name
