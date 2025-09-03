@@ -41,5 +41,5 @@ class PMAAccessor:
             params["search"] = search
 
         response = await self.client.get("/device/pma.json", params=params)
-        results = response.json().get("results", [])
+        results = (await response.json()).get("results", [])
         return [PMA(**item) for item in results]

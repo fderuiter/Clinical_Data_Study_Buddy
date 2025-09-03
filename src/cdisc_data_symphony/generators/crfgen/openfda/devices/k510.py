@@ -41,5 +41,5 @@ class K510Accessor:
             params["search"] = search
 
         response = await self.client.get("/device/510k.json", params=params)
-        results = response.json().get("results", [])
+        results = (await response.json()).get("results", [])
         return [K510(**item) for item in results]

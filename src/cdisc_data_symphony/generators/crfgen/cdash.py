@@ -377,8 +377,9 @@ def _create_header(section, config, full_title):
     title_cell.text = full_title
     sponsor_cell.width = title_cell.width = section.page_width / 2
 
+    header_color = config.get("styling", {}).get("header_color", "1F1F1F")
     for c in (sponsor_cell, title_cell):
-        _set_cell_shading(c, "1F1F1F")  # very dark grey
+        _set_cell_shading(c, header_color)
         _style_header_cell(c)
 
     title_para = title_cell.paragraphs[0]
@@ -416,13 +417,14 @@ def _create_footer(section, config, full_title):
     f_right.runs[0].font.color.rgb = RGBColor(0x80, 0x80, 0x80)
 
 
-def _create_admin_section(document, full_title):
+def _create_admin_section(document, full_title, config):
     """
     Creates Section A (Administrative) of the CRF.
 
     Args:
         document: The docx.Document object.
         full_title (str): The full title of the CRF.
+        config (dict): A dictionary containing configuration settings.
     """
     document.add_paragraph()
     secA_tbl = document.add_table(rows=3, cols=2, style="Table Grid")
@@ -433,7 +435,8 @@ def _create_admin_section(document, full_title):
     hdr_cell = hdr_row.cells[0]
     hdr_cell.merge(hdr_row.cells[1])
     hdr_cell.text = "SECTION A  ADMINISTRATIVE"
-    _set_cell_shading(hdr_cell, "8064A2")  # muted purple
+    section_header_color = config.get("styling", {}).get("section_header_color", "8064A2")
+    _set_cell_shading(hdr_cell, section_header_color)
     _style_header_cell(hdr_cell)
 
     secA_tbl.rows[1].cells[0].text = f"Was {full_title.lower()} completed?"
@@ -447,7 +450,7 @@ def _create_admin_section(document, full_title):
     secA_tbl.rows[2].cells[1].text = "__|__|____|____|    DD-MMM-YYYY"
 
 
-def _create_variables_table(document, section, domain_df, domain: str, fda_adverse_events: List[Dict[str, Any]] = None):
+def _create_variables_table(document, section, domain_df, domain: str, config: dict, fda_adverse_events: List[Dict[str, Any]] = None):
     """
     Creates Section B (Domain Variables) of the CRF.
 
@@ -459,6 +462,7 @@ def _create_variables_table(document, section, domain_df, domain: str, fda_adver
         section: The docx.section.Section object for the document.
         domain_df (pd.DataFrame): A DataFrame containing the variables for the domain.
         domain (str): The two-letter domain code.
+        config (dict): A dictionary containing configuration settings.
         fda_adverse_events (List[Dict[str, Any]], optional): A list of adverse
             event terms from OpenFDA. Defaults to None.
     """
@@ -475,9 +479,10 @@ def _create_variables_table(document, section, domain_df, domain: str, fda_adver
         "Variable", "Label / Question", "Type",
         "Controlled Terminology", "Data Entry", "Instructions",
     ]
+    table_header_color = config.get("styling", {}).get("table_header_color", "4F81BD")
     for idx, title in enumerate(col_titles):
         hdr_cells[idx].text = title
-        _set_cell_shading(hdr_cells[idx], "4F81BD")
+        _set_cell_shading(hdr_cells[idx], table_header_color)
         _style_header_cell(hdr_cells[idx])
 
     ct_legend: dict[str, int] = {}
@@ -572,7 +577,7 @@ def _create_variables_table(document, section, domain_df, domain: str, fda_adver
         fda_tbl = document.add_table(rows=1, cols=1, style="Table Grid")
         hdr_cell = fda_tbl.rows[0].cells[0]
         hdr_cell.text = "Reaction Term"
-        _set_cell_shading(hdr_cell, "4F81BD")
+        _set_cell_shading(hdr_cell, table_header_color)
         _style_header_cell(hdr_cell)
         for event in fda_adverse_events:
             row_cells = fda_tbl.add_row().cells
@@ -627,16 +632,17 @@ def build_domain_crf(
 
     # Uniform font for entire document
     style = document.styles["Normal"]
-    style.font.name = "Arial"
-    style.font.size = Pt(10)
+    styling = config.get("styling", {})
+    style.font.name = styling.get("font_name", "Arial")
+    style.font.size = Pt(styling.get("font_size", 10))
 
     # ---------------------------------------------------------------------
     #  Create document components
     # ---------------------------------------------------------------------
     _create_header(section, config, full_title)
     _create_footer(section, config, full_title)
-    _create_admin_section(document, full_title)
-    _create_variables_table(document, section, domain_df, domain, fda_adverse_events=fda_adverse_events)
+    _create_admin_section(document, full_title, config)
+    _create_variables_table(document, section, domain_df, domain, config, fda_adverse_events=fda_adverse_events)
 
     # ---------------------------------------------------------------------
     #  Save document

@@ -41,5 +41,5 @@ class ClassificationAccessor:
             params["search"] = search
 
         response = await self.client.get("/device/classification.json", params=params)
-        results = response.json().get("results", [])
+        results = (await response.json()).get("results", [])
         return [Classification(**item) for item in results]

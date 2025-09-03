@@ -41,7 +41,7 @@ class MAUDEAccessor:
             params["search"] = search
 
         response = await self.client.get("/device/event.json", params=params)
-        results = response.json().get("results", [])
+        results = (await response.json()).get("results", [])
         return [MAUDEEvent(**item) for item in results]
 
     async def count(self, field: str) -> dict:

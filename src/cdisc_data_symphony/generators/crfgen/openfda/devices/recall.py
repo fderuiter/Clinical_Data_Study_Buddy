@@ -41,5 +41,5 @@ class RecallAccessor:
             params["search"] = search
 
         response = await self.client.get("/device/recall.json", params=params)
-        results = response.json().get("results", [])
+        results = (await response.json()).get("results", [])
         return [Recall(**item) for item in results]
