@@ -41,7 +41,7 @@ class UDIAccessor:
             params["search"] = search
 
         response = await self.client.get("/device/udi.json", params=params)
-        results = response.json().get("results", [])
+        results = (await response.json()).get("results", [])
         return [UDI(**item) for item in results]
 
     async def get_by_di(self, di: str) -> Optional[UDI]:

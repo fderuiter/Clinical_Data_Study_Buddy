@@ -94,3 +94,47 @@ def test_generate_with_openfda(mock_load_ig, mock_populate_ae, tmp_path):
     assert fda_table.cell(0, 0).text == "Reaction Term"
     assert fda_table.cell(1, 0).text == "Headache"
     assert fda_table.cell(2, 0).text == "Nausea"
+
+
+@patch("cdisc_data_symphony.core.generation_service.load_ig")
+def test_generate_with_custom_styling(mock_load_ig, tmp_path):
+    out_dir = tmp_path / "out"
+    config_path = tmp_path / "config.yaml"
+    with open(config_path, "w") as f:
+        f.write("""styling:
+  header_color: "FF0000"
+  section_header_color: "00FF00"
+  table_header_color: "0000FF"
+  font_name: "Comic Sans MS"
+  font_size: 12
+""")
+    mock_df = pd.DataFrame([
+        {
+            "Domain": "AE", "Variable": "AETERM", "Order": 1,
+            "Display Label": "Adverse Event Term",
+            "CRF Instructions": "Report the term for the adverse event.",
+            "Type": "Char", "CT Values": None, "CT Codes": None,
+            "Implementation Notes": "Test"
+        }
+    ])
+    mock_load_ig.return_value = mock_df
+
+    result = runner.invoke(app, ["generate", "cdash-crf", "--ig-version", "v2.3", "--out", str(out_dir), "--domains", "AE", "--config", str(config_path)])
+    assert result.exit_code == 0, result.stdout
+
+    doc_path = out_dir / "AE_Adverse_Events_CRF.docx"
+    assert doc_path.exists()
+
+    with ZipFile(doc_path) as zf:
+        doc_xml = zf.read("word/document.xml").decode("utf-8")
+        assert 'w:fill="00FF00"' in doc_xml
+        assert 'w:fill="0000FF"' in doc_xml
+        header_xml = ""
+        for name in zf.namelist():
+            if "header" in name:
+                header_xml = zf.read(name).decode("utf-8")
+                break
+        assert 'w:fill="FF0000"' in header_xml
+        styles_xml = zf.read("word/styles.xml").decode("utf-8")
+        assert '<w:rFonts w:ascii="Comic Sans MS"' in styles_xml
+        assert '<w:sz w:val="24"/>' in styles_xml

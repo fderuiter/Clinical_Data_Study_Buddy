@@ -41,7 +41,7 @@ class EnforcementAccessor:
             params["search"] = search
 
         response = await self.client.get("/device/enforcement.json", params=params)
-        results = response.json().get("results", [])
+        results = (await response.json()).get("results", [])
         return [EnforcementReport(**item) for item in results]
 
     async def count(self, field: str) -> dict:

@@ -41,5 +41,5 @@ class RegListAccessor:
             params["search"] = search
 
         response = await self.client.get("/device/registrationlisting.json", params=params)
-        results = response.json().get("results", [])
+        results = (await response.json()).get("results", [])
         return [Registration(**item) for item in results]
