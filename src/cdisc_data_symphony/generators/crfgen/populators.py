@@ -1,3 +1,8 @@
+"""
+This module provides functions to populate CRF data by fetching information
+from the OpenFDA API. It includes functions for retrieving adverse event
+and drug label data.
+"""
 import logging
 from typing import List, Dict, Any
 from cdisc_data_symphony.api.openfda import client
@@ -8,7 +13,23 @@ def populate_ae_from_fda(
     drug_name: str, max_results: int = 10, start_date: str = None, end_date: str = None
 ) -> List[Dict[str, Any]]:
     """
-    Fetches Adverse Event data from openFDA and formats it.
+    Fetches Adverse Event data from OpenFDA and formats it.
+
+    This function queries the OpenFDA API for adverse events related to a
+    specific drug and extracts the reaction terms.
+
+    Args:
+        drug_name (str): The name of the drug to search for.
+        max_results (int): The maximum number of adverse events to return.
+        start_date (str, optional): The start date for the search (YYYY-MM-DD).
+            Defaults to None.
+        end_date (str, optional): The end date for the search (YYYY-MM-DD).
+            Defaults to None.
+
+    Returns:
+        List[Dict[str, Any]]: A list of dictionaries, where each dictionary
+                              contains a single key "reaction_term" with the
+                              adverse event term.
     """
     logger.info(f"Fetching adverse events for drug: {drug_name} with max_results: {max_results}")
     adverse_events = client.get_adverse_events(
@@ -33,7 +54,16 @@ def populate_ae_from_fda(
 
 def populate_label_from_fda(drug_name: str) -> Dict[str, Any]:
     """
-    Fetches Drug Label data from openFDA and formats it.
+    Fetches Drug Label data from OpenFDA and formats it.
+
+    This function queries the OpenFDA API for a drug label and extracts key
+    information such as brand name, generic name, indications, and adverse reactions.
+
+    Args:
+        drug_name (str): The name of the drug to search for.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the extracted drug label information.
     """
     logger.info(f"Fetching drug label for: {drug_name}")
     label_data = client.get_drug_label(drug_name)

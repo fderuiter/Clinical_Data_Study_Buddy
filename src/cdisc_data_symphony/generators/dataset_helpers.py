@@ -1,3 +1,11 @@
+"""
+This module provides helper functions for dataset generation.
+
+The functions in this module are used to:
+- Generate a define.xml file from a set of domains.
+- Package generated datasets into a zip archive.
+- Apply a "study story" to the datasets to simulate real-world scenarios.
+"""
 import os
 import zipfile
 from pathlib import Path
@@ -16,6 +24,17 @@ console = Console()
 
 
 def generate_define_xml(temp_dir, domains):
+    """
+    Generates a define.xml file for the given domains.
+
+    This function creates a define.xml file by fetching metadata from the CDISC Library
+    for the specified domains and their variables. The generated file is saved in the
+    temporary directory.
+
+    Args:
+        temp_dir (pathlib.Path): The temporary directory containing the dataset files.
+        domains (list): A list of domain names to include in the define.xml file.
+    """
     console.print("Generating define.xml...")
 
     # Create the basic ODM structure
@@ -125,6 +144,17 @@ def generate_define_xml(temp_dir, domains):
 
 
 def package_datasets(temp_dir, output_dir):
+    """
+    Packages the generated datasets into a zip file.
+
+    This function takes all the files in the temporary directory, packages them into a
+    zip archive named "edc_raw_datasets.zip", and saves it in the output directory.
+    After packaging, it cleans up the temporary directory.
+
+    Args:
+        temp_dir (pathlib.Path): The temporary directory containing the dataset files.
+        output_dir (pathlib.Path): The directory where the zip file will be saved.
+    """
     zip_filename = Path(output_dir) / "edc_raw_datasets.zip"
     console.print(f"Packaging datasets into {zip_filename}...")
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
@@ -139,6 +169,19 @@ def package_datasets(temp_dir, output_dir):
 
 
 def apply_study_story(study_story, temp_dir, num_subjects, domains, file_format):
+    """
+    Applies a study story to the generated datasets.
+
+    This function modifies the datasets to simulate a real-world scenario, such as
+    a high dropout rate.
+
+    Args:
+        study_story (str): The name of the study story to apply (e.g., "high_dropout").
+        temp_dir (pathlib.Path): The temporary directory containing the dataset files.
+        num_subjects (int): The total number of subjects in the study.
+        domains (list): A list of domain names.
+        file_format (str): The file format of the datasets (e.g., "csv").
+    """
     if study_story == "high_dropout":
         console.print("Applying 'high_dropout' study story...")
         dropout_rate = 0.3

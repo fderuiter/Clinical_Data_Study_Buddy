@@ -1,3 +1,13 @@
+"""
+This module provides the core functionality for building Case Report Forms (CRFs)
+in Microsoft Word format based on CDASH IG standards.
+
+It includes functions for:
+- Fetching CDASHIG metadata from the CDISC Library API.
+- Creating and styling various components of a Word document, such as headers,
+  footers, tables, and form controls.
+- Assembling the complete CRF for a given domain.
+"""
 import os
 import pathlib
 from typing import Dict, Tuple, List, Any
@@ -76,7 +86,17 @@ REPEATING_DOMAINS = {"AE", "CE", "CM", "DS", "DV", "HO", "MH", "SA"}
 
 
 def get_domain_info(domain: str) -> Tuple[str, str]:
-    """Return (category, full title) for *domain* code."""
+    """
+    Returns the category and full title for a given domain code.
+
+    Args:
+        domain (str): The two-letter domain code (e.g., "AE").
+
+    Returns:
+        Tuple[str, str]: A tuple containing the category and the full title
+                         of the domain. If the domain is not found, it returns
+                         ("Unknown", domain).
+    """
     try:
         return DOMAIN_INFO[domain.upper()]
     except KeyError:
@@ -89,7 +109,16 @@ def get_domain_info(domain: str) -> Tuple[str, str]:
 
 
 def _add_page_field(paragraph):
-    """Insert Word PAGE field into *paragraph* (in‑place)."""
+    """
+    Inserts a Word PAGE field into a paragraph.
+
+    This function modifies the paragraph in-place to include a field that
+    will display the current page number.
+
+    Args:
+        paragraph: The docx.paragraph.Paragraph object to which the page
+                   field will be added.
+    """
     run = paragraph.add_run()
 
     fld_char_begin = OxmlElement("w:fldChar")
@@ -107,7 +136,13 @@ def _add_page_field(paragraph):
 
 
 def _set_cell_shading(cell, color_hex: str = "4F81BD"):
-    """Shade *cell* background with *color_hex* (RGB string without #)."""
+    """
+    Shades a table cell's background with a specified color.
+
+    Args:
+        cell: The docx.table._Cell object to be shaded.
+        color_hex (str): The RGB hex string for the color (without the '#').
+    """
     tc_pr = cell._tc.get_or_add_tcPr()
     # Remove existing shading if any
     for shd in tc_pr.findall("w:shd", tc_pr.nsmap):
@@ -118,7 +153,12 @@ def _set_cell_shading(cell, color_hex: str = "4F81BD"):
 
 
 def _add_bottom_border(cell) -> None:
-    """Add a thin bottom border to *cell*."""
+    """
+    Adds a thin bottom border to a table cell.
+
+    Args:
+        cell: The docx.table._Cell object to which the border will be added.
+    """
     tc_pr = cell._tc.get_or_add_tcPr()
     borders = tc_pr.find(qn("w:tcBorders"))
     if borders is None:
@@ -134,7 +174,13 @@ def _add_bottom_border(cell) -> None:
 
 
 def _add_checkbox(paragraph) -> None:
-    """Insert a checkbox content control into *paragraph*."""
+    """
+    Inserts a checkbox content control into a paragraph.
+
+    Args:
+        paragraph: The docx.paragraph.Paragraph object where the checkbox
+                   will be inserted.
+    """
     sdt = OxmlElement("w:sdt")
     pr = OxmlElement("w:sdtPr")
     cb = OxmlElement("w14:checkbox")
@@ -151,7 +197,13 @@ def _add_checkbox(paragraph) -> None:
 
 
 def _add_date_picker(paragraph) -> None:
-    """Insert a date picker content control into *paragraph*."""
+    """
+    Inserts a date picker content control into a paragraph.
+
+    Args:
+        paragraph: The docx.paragraph.Paragraph object where the date picker
+                   will be inserted.
+    """
     sdt = OxmlElement("w:sdt")
     pr = OxmlElement("w:sdtPr")
     dt = OxmlElement("w14:date")
@@ -168,12 +220,25 @@ def _add_date_picker(paragraph) -> None:
 
 
 def _add_underline_entry(paragraph, length: int) -> None:
+    """
+    Adds an underlined space for manual data entry.
+
+    Args:
+        paragraph: The docx.paragraph.Paragraph object where the entry
+                   line will be added.
+        length (int): The number of space characters to underline.
+    """
     run = paragraph.add_run(" " * length)
     run.font.underline = True
 
 
 def _style_header_cell(cell):
-    """Apply white bold text to header *cell*."""
+    """
+    Applies bold, white font styling to a header cell.
+
+    Args:
+        cell: The docx.table._Cell object to be styled.
+    """
     para = cell.paragraphs[0]
     run = para.runs[0]
     run.bold = True
@@ -187,7 +252,16 @@ def _style_header_cell(cell):
 
 def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
     """
-    Load and normalize CDASHIG variables from the CDISC Library API.
+    Loads and normalizes CDASHIG variables from the CDISC Library API.
+
+    Args:
+        ig_version (str): The version of the CDASHIG to fetch (e.g., "v2.3").
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the normalized CDASHIG variables.
+
+    Raises:
+        ValueError: If the CDISC_PRIMARY_KEY environment variable is not set.
     """
     api_key = os.environ.get("CDISC_PRIMARY_KEY")
     if not api_key:
@@ -259,7 +333,17 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
 
 
 def load_ig(ig_version: str) -> pd.DataFrame:
-    """Load and normalise CDASHIG variables from the CDISC Library API."""
+    """
+    Loads and normalizes CDASHIG variables from the CDISC Library API.
+
+    This function serves as a wrapper around get_cdashig_variables_from_api.
+
+    Args:
+        ig_version (str): The version of the CDASHIG to fetch.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the CDASHIG variables.
+    """
     return get_cdashig_variables_from_api(ig_version)
 
 
@@ -269,7 +353,14 @@ def load_ig(ig_version: str) -> pd.DataFrame:
 
 
 def _create_header(section, config, full_title):
-    """Create the page header."""
+    """
+    Creates the page header for the CRF document.
+
+    Args:
+        section: The docx.section.Section object for the document.
+        config (dict): A dictionary containing study metadata.
+        full_title (str): The full title of the CRF.
+    """
     header = section.header
     hdr_tbl = header.add_table(rows=2, cols=2, width=section.page_width)
     hdr_tbl.alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -304,7 +395,14 @@ def _create_header(section, config, full_title):
 
 
 def _create_footer(section, config, full_title):
-    """Create the page footer."""
+    """
+    Creates the page footer for the CRF document.
+
+    Args:
+        section: The docx.section.Section object for the document.
+        config (dict): A dictionary containing the version label.
+        full_title (str): The full title of the CRF.
+    """
     footer = section.footer
     version_label = config.get("version_label", "Version 1.0 DRAFT")
     f_left = footer.add_paragraph(f"{full_title}, {version_label}")
@@ -319,7 +417,13 @@ def _create_footer(section, config, full_title):
 
 
 def _create_admin_section(document, full_title):
-    """Create Section A - Administrative."""
+    """
+    Creates Section A (Administrative) of the CRF.
+
+    Args:
+        document: The docx.Document object.
+        full_title (str): The full title of the CRF.
+    """
     document.add_paragraph()
     secA_tbl = document.add_table(rows=3, cols=2, style="Table Grid")
     secA_tbl.autofit = False
@@ -344,7 +448,20 @@ def _create_admin_section(document, full_title):
 
 
 def _create_variables_table(document, section, domain_df, domain: str, fda_adverse_events: List[Dict[str, Any]] = None):
-    """Create Section B - Domain Variables."""
+    """
+    Creates Section B (Domain Variables) of the CRF.
+
+    This function builds the main table of variables for the domain, including
+    data entry controls and footnotes.
+
+    Args:
+        document: The docx.Document object.
+        section: The docx.section.Section object for the document.
+        domain_df (pd.DataFrame): A DataFrame containing the variables for the domain.
+        domain (str): The two-letter domain code.
+        fda_adverse_events (List[Dict[str, Any]], optional): A list of adverse
+            event terms from OpenFDA. Defaults to None.
+    """
     document.add_paragraph()
     var_tbl = document.add_table(rows=1, cols=6, style="Table Grid")
     var_tbl.autofit = False
@@ -483,7 +600,19 @@ def _create_variables_table(document, section, domain_df, domain: str, fda_adver
 def build_domain_crf(
     domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path, config: dict, fda_adverse_events: List[Dict[str, Any]] = None
 ) -> None:
-    """Build a Word document for a single CDASH *domain* and save it to disk."""
+    """
+    Builds a Word document for a single CDASH domain and saves it to disk.
+
+    Args:
+        domain_df (pd.DataFrame): A DataFrame containing the variables for the domain.
+        domain (str): The two-letter domain code.
+        out_dir (pathlib.Path): The directory where the generated Word document
+                                will be saved.
+        config (dict): A dictionary containing configuration settings, including
+                       study metadata and version information.
+        fda_adverse_events (List[Dict[str, Any]], optional): A list of adverse
+            event terms from OpenFDA. Defaults to None.
+    """
 
     category, full_title = get_domain_info(domain)
 

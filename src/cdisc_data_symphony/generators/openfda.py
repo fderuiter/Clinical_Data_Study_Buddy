@@ -1,9 +1,20 @@
+"""
+This module provides functionality to interact with the OpenFDA API to populate
+Case Report Forms (CRFs) with adverse event and drug label information.
+"""
 import csv
 import sys
 import json
 from cdisc_data_symphony.generators.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
 
 def output_csv(data, writer):
+    """
+    Writes a list of dictionaries to a CSV file.
+
+    Args:
+        data (list): A list of dictionaries to be written to CSV.
+        writer: A csv.writer object.
+    """
     if not data:
         return
     headers = data[0].keys()
@@ -12,6 +23,20 @@ def output_csv(data, writer):
         writer.writerow(item.values())
 
 def populate_crf(drug_name: str, domain: str, max_results: int, start_date: str, end_date: str, output_format: str):
+    """
+    Populates a CRF with data from OpenFDA.
+
+    This function fetches data from OpenFDA for a given drug and domain,
+    and then outputs the data in the specified format (JSON or CSV).
+
+    Args:
+        drug_name (str): The name of the drug to fetch data for.
+        domain (str): The domain of data to fetch ("AE" for adverse events, "LABEL" for drug labels).
+        max_results (int): The maximum number of results to return.
+        start_date (str): The start date for the data search (YYYY-MM-DD).
+        end_date (str): The end date for the data search (YYYY-MM-DD).
+        output_format (str): The desired output format ("json" or "csv").
+    """
     results = None
     if domain == "AE":
         results = populate_ae_from_fda(

@@ -1,5 +1,6 @@
 """
-Core module for the analysis generator.
+This module contains the AnalysisGenerator class, which is the core component
+for generating analysis code in various languages like SAS and R.
 """
 from . import r_templates, sas_templates
 
@@ -7,8 +8,21 @@ from . import r_templates, sas_templates
 class AnalysisGenerator:
     """
     A class to generate analysis code in SAS and R.
+
+    This class takes the desired language, dataset, output type, and treatment
+    variable as input, and generates the corresponding analysis code based on
+    pre-defined templates.
     """
     def __init__(self, language, dataset, output_type, treatment_var):
+        """
+        Initializes the AnalysisGenerator.
+
+        Args:
+            language (str): The programming language for the analysis code ('sas' or 'r').
+            dataset (str): The name of the dataset to be used in the analysis.
+            output_type (str): The type of analysis output to generate (e.g., 'demographics').
+            treatment_var (str): The name of the treatment variable in the dataset.
+        """
         self.language = language
         self.dataset = dataset
         self.output_type = output_type
@@ -16,7 +30,13 @@ class AnalysisGenerator:
 
     def generate_code(self):
         """
-        Generates the analysis code.
+        Generates the analysis code based on the specified language.
+
+        Returns:
+            str: The generated analysis code as a string.
+
+        Raises:
+            ValueError: If the specified language is not supported.
         """
         if self.language.lower() == 'sas':
             return self._generate_sas_code()
@@ -27,7 +47,13 @@ class AnalysisGenerator:
 
     def _generate_sas_code(self):
         """
-        Generates SAS code.
+        Generates SAS code for the specified output type.
+
+        This method selects the appropriate SAS code template based on the
+        output type and formats it with the dataset and treatment variable names.
+
+        Returns:
+            str: The generated SAS code as a string.
         """
         if self.output_type.lower() == 'demographics':
             return sas_templates.DEMO_TABLE_TEMPLATE.format(
@@ -69,7 +95,13 @@ class AnalysisGenerator:
 
     def _generate_r_code(self):
         """
-        Generates R code.
+        Generates R code for the specified output type.
+
+        This method selects the appropriate R code template based on the
+        output type and formats it with the dataset and treatment variable names.
+
+        Returns:
+            str: The generated R code as a string.
         """
         if self.output_type.lower() == 'demographics':
             return r_templates.DEMO_TABLE_TEMPLATE.format(

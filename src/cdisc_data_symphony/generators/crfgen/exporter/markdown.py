@@ -1,3 +1,7 @@
+"""
+This module provides the functionality to export CRF (Case Report Form) data
+to Markdown (.md) files using Jinja2 templates.
+"""
 from pathlib import Path
 from typing import Sequence
 
@@ -14,6 +18,16 @@ env = Environment(
 
 @register("md")
 def render_md(forms: Sequence[Form], out_dir: Path):
+    """
+    Renders a sequence of Form objects to .md files.
+
+    This function uses a Jinja2 template to generate a Markdown file for each
+    form in the sequence.
+
+    Args:
+        forms (Sequence[Form]): A sequence of Form objects to be rendered.
+        out_dir (Path): The output directory where the .md files will be saved.
+    """
     tpl = env.get_template("markdown.j2")
     out_dir.mkdir(parents=True, exist_ok=True)
     for f in forms:

@@ -1,3 +1,6 @@
+"""
+This module provides a service for downloading CDISC standards from the CDISC Library API.
+"""
 import json
 from pathlib import Path
 import httpx
@@ -13,6 +16,12 @@ from cdisc_data_symphony.generators.crfgen.utils import get_api_key
 def _get_client() -> AuthenticatedClient:
     """
     Get an authenticated client for the CDISC Library API.
+
+    This function retrieves the API key and creates an AuthenticatedClient
+    instance with appropriate settings for connecting to the CDISC Library API.
+
+    Returns:
+        AuthenticatedClient: An authenticated client for the CDISC Library API.
     """
     api_key = get_api_key()
     transport = httpx.HTTPTransport(retries=5)
@@ -31,6 +40,18 @@ def _get_client() -> AuthenticatedClient:
 def download_standard(standard: str, version: str, output_dir: Path):
     """
     Downloads a CDISC data standard from the CDISC Library.
+
+    This function currently supports downloading the "sdtmig" standard.
+    It fetches the standard's data, including its classes and datasets,
+    and saves it as a JSON file in the specified output directory.
+
+    Args:
+        standard (str): The name of the standard to download. Currently, only "sdtmig" is supported.
+        version (str): The version of the standard to download.
+        output_dir (Path): The directory where the downloaded standard will be saved.
+
+    Raises:
+        ValueError: If a standard other than "sdtmig" is requested.
     """
     if standard.lower() != "sdtmig":
         raise ValueError("Only sdtmig is supported at this time.")

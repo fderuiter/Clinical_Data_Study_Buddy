@@ -1,3 +1,7 @@
+"""
+This module provides the functionality to export CRF (Case Report Form) data
+to an ODM-XML (Operational Data Model) file.
+"""
 from pathlib import Path
 from typing import Sequence
 
@@ -9,7 +13,16 @@ from .registry import register
 
 @register("odm")
 def render_odm(forms: Sequence[Form], out_dir: Path):
-    """Render a list of forms to ODM-XML."""
+    """
+    Renders a sequence of Form objects to an ODM-XML file.
+
+    This function constructs an ODM-XML document from the provided forms
+    and saves it to the specified output directory.
+
+    Args:
+        forms (Sequence[Form]): A sequence of Form objects to be rendered.
+        out_dir (Path): The output directory where the ODM-XML file will be saved.
+    """
     root = ODM.ODM(
         FileOID="cdisc-crf-gen.v0.1",
         Granularity="Metadata",

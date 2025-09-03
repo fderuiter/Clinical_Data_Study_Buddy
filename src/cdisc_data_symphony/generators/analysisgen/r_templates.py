@@ -1,5 +1,8 @@
 """
-R code templates for analysis generation.
+This module provides R code templates for generating analysis outputs.
+
+Each template is a string that can be formatted with study-specific
+parameters like dataset name and treatment variable.
 """
 
 DEMO_TABLE_TEMPLATE = """

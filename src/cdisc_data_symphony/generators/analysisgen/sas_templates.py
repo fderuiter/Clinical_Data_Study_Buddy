@@ -1,5 +1,9 @@
 """
-SAS code templates for analysis generation.
+This module provides SAS code templates for generating analysis outputs.
+
+Each template is a string that can be formatted with study-specific
+parameters like dataset name and treatment variable. The templates cover
+a variety of common clinical trial analyses.
 """
 
 DEMO_TABLE_TEMPLATE = """

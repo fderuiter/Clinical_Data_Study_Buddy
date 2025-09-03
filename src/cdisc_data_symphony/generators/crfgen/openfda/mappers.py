@@ -1,3 +1,8 @@
+"""
+This module provides functions for mapping and enriching data from different
+OpenFDA endpoints. These functions are used to create a more complete and
+integrated view of the data.
+"""
 from typing import List, Optional
 import hashlib
 import json
@@ -6,14 +11,19 @@ from .models import MAUDEEvent, UDI, Classification, Recall
 
 def crosswalk_events_to_udi(events: List[MAUDEEvent], udis: List[UDI]) -> List[dict]:
     """
-    Crosswalks MAUDE events to UDI records.
+    Crosswalks MAUDE events to UDI records based on the UDI-DI.
+
+    This function joins MAUDE event records with UDI records on the `udi_di`
+    key, creating a new record that includes both event and UDI information,
+    as well as provenance data.
 
     Args:
-        events: A list of MAUDEEvent records.
-        udis: A list of UDI records.
+        events (List[MAUDEEvent]): A list of MAUDEEvent records.
+        udis (List[UDI]): A list of UDI records.
 
     Returns:
-        A list of dictionaries, where each dictionary represents a joined record.
+        List[dict]: A list of dictionaries, where each dictionary represents
+                    a joined record containing event and UDI data.
     """
     results = []
     udi_map = {udi.di: udi for udi in udis}
@@ -37,14 +47,18 @@ def crosswalk_events_to_udi(events: List[MAUDEEvent], udis: List[UDI]) -> List[d
 
 def enrich_with_classification(records: List[dict], classifications: List[Classification]) -> List[dict]:
     """
-    Enriches records with classification information.
+    Enriches a list of records with device classification information.
+
+    This function joins records (e.g., from a crosswalk) with classification
+    records based on the product code.
 
     Args:
-        records: A list of records (e.g., from a join).
-        classifications: A list of Classification records.
+        records (List[dict]): A list of records to be enriched.
+        classifications (List[Classification]): A list of Classification records.
 
     Returns:
-        The enriched list of records.
+        List[dict]: The enriched list of records, with classification
+                    information added where a match was found.
     """
     classification_map = {c.product_code: c for c in classifications}
 
@@ -54,7 +68,7 @@ def enrich_with_classification(records: List[dict], classifications: List[Classi
             product_code = record["recall"].product_code
         elif "event" in record:
             for device in record["event"]["device"]:
-                if device["product_code"]:
+                if "product_code" in device and device["product_code"]:
                     product_code = device["product_code"]
                     break
 

@@ -1,9 +1,20 @@
+"""
+This module provides functionality for applying custom styles to a .docx document.
+"""
 from docx import Document
 from docx.shared import Pt, RGBColor
 
 def apply_styles(doc: Document, styles: dict):
     """
-    Applies a set of styles to a docx document.
+    Applies a set of styles to a .docx document.
+
+    This function can modify font styles, add a logo to the header, and is
+    intended to be extended to apply color styles.
+
+    Args:
+        doc (Document): The python-docx Document object to be styled.
+        styles (dict): A dictionary containing the style definitions.
+                       Expected keys include "font", "logo_path", and "colors".
     """
     if not styles:
         return
