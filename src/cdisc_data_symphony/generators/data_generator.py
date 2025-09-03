@@ -75,7 +75,7 @@ class DataGenerator:
         end_date = datetime(2023, 12, 31)
         delta = end_date - start_date
         random_days = random.randint(0, delta.days)
-        return (start_date + timedelta(days=random_days)).isoformat()
+        return (start_date + timedelta(days=random_days)).date().isoformat()
 
     def _generate_from_codelist(self, codelist):
         """

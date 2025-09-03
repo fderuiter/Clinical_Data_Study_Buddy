@@ -1,3 +1,4 @@
+import re
 from cdisc_data_symphony.generators.data_generator import DataGenerator
 from cdisc_data_symphony.generators.crfgen.schema import Form, FieldDef, Codelist
 
@@ -31,3 +32,19 @@ def test_generate_from_codelist():
     dataset = generator.generate(num_subjects=1)
 
     assert dataset[0]["SEX"] == "C123"
+
+
+def test_generate_date_format():
+    """
+    Tests that the DataGenerator generates a date in the correct format.
+    """
+    fields = [
+        FieldDef(oid="BRTHDTC", prompt="Birth Date", datatype="date", cdash_var="BRTHDTC"),
+    ]
+    form_data = Form(title="DM", domain="DM", fields=fields)
+    generator = DataGenerator(form_data)
+    dataset = generator.generate(num_subjects=1)
+    generated_date = dataset[0]["BRTHDTC"]
+
+    assert "T" not in generated_date
+    assert re.match(r"^\d{4}-\d{2}-\d{2}$", generated_date)
