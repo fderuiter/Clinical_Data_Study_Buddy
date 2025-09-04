@@ -64,6 +64,7 @@ class FieldDef(BaseModel):
     prompt: str
     datatype: DataType
     cdash_var: str
+    length: Optional[int] = None
     codelist: Optional[Codelist] = None
     control: Optional[Literal["radio", "checkbox"]] = None
     range_check: Optional[dict] = None

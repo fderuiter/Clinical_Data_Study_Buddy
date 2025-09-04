@@ -51,3 +51,18 @@ def test_generate_date_format():
 
     assert "T" not in generated_date
     assert re.match(r"^\d{4}-\d{2}-\d{2}$", generated_date)
+
+
+def test_generate_text_with_length():
+    """
+    Tests that the DataGenerator generates text with a specific length.
+    """
+    fields = [
+        FieldDef(oid="TEXT_FIELD", prompt="Text Field", datatype="text", cdash_var="TEXTVAR", length=20),
+    ]
+    form_data = Form(title="TEST", domain="TS", fields=fields)
+    generator = DataGenerator(form_data)
+    dataset = generator.generate(num_subjects=1)
+    generated_text = dataset[0]["TEXTVAR"]
+
+    assert len(generated_text) == 20

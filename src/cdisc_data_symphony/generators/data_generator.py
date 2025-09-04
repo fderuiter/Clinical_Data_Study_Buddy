@@ -111,7 +111,8 @@ class DataGenerator:
 
         datatype = field.datatype.lower()
         if datatype == "text":
-            return self._generate_text()
+            length = field.length if field.length is not None else 10
+            return self._generate_text(length)
         elif datatype == "integer":
             return self._generate_integer()
         elif datatype == "float":
