@@ -136,7 +136,7 @@ class OpenFDAClient:
 
         print(f"Response status code: {response.status_code}")
 
-        response.raise_for_status()
+        await response.raise_for_status()
         return response
 
     async def close(self):

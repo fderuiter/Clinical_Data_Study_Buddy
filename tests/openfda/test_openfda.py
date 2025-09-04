@@ -30,6 +30,9 @@ from cdisc_data_symphony.generators.crfgen.openfda.devices.k510 import K510Acces
 from cdisc_data_symphony.generators.crfgen.openfda.devices.pma import PMAAccessor
 from cdisc_data_symphony.generators.crfgen.openfda.devices.reglist import RegListAccessor
 
+import httpx
+
+
 @pytest.mark.asyncio
 async def test_openfda_client_get():
     client = OpenFDAClient()
@@ -40,6 +43,29 @@ async def test_openfda_client_get():
     client.client.get.return_value = mock_response
 
     await client.get("/device/udi.json")
+
+    client.client.get.assert_called_once()
+    await client.close()
+
+
+from unittest.mock import patch
+
+
+@pytest.mark.asyncio
+async def test_openfda_client_get_error():
+    client = OpenFDAClient()
+    client.client = AsyncMock()
+    mock_response = AsyncMock()
+    mock_response.status_code = 400
+    mock_response.request = httpx.Request("GET", "http://test.com")
+    mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
+        "Bad Request", request=mock_response.request, response=mock_response
+    )
+    client.client.get.return_value = mock_response
+
+    with pytest.raises(httpx.HTTPStatusError):
+        # Call the wrapped function directly to bypass the retry decorator
+        await client.get.__wrapped__(client, "/device/udi.json")
 
     client.client.get.assert_called_once()
     await client.close()

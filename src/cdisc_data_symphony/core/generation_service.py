@@ -130,11 +130,14 @@ def generate_cdash_crf(ig_version: str, out_dir: pathlib.Path, domains: Optional
     out_dir.mkdir(parents=True, exist_ok=True)
 
     config = {}
-    if config_path.exists():
+    if config_path.is_file():
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
     else:
-        print(f"Warning: Config file not found at {config_path}. Using default values.")
+        if config_path.exists():
+            print(f"Warning: Config path {config_path} is a directory, not a file. Using default values.")
+        else:
+            print(f"Warning: Config file not found at {config_path}. Using default values.")
 
     fda_adverse_events = None
     if openfda_drug_name:
