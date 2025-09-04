@@ -1,4 +1,5 @@
 import typer
+import click
 from rich.console import Console
 from dotenv import load_dotenv
 
@@ -8,6 +9,7 @@ from cdisc_data_symphony.cli.commands.download import download_app
 from cdisc_data_symphony.cli.commands.spec import spec_app
 from cdisc_data_symphony.cli.commands.openfda import openfda_app
 from cdisc_data_symphony.cli.commands.guides import adrg_app, sdrg_app
+from cdisc_data_symphony.cli.commands.legacy import legacy_app
 
 
 load_dotenv()
@@ -36,6 +38,9 @@ app.add_typer(spec_app, name="spec")
 app.add_typer(openfda_app, name="openfda")
 app.add_typer(adrg_app, name="adrg")
 app.add_typer(sdrg_app, name="sdrg")
+
+# Register legacy commands
+app.add_typer(legacy_app, name="legacy")
 
 
 if __name__ == "__main__":
