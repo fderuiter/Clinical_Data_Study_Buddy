@@ -138,6 +138,6 @@ class DataGenerator:
         for i in range(num_subjects):
             subject_data = {}
             for field in self.form_data.fields:
-                subject_data[field.oid] = self._generate_field_value(field)
+                subject_data[field.cdash_var] = self._generate_field_value(field)
             dataset.append(subject_data)
         return dataset
