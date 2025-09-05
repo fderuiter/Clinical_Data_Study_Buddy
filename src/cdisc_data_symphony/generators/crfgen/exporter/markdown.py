@@ -7,11 +7,11 @@ from typing import Sequence
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cdisc_data_symphony.builder.crfgen.schema import Form
+from cdisc_data_symphony.core.models.schema import Form
 from .registry import register
 
 env = Environment(
-    loader=FileSystemLoader("src/cdisc_data_symphony/templates/crfgen"),
+    loader=FileSystemLoader("templates/crfgen"),
     autoescape=select_autoescape(),
 )
 

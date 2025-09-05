@@ -5,7 +5,7 @@ generating Excel-based specification templates for CDISC datasets.
 import os
 from openpyxl import Workbook
 from cdisc_library_client.harvest import harvest
-from cdisc_data_symphony.builder.crfgen.utils import get_api_key
+from cdisc_data_symphony.generators.crfgen.utils import get_api_key
 
 
 class SpecificationTemplatesGenerator:

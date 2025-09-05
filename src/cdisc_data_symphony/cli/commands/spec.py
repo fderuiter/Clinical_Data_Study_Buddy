@@ -2,7 +2,7 @@ import typer
 from rich.console import Console
 import pathlib
 from dotenv import load_dotenv
-from cdisc_data_symphony.builder.spec import generate_dataset, validate
+from cdisc_data_symphony.generators.spec import generate_dataset, validate
 
 load_dotenv()
 console = Console()

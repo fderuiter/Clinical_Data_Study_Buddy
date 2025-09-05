@@ -1,4 +1,4 @@
-from cdisc_data_symphony.builder.documents.base_document_generator import BaseDocumentGenerator
+from cdisc_data_symphony.generators.documents.base_document_generator import BaseDocumentGenerator
 
 class ADRGGenerator(BaseDocumentGenerator):
     @property
