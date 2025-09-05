@@ -1,0 +1,18 @@
+# Study Protocol
+
+## Therapeutic Area
+{{ protocol.therapeutic_area }}
+
+## Phase
+Phase {{ protocol.phase }}
+
+## Duration
+{{ protocol.duration_weeks }} weeks
+
+## Treatment Arms
+{% for arm in protocol.treatment_arms %}
+- {{ arm }}
+{% endfor %}
+
+## Timeline
+![Study Timeline](gantt_chart.png)

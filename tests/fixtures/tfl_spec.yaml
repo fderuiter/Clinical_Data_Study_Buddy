@@ -1,0 +1,23 @@
+version: 1.0
+tfls:
+  - shell_id: "T14.1.1"
+    title: "Demographic and Baseline Characteristics"
+    population: "SAFETY"
+    derivations:
+      - "Age is calculated from birth date and informed consent date."
+      - "Race is mapped from multiple source fields."
+    footnotes:
+      - "N is the number of subjects in the safety population."
+    layout:
+      orientation: "portrait"
+      page_size: "A4"
+
+  - shell_id: "T14.2.1"
+    title: "Adverse Events Summary"
+    population: "SAFETY"
+    derivations: []
+    footnotes:
+      - "Events are coded using MedDRA version 25.0."
+    layout:
+      orientation: "landscape"
+      page_size: "A4"

@@ -30,7 +30,7 @@ jobs:
       - name: Crawl CDISC Library → crf.json
         env:
           CDISC_API_KEY: ${{ secrets.CDISC_API_KEY }}
-        run: poetry run scripts/build_canonical.py -o crf.json
+        run: poetry run build-canonical -o crf.json
 
       - name: Check for crf.json changes
         id: diff

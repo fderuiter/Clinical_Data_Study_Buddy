@@ -1,0 +1,19 @@
+# Configuration for CRF Generation
+# This file allows for customization of the generated CRF documents.
+
+# Study-specific metadata
+study_metadata:
+  sponsor_name: "New Sponsor Name"
+  study_name: "New Study Name"
+  protocol_id: "NSP-001"
+
+# Document versioning
+version_label: "Version 2.0 DRAFT"
+
+# Styling options (placeholders for now)
+styling:
+  header_color: "1F1F1F"
+  section_header_color: "8064A2"
+  table_header_color: "4F81BD"
+  font_name: "Arial"
+  font_size: 10

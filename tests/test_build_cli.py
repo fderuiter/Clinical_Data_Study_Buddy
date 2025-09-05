@@ -1,24 +1,31 @@
 import pathlib
-import subprocess
-import sys
-
+from typer.testing import CliRunner
 import pytest
+from cdisc_data_symphony.cli.main import app
+from unittest.mock import patch
 
+runner = CliRunner()
 
 @pytest.mark.parametrize("fmt", [["md"], ["csv"], ["md", "csv"]])
-def test_build_cli(tmp_path: pathlib.Path, fmt):
+@patch("cdisc_data_symphony.cli.commands.build.get_api_key")
+@patch("cdisc_data_symphony.cli.commands.build.harvest")
+def test_build_cli(mock_harvest, mock_get_api_key, tmp_path: pathlib.Path, fmt):
+    mock_get_api_key.return_value = "test_key"
+    mock_harvest.return_value = []
+
     cmd = [
-        sys.executable,
-        "scripts/build.py",
+        "build",
+        "build",
         "--source",
         "tests/.data/sample_crf.json",
         "--outdir",
-        str(tmp_path),
-        "--formats",
-        *fmt,
+        str(tmp_path)
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    assert result.returncode == 0, result.stderr
+    for f in fmt:
+        cmd.extend(["--formats", f])
+
+    result = runner.invoke(app, cmd)
+    assert result.exit_code == 0, result.stdout
 
     for f in fmt:
         if f == "md":

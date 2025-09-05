@@ -1,172 +1,88 @@
-# CDISC CRF Generator
+# CDISC Data Symphony
 
-![Weekly Sync Status](https://github.com/fderuiter/cdisc_crf_generator/actions/workflows/weekly-sync.yml/badge.svg)
+![Weekly Sync Status](https://github.com/fderuiter/cdisc_generators/actions/workflows/weekly-sync.yml/badge.svg)
 
-This project provides tools for generating Case Report Forms (CRFs) using metadata from the CDISC Library.
+CDISC Data Symphony is a set of tools for generating clinical study artifacts, including Case Report Forms (CRFs), synthetic datasets, analysis code, and more. It is designed to streamline the process of creating and managing clinical trial documentation and data, ensuring compliance with CDISC standards.
 
-Additional documentation is available in the [docs](docs/) directory, including an [FAQ](docs/FAQ.md) about accessing and using the CDISC Library.
+## Features
 
-Utility helpers such as `cdisc_library_client.normalize_headers()` are provided
-to sanitize HTTP headers before requests are made. This avoids issues when
-secrets are supplied as bytes.
+*   **CRF Generation**: Generate Case Report Forms (CRFs) in various formats (e.g., PDF, DOCX, CSV) from a specification.
+*   **Synthetic Data Generation**: Create synthetic datasets for testing and validation purposes.
+*   **Analysis Code Generation**: Generate analysis code (e.g., SAS, R) for statistical analysis.
+*   **Study Protocol Generation**: Create study protocols from a template.
+*   **OpenFDA Integration**: Integrate with the OpenFDA API to fetch data and generate reports.
+*   **CLI and Web UI**: A command-line interface (CLI) for power users and a web-based user interface (UI) for ease of use.
 
+## Installation
 
-## Quickstart
+To use CDISC Data Symphony, you need to have Python 3.12+ and Poetry installed.
 
-Follow these steps to set up the project and generate your first set of CRF artifacts.
+1.  **Install Python 3.12+**: Follow the instructions on the [official Python website](https://www.python.org/downloads/).
+2.  **Install Poetry**: Follow the instructions on the [official Poetry website](https://python-poetry.org/docs/#installation).
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/fderuiter/cdisc_crf_generator.git
-    cd cdisc_crf_generator
-    ```
+Once you have Python and Poetry installed, you can clone the repository and install the dependencies:
 
-2.  **Set up the environment:**
-    This project uses Poetry for dependency management. Make sure you have Python 3.11+ and Poetry installed.
-    ```bash
-    poetry install
-    ```
+```bash
+git clone https://github.com/fderuiter/cdisc_generators.git
+cd cdisc_generators
+poetry install
+```
 
-3.  **Configure your CDISC Library API Key:**
-    You will need a primary subscription key from the CDISC Library. Once you have it, export it as an environment variable:
-    ```bash
-    export CDISC_PRIMARY_KEY="your-api-key-here"
-    ```
-
-4.  **Fetch the canonical CRF data:**
-    This command crawls the CDISC Library and creates a canonical `crf.json` file.
-    ```bash
-    poetry run scripts/build_canonical.py -o crf.json
-    ```
-
-5.  **Generate all CRF artifacts:**
-    This command reads the `crf.json` file and generates the CRF documents in multiple formats (Markdown, DOCX, CSV, etc.) inside the `artefacts/` directory.
-    ```bash
-    poetry run scripts/build.py --source crf.json --outdir artefacts
-    ```
-
-6.  **View the generated files:**
-    The generated artifacts are now in the `artefacts/` directory. You can open them to see the results. For example, on macOS, you could run:
-    ```bash
-    open artefacts/VS.docx
-    ```
 ## Development Setup
 
-This project uses [Poetry](https://python-poetry.org/) for dependency management. Setup scripts are provided for different operating systems.
+If you want to contribute to the project, you will need to set up a development environment.
 
-### Linux and macOS
+1.  **Fork and Clone the Repository**:
+    ```bash
+    git clone https://github.com/<your-username>/cdisc_generators.git
+    cd cdisc_generators
+    ```
 
-Run the setup script from your shell:
+2.  **Install Dependencies**:
+    The `setup.sh` script will install all the necessary dependencies using Poetry.
+    ```bash
+    ./setup.sh
+    ```
 
-```bash
-./setup.sh
-```
+3.  **Run Tests**:
+    To ensure that everything is set up correctly, run the test suite:
+    ```bash
+    poetry run pytest
+    ```
 
-The script will:
-1.  Check for `python3` (3.11+) and `poetry`.
-2.  If they are not found, it will attempt to install them using the system's package manager (`apt`, `yum`, or `brew`).
-3.  Install all project dependencies.
-4.  Set up pre-commit hooks.
+## Usage
 
-### Windows
+CDISC Data Symphony provides a command-line interface (CLI) for interacting with its features.
 
-Run the PowerShell setup script from a PowerShell terminal. You may need to adjust your execution policy first:
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-./setup.ps1
-```
-
-The script will:
-1.  Check for Python 3.11+ and Poetry.
-2.  If they are not found, it will download and install them. This may require administrator privileges.
-3.  Install all project dependencies.
-4.  Set up pre-commit hooks.
-> **Note:** If Python or Poetry are installed by the script, you will need to restart your terminal and run the script again for the changes to take effect.
-
-### Docker-based Environment (Recommended)
-
-For the most consistent and reliable setup, you can use the provided development container. This avoids any "works on my machine" issues.
-
-## Updating the CDISC Library API Client
-
-This project includes a generated Python client for the CDISC Library API located in `src/cdisc_library_client`. This client is generated from the official CDISC Library OpenAPI specification.
-
-To update the client to the latest version, you can use the following command:
+The CLI is organized into subcommands for different functionalities. You can get more information about each subcommand by using the `--help` flag.
 
 ```bash
-make update-sdk
+poetry run cdisc --help
 ```
 
-This command will:
-1.  Download the latest OpenAPI specification from the official CDISC website.
-2.  Regenerate the Python client in `src/cdisc_library_client`.
+### Examples
 
-It is recommended to run this command periodically to ensure the client is up-to-date with any changes to the CDISC Library API.
+Here are some examples of how to use the CLI:
 
-**Prerequisites:**
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Visual Studio Code](https://code.visualstudio.com/)
-- [VS Code Remote - Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+*   **Generate a CRF**:
+    ```bash
+    poetry run cdisc generate crf --config examples/crf_config.yaml
+    ```
 
-**To get started:**
-1.  Open the project folder in VS Code.
-2.  A notification will appear asking if you want to "Reopen in Container". Click it.
-3.  VS Code will build the Docker image and start the development container. This may take a few minutes on the first run.
+*   **Generate synthetic data**:
+    ```bash
+    poetry run cdisc generate synthetic-data --config examples/study_config.json
+    ```
 
-Once inside the dev container, you'll have a fully configured environment with all tools and dependencies ready to go. You can use the integrated terminal in VS Code to run tests, scripts, etc.
+*   **Download a CDISC standard**:
+    ```bash
+    poetry run cdisc download standard --name SDTMIG --version 3.3
+    ```
 
-## Generating CDASH CRFs
+## Contributing
 
-The repository includes `scripts/generate_cdash_crf.py` which converts the
-official CDASH workbooks into Word documents—one per domain.  The script now
-adds extra metadata from the IG such as variable type, controlled terminology
-and completion instructions.  Generated CRFs use a consistent landscape layout
-with protocol information in the header and versioned footers with page numbers.
-`pandas`, `python-docx` and `openpyxl` are already listed in the project
-dependencies.
+We welcome contributions to the project! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on how to get started.
 
-```bash
-python scripts/generate_cdash_crf.py \
-    --model CDASH_Model_v1.3.xlsx \
-    --ig CDASHIG_v2.3.xlsx \
-    --out ./crfs
+## License
 
-# To build only specific domains
-python scripts/generate_cdash_crf.py --model CDASH_Model_v1.3.xlsx \
-    --ig CDASHIG_v2.3.xlsx --domains AE CM
-```
-
-Edit `build_domain_crf()` in the script to customise the table layout or add
-study branding or adjust fonts and orientation if needed.
-
-## Generating Synthetic Datasets
-
-In addition to generating CRFs from the CDISC Library, this project can also generate synthetic CDISC-compliant datasets using the cdiscdataset.com API.
-
-### Quickstart
-
-To generate a synthetic dataset, run the `scripts/generate_synthetic_data.py` script with the desired parameters. For example, to generate an SDTM dataset for the DM domain, run the following command:
-
-```bash
-python scripts/generate_synthetic_data.py \
-    --dataset-type SDTM \
-    --domain DM \
-    --num-subjects 100 \
-    --output-dir ./synthetic_data
-```
-
-This will generate a CSV file in the `synthetic_data` directory.
-
-### Options
-
-The following options are available for the `generate_synthetic_data.py` script:
-
-| Option             | Description                                  | Default    |
-| ------------------ | -------------------------------------------- | ---------- |
-| `--dataset-type`   | Type of dataset to generate (SDTM, ADaM, SEND) |            |
-| `--domain`         | Domain for the dataset                       |            |
-| `--num-subjects`   | Number of subjects                           | 50         |
-| `--therapeutic-area` | Therapeutic area                             | "Oncology" |
-| `--format`         | Output format (csv, json, xpt)               | "csv"      |
-| `--output-dir`     | Directory to save the downloaded file        | "."        |
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.

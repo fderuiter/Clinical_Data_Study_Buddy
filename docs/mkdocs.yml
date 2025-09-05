@@ -1,0 +1,15 @@
+site_name: CDISC Generators
+nav:
+    - Home: index.md
+    - User Guide:
+        - Quickstart: user_guide/quickstart.md
+        - Generating CRFs: user_guide/generating_crfs.md
+        - Generating Datasets: user_guide/generating_datasets.md
+        - Generating Analysis Code: user_guide/generating_analysis_code.md
+        - Generating Study Protocols: user_guide/generating_study_protocols.md
+        - Specification Management: user_guide/specification_management.md
+        - Reviewer's Guides: user_guide/reviewers_guides.md
+        - OpenFDA Integration: user_guide/openfda_integration.md
+    - Developer Guide:
+        - Contributing: developer_guide/contributing.md
+        - CDISC Library API Client: developer_guide/api_client.md
