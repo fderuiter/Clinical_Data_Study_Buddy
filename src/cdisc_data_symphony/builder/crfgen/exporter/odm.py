@@ -7,7 +7,7 @@ from typing import Sequence
 
 import odmlib.odm_1_3_2.model as ODM
 
-from cdisc_data_symphony.generators.crfgen.schema import Form
+from cdisc_data_symphony.builder.crfgen.schema import Form
 from .registry import register
 
 

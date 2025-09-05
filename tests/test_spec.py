@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from pathlib import Path
 from unittest.mock import patch
-from cdisc_data_symphony.generators import spec
+from cdisc_data_symphony.builder import spec
 
 def test_validate_handles_simple_filename(capsys):
     """

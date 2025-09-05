@@ -1,7 +1,7 @@
 import typer
 from rich.console import Console
 from dotenv import load_dotenv
-from cdisc_data_symphony.generators.openfda import populate_crf
+from cdisc_data_symphony.builder.openfda import populate_crf
 
 load_dotenv()
 console = Console()

@@ -1,9 +1,9 @@
 import os
 from unittest.mock import MagicMock
 import pytest
-from cdisc_data_symphony.generators.protogen.gantt import generate_gantt_chart
-from cdisc_data_symphony.generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
-from cdisc_data_symphony.generators.protogen.clinicaltrials import search_studies
+from cdisc_data_symphony.builder.protogen.gantt import generate_gantt_chart
+from cdisc_data_symphony.builder.protogen.protocol import StudyProtocol, generate_protocol_markdown
+from cdisc_data_symphony.builder.protogen.clinicaltrials import search_studies
 
 @pytest.fixture
 def mock_requests_get(mocker):

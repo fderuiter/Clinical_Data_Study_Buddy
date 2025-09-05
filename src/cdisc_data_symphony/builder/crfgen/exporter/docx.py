@@ -7,8 +7,8 @@ from typing import Sequence
 
 import docx
 
-from cdisc_data_symphony.generators.crfgen.schema import Form
-from cdisc_data_symphony.generators.crfgen.style.style import apply_styles
+from cdisc_data_symphony.builder.crfgen.schema import Form
+from cdisc_data_symphony.builder.crfgen.style.style import apply_styles
 from .registry import register
 
 

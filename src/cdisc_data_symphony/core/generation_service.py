@@ -13,18 +13,18 @@ The services offered include the generation of:
 import pathlib
 from typing import List, Optional
 import yaml
-from cdisc_data_symphony.generators.data_generator import DataGenerator
+from cdisc_data_symphony.builder.data_generator import DataGenerator
 from cdisc_library_client.harvest import harvest
-from cdisc_data_symphony.generators.crfgen.utils import get_api_key
+from cdisc_data_symphony.builder.crfgen.utils import get_api_key
 import pandas as pd
-from cdisc_data_symphony.generators.raw_dataset_package import generate_raw_dataset_package
-from cdisc_data_symphony.generators.analysisgen.generator import AnalysisGenerator
-from cdisc_data_symphony.generators.tfl.tfl_shell_generator import TFLShellGenerator
-from cdisc_data_symphony.generators.edc_raw_dataset_package_generator import EDCRawDatasetPackageGenerator
-from cdisc_data_symphony.generators.documents.study_protocols_generator import StudyProtocolsGenerator
-from cdisc_data_symphony.generators.specification_templates_generator import SpecificationTemplatesGenerator
-from cdisc_data_symphony.generators.crfgen.cdash import build_domain_crf, load_ig
-from cdisc_data_symphony.generators.crfgen.populators import populate_ae_from_fda
+from cdisc_data_symphony.builder.raw_dataset_package import generate_raw_dataset_package
+from cdisc_data_symphony.builder.analysisgen.generator import AnalysisGenerator
+from cdisc_data_symphony.builder.tfl.tfl_shell_generator import TFLShellGenerator
+from cdisc_data_symphony.builder.edc_raw_dataset_package_generator import EDCRawDatasetPackageGenerator
+from cdisc_data_symphony.builder.documents.study_protocols_generator import StudyProtocolsGenerator
+from cdisc_data_symphony.builder.specification_templates_generator import SpecificationTemplatesGenerator
+from cdisc_data_symphony.builder.crfgen.cdash import build_domain_crf, load_ig
+from cdisc_data_symphony.builder.crfgen.populators import populate_ae_from_fda
 import yaml
 
 

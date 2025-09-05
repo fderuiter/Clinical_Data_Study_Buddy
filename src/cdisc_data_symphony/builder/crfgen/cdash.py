@@ -19,7 +19,7 @@ from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
     get_mdr_cdashig_version_domains_domain_fields,
 )
 from cdisc_library_client.client import AuthenticatedClient
-from cdisc_data_symphony.generators.crfgen.populators import populate_ae_from_fda
+from cdisc_data_symphony.builder.crfgen.populators import populate_ae_from_fda
 from docx import Document
 from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH

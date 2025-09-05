@@ -5,7 +5,7 @@ Case Report Forms (CRFs) with adverse event and drug label information.
 import csv
 import sys
 import json
-from cdisc_data_symphony.generators.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
+from cdisc_data_symphony.builder.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
 
 def output_csv(data, writer):
     """

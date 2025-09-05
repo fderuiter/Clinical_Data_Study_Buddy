@@ -1,6 +1,6 @@
 import re
-from cdisc_data_symphony.generators.data_generator import DataGenerator
-from cdisc_data_symphony.generators.crfgen.schema import Form, FieldDef, Codelist
+from cdisc_data_symphony.builder.data_generator import DataGenerator
+from cdisc_data_symphony.builder.crfgen.schema import Form, FieldDef, Codelist
 
 def test_generate():
     """
