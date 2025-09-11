@@ -34,7 +34,7 @@ def test_generate_from_codelist():
     generator = DataGenerator(form_data)
     dataset = generator.generate(num_subjects=1)
 
-    assert dataset[0]["SEX"] == "C123"
+    assert dataset[0]["SEX"] == "MALE"
 
 
 def test_generate_date_format():
