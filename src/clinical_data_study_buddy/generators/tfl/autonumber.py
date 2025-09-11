@@ -31,12 +31,30 @@ class AutoNumberer:
         Returns:
             TFLSpec: The updated TFL specification with re-numbered TFLs.
         """
-        major = 1
-        minor = 1
+        tfl_groups = {}
+        # Group TFLs by major number
         for tfl in self.spec.tfls:
-            # This is a naive implementation. A real one would need to parse the existing numbers
-            # or have a more structured way of assigning them.
-            # For now, we'll just re-number everything sequentially.
-            tfl.shell_id = f"{prefix}.{major}.{minor}"
-            minor += 1
+            major = -1 # Default group for invalid shell_ids
+            try:
+                parts = tfl.shell_id.split('.')
+                if len(parts) == 3:
+                    major = int(parts[1])
+            except (ValueError, IndexError):
+                pass # Keep major = -1
+
+            if major not in tfl_groups:
+                tfl_groups[major] = []
+            tfl_groups[major].append(tfl)
+
+        # Re-number TFLs within each group
+        for major, tfls in sorted(tfl_groups.items()):
+            minor = 1
+            for tfl in tfls:
+                if major == -1:
+                    # For now, assign to a default major number, e.g., 99
+                    # A better solution might be to raise an error or use a different logic
+                    tfl.shell_id = f"{prefix}.99.{minor}"
+                else:
+                    tfl.shell_id = f"{prefix}.{major}.{minor}"
+                minor += 1
         return self.spec
