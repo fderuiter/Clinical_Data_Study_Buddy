@@ -39,6 +39,7 @@ def generate_tfl_shell(spec: str, output_file: pathlib.Path):
     """
     generator = TFLShellGenerator(spec)
     shell = generator.generate()
+    output_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w') as f:
         f.write(shell)
 
@@ -112,6 +113,7 @@ def generate_analysis_code(language: str, dataset: str, output_type: str, treatm
     """
     generator = AnalysisGenerator(language, dataset, output_type, treatment_var)
     code = generator.generate_code()
+    output_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w') as f:
         f.write(code)
 
