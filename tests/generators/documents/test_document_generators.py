@@ -25,3 +25,20 @@ def test_sdrg_generator(study_config_path, tmp_path):
     assert output_path.exists()
     doc = Document(output_path)
     assert doc.paragraphs[0].text == "Study Data Reviewer's Guide"
+
+def test_sdrg_generator_content(study_config_path, tmp_path):
+    output_path = tmp_path / "sdrg.docx"
+    generator = SDRGGenerator(study_config_path)
+    generator.generate(output_path)
+
+    assert output_path.exists()
+    doc = Document(output_path)
+    # Check for section headings
+    headings = [p.text for p in doc.paragraphs if p.style.name.startswith('Heading')]
+    assert "1. Introduction" in headings
+    assert "2. Protocol Description" in headings
+    assert "3. List of Included Documents" in headings
+    assert "4. Data Collection and Processing" in headings
+    assert "5. SDTM Datasets" in headings
+    assert "6. Data Conformance" in headings
+    assert "7. Appendices" in headings
