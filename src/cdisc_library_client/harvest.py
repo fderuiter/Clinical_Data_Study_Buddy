@@ -12,7 +12,7 @@ from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
 )
 from cdisc_library_client.api.default import get_mdr_products_data_collection
 
-from cdisc_data_symphony.core.models.schema import Form, FieldDef
+from clinical_data_study_buddy.core.models.schema import Form, FieldDef
 
 
 class CrfGen:

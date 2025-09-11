@@ -3,9 +3,9 @@ import pytest
 from click.testing import CliRunner
 from pydantic import ValidationError
 
-from cdisc_data_symphony.generators.tfl.models import TFLSpec
-from cdisc_data_symphony.generators.tfl.autonumber import AutoNumberer
-from cdisc_data_symphony.services.filename_service import generate_filename, generate_bookmark
+from clinical_data_study_buddy.generators.tfl.models import TFLSpec
+from clinical_data_study_buddy.generators.tfl.autonumber import AutoNumberer
+from clinical_data_study_buddy.services.filename_service import generate_filename, generate_bookmark
 # from src.crfgen.crfgen import app
 
 VALID_SPEC = """

@@ -1,8 +1,8 @@
-# CDISC Data Symphony
+# Clinical Data Study Buddy
 
-![Weekly Sync Status](https://github.com/fderuiter/cdisc-data-symphony/actions/workflows/weekly-sync.yml/badge.svg)
+![Weekly Sync Status](https://github.com/fderuiter/Clinical_Data_Study_Buddy/actions/workflows/weekly-sync.yml/badge.svg)
 
-CDISC Data Symphony is a comprehensive suite of tools designed to streamline the generation of clinical study artifacts. It helps create and manage clinical trial documentation and data, ensuring compliance with CDISC standards. Artifacts that can be generated include Case Report Forms (CRFs), synthetic datasets, analysis code, study protocols, and more.
+Clinical Data Study Buddy is a comprehensive suite of tools designed to streamline the generation of clinical study artifacts. It helps create and manage clinical trial documentation and data, ensuring compliance with CDISC standards. Artifacts that can be generated include Case Report Forms (CRFs), synthetic datasets, analysis code, study protocols, and more.
 
 ## Features
 
@@ -18,15 +18,15 @@ CDISC Data Symphony is a comprehensive suite of tools designed to streamline the
 
 The project is organized into several key modules:
 
-*   `src/cdisc_data_symphony/core`: Contains the core business logic and services, such as the `GenerationService` and `DownloadService`.
-*   `src/cdisc_data_symphony/generators`: Contains the logic for generating the various artifacts. Each generator is responsible for a specific type of output (e.g., `CRFGenerator`, `DataGenerator`).
-*   `src/cdisc_data_symphony/cli`: Implements the command-line interface using Typer. Each command is organized into its own subcommand.
-*   `src/cdisc_data_symphony/api`: Contains the REST API, built with FastAPI. This is currently used for the OpenFDA integration.
-*   `src/cdisc_data_symphony/web`: Contains the web-based user interface, also built with FastAPI and Jinja2 templates.
+*   `src/clinical_data_study_buddy/core`: Contains the core business logic and services, such as the `GenerationService` and `DownloadService`.
+*   `src/clinical_data_study_buddy/generators`: Contains the logic for generating the various artifacts. Each generator is responsible for a specific type of output (e.g., `CRFGenerator`, `DataGenerator`).
+*   `src/clinical_data_study_buddy/cli`: Implements the command-line interface using Typer. Each command is organized into its own subcommand.
+*   `src/clinical_data_study_buddy/api`: Contains the REST API, built with FastAPI. This is currently used for the OpenFDA integration.
+*   `src/clinical_data_study_buddy/web`: Contains the web-based user interface, also built with FastAPI and Jinja2 templates.
 
 ## Installation
 
-To use CDISC Data Symphony, you need to have Python 3.12+ and Poetry installed.
+To use Clinical Data Study Buddy, you need to have Python 3.12+ and Poetry installed.
 
 1.  **Install Python 3.12+**: Follow the instructions on the [official Python website](https://www.python.org/downloads/).
 2.  **Install Poetry**: Follow the instructions on the [official Poetry website](https://python-poetry.org/docs/#installation).
@@ -34,8 +34,8 @@ To use CDISC Data Symphony, you need to have Python 3.12+ and Poetry installed.
 Once you have Python and Poetry installed, you can clone the repository and install the dependencies:
 
 ```bash
-git clone https://github.com/fderuiter/cdisc-data-symphony.git
-cd cdisc-data-symphony
+git clone https://github.com/fderuiter/Clinical_Data_Study_Buddy.git
+cd Clinical_Data_Study_Buddy
 poetry install
 ```
 
@@ -53,8 +53,8 @@ If you want to contribute to the project, you will need to set up a development 
 
 1.  **Fork and Clone the Repository**:
     ```bash
-    git clone https://github.com/<your-username>/cdisc-data-symphony.git
-    cd cdisc-data-symphony
+    git clone https://github.com/<your-username>/Clinical_Data_Study_Buddy.git
+    cd Clinical_Data_Study_Buddy
     ```
 
 2.  **Install Dependencies**:
@@ -71,14 +71,14 @@ If you want to contribute to the project, you will need to set up a development 
 
 ## Usage
 
-CDISC Data Symphony provides both a command-line interface (CLI) and a web-based user interface (UI).
+Clinical Data Study Buddy provides both a command-line interface (CLI) and a web-based user interface (UI).
 
 ### Web UI
 
 To run the web UI, use the following command:
 
 ```bash
-poetry run uvicorn cdisc_data_symphony.web.main:app --reload
+poetry run uvicorn clinical_data_study_buddy.web.main:app --reload
 ```
 
 Then, open your web browser and navigate to `http://127.0.0.1:8000`.
