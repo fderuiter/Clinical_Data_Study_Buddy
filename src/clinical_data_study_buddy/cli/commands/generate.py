@@ -17,6 +17,12 @@ console = Console()
 generate_app = typer.Typer()
 
 
+def validate_num_subjects(value: int):
+    if value < 10 or value > 200:
+        raise typer.BadParameter("Number of subjects must be between 10 and 200")
+    return value
+
+
 @generate_app.command()
 def tfl_shell(
     spec: str = typer.Option(..., "--spec", help="TFL specification"),
@@ -42,7 +48,9 @@ def tfl_shell(
 
 @generate_app.command()
 def edc_raw_dataset_package(
-    num_subjects: int = typer.Option(50, "--num-subjects", help="Number of subjects (10-200)"),
+    num_subjects: int = typer.Option(
+        50, "--num-subjects", help="Number of subjects (10-200)", callback=validate_num_subjects
+    ),
     therapeutic_area: str = typer.Option("Oncology", "--therapeutic-area", help="Therapeutic area for the study"),
     domains: List[str] = typer.Option(..., "--domains", help="List of domains to include (e.g., DM AE VS LB)"),
     study_story: str = typer.Option("none", "--study-story", help="Study story to simulate (none, high_dropout)"),
