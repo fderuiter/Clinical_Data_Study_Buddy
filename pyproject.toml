@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "cdisc-generators"
+name = "clinical-data-study-buddy"
 version = "0.1.0"
-description = "Generate CRFs from CDISC Library"
+description = "A suite of tools to generate clinical study artifacts."
 authors = ["You <you@example.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [
-    { include = "cdisc_data_symphony", from = "src" },
+    { include = "clinical_data_study_buddy", from = "src" },
     { include = "cdisc_library_client", from = "src" }
 ]
 
@@ -52,7 +52,7 @@ profile = "black"
 skip = ["src/clients/cdisc_library_client"]
 
 [tool.poetry.scripts]
-cdisc = "cdisc_data_symphony.cli.main:app"
+cdsb = "clinical_data_study_buddy.cli.main:app"
 update-issue-links = "scripts.update_issue_links:main"
 generate-diagram = "scripts.diagram:main"
 read-excel = "scripts.read_excel:main"

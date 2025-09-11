@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import AsyncMock
 
-from cdisc_data_symphony.generators.crfgen.openfda.client import OpenFDAClient
-from cdisc_data_symphony.generators.crfgen.openfda.query import term_query, range_query, count_query, paging_query
+from clinical_data_study_buddy.generators.crfgen.openfda.client import OpenFDAClient
+from clinical_data_study_buddy.generators.crfgen.openfda.query import term_query, range_query, count_query, paging_query
 
 def test_term_query():
     assert term_query("field", "term") == 'field:"term"'
@@ -21,14 +21,14 @@ def test_paging_query():
     with pytest.raises(ValueError):
         paging_query(skip=25001)
 
-from cdisc_data_symphony.generators.crfgen.openfda.devices.udi import UDIAccessor
-from cdisc_data_symphony.generators.crfgen.openfda.devices.event import MAUDEAccessor
-from cdisc_data_symphony.generators.crfgen.openfda.devices.recall import RecallAccessor
-from cdisc_data_symphony.generators.crfgen.openfda.devices.enforcement import EnforcementAccessor
-from cdisc_data_symphony.generators.crfgen.openfda.devices.classification import ClassificationAccessor
-from cdisc_data_symphony.generators.crfgen.openfda.devices.k510 import K510Accessor
-from cdisc_data_symphony.generators.crfgen.openfda.devices.pma import PMAAccessor
-from cdisc_data_symphony.generators.crfgen.openfda.devices.reglist import RegListAccessor
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.udi import UDIAccessor
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.event import MAUDEAccessor
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.recall import RecallAccessor
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.enforcement import EnforcementAccessor
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.classification import ClassificationAccessor
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.k510 import K510Accessor
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.pma import PMAAccessor
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.reglist import RegListAccessor
 
 import httpx
 

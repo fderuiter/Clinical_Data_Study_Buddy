@@ -1,6 +1,6 @@
 import re
-from cdisc_data_symphony.generators.data_generator import DataGenerator
-from cdisc_data_symphony.core.models.schema import Form, FieldDef, Codelist
+from clinical_data_study_buddy.generators.data_generator import DataGenerator
+from clinical_data_study_buddy.core.models.schema import Form, FieldDef, Codelist
 
 def test_generate():
     """

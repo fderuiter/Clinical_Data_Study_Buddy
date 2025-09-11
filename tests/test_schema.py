@@ -1,6 +1,6 @@
 import json
 
-from cdisc_data_symphony.core.models.schema import Form
+from clinical_data_study_buddy.core.models.schema import Form
 
 
 def test_fixture_loads():

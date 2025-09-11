@@ -1,6 +1,6 @@
 import pytest
 
-from cdisc_data_symphony.generators.crfgen.utils import get_api_key
+from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
 from cdisc_library_client.harvest import harvest
 
 reason = ""

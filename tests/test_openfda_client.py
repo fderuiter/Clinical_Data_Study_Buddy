@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from cdisc_data_symphony.api.openfda import client
-from cdisc_data_symphony.generators.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
+from clinical_data_study_buddy.api.openfda import client
+from clinical_data_study_buddy.generators.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
 
 class TestOpenFDAClient(unittest.TestCase):
 
@@ -70,7 +70,7 @@ class TestOpenFDAClient(unittest.TestCase):
 
 class TestPopulators(unittest.TestCase):
 
-    @patch('cdisc_data_symphony.api.openfda.client.get_adverse_events')
+    @patch('clinical_data_study_buddy.api.openfda.client.get_adverse_events')
     def test_populate_ae_from_fda(self, mock_get_adverse_events):
         mock_get_adverse_events.return_value = [
             {"patient": {"reaction": [{"reactionmeddrapt": "Nausea"}]}},
@@ -85,13 +85,13 @@ class TestPopulators(unittest.TestCase):
             "TestDrug", max_results=5, start_date="20210101", end_date="20211231"
         )
 
-    @patch('cdisc_data_symphony.api.openfda.client.get_adverse_events')
+    @patch('clinical_data_study_buddy.api.openfda.client.get_adverse_events')
     def test_populate_ae_from_fda_no_results(self, mock_get_adverse_events):
         mock_get_adverse_events.return_value = []
         results = populate_ae_from_fda("TestDrug")
         self.assertEqual(results, [])
 
-    @patch('cdisc_data_symphony.api.openfda.client.get_drug_label')
+    @patch('clinical_data_study_buddy.api.openfda.client.get_drug_label')
     def test_populate_label_from_fda(self, mock_get_drug_label):
         mock_get_drug_label.return_value = {
             "openfda": {

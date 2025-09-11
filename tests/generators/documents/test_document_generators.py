@@ -1,8 +1,8 @@
 import pytest
 import pathlib
 from docx import Document
-from cdisc_data_symphony.generators.documents.adrg_generator import ADRGGenerator
-from cdisc_data_symphony.generators.documents.sdrg_generator import SDRGGenerator
+from clinical_data_study_buddy.generators.documents.adrg_generator import ADRGGenerator
+from clinical_data_study_buddy.generators.documents.sdrg_generator import SDRGGenerator
 
 @pytest.fixture
 def study_config_path():

@@ -3,8 +3,9 @@ import pytest
 from click.testing import CliRunner
 from pydantic import ValidationError
 
-from cdisc_data_symphony.generators.tfl.models import TFLSpec
-from cdisc_data_symphony.generators.tfl.autonumber import AutoNumberer
+from clinical_data_study_buddy.generators.tfl.models import TFLSpec
+from clinical_data_study_buddy.generators.tfl.autonumber import AutoNumberer
+from clinical_data_study_buddy.services.filename_service import generate_filename, generate_bookmark
 # from src.crfgen.crfgen import app
 
 VALID_SPEC = """
@@ -46,11 +47,11 @@ def test_autonumberer():
     autonumberer = AutoNumberer(spec)
 
     # Test generate_filename
-    filename = autonumberer.generate_filename(spec.tfls[0], extension="pdf")
+    filename = generate_filename(spec.tfls[0], extension="pdf")
     assert filename == "t14-1-1.pdf"
 
     # Test generate_bookmark
-    bookmark = autonumberer.generate_bookmark(spec.tfls[0])
+    bookmark = generate_bookmark(spec.tfls[0])
     assert bookmark == "T14_1_1"
 
     # Test assign_numbers

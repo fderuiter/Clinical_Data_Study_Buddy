@@ -1,7 +1,7 @@
 import pandas as pd
 from unittest.mock import patch
 from typer.testing import CliRunner
-from cdisc_data_symphony.cli.main import app
+from clinical_data_study_buddy.cli.main import app
 from docx import Document
 from zipfile import ZipFile
 
@@ -10,10 +10,10 @@ runner = CliRunner()
 def test_help():
     result = runner.invoke(app, ["generate", "cdash-crf", "--help"])
     assert result.exit_code == 0
-    assert "Generate Word CRF shells" in result.stdout
+    assert "Generates Word CRF (Case Report Form) shells" in result.stdout
 
 
-@patch("cdisc_data_symphony.core.generation_service.load_ig")
+@patch("clinical_data_study_buddy.core.generation_service.load_ig")
 def test_generate(mock_load_ig, tmp_path):
     out_dir = tmp_path / "out"
     mock_df = pd.DataFrame([
@@ -69,8 +69,8 @@ def test_generate(mock_load_ig, tmp_path):
     assert len(table.columns) == 6
 
 
-@patch("cdisc_data_symphony.core.generation_service.populate_ae_from_fda")
-@patch("cdisc_data_symphony.core.generation_service.load_ig")
+@patch("clinical_data_study_buddy.core.generation_service.populate_ae_from_fda")
+@patch("clinical_data_study_buddy.core.generation_service.load_ig")
 def test_generate_with_openfda(mock_load_ig, mock_populate_ae, tmp_path):
     out_dir = tmp_path / "out"
     mock_df = pd.DataFrame([
@@ -96,7 +96,7 @@ def test_generate_with_openfda(mock_load_ig, mock_populate_ae, tmp_path):
     assert fda_table.cell(2, 0).text == "Nausea"
 
 
-@patch("cdisc_data_symphony.core.generation_service.load_ig")
+@patch("clinical_data_study_buddy.core.generation_service.load_ig")
 def test_generate_with_custom_styling(mock_load_ig, tmp_path):
     out_dir = tmp_path / "out"
     config_path = tmp_path / "config.yaml"

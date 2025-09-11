@@ -11,7 +11,7 @@ This document outlines a proposed new structure for the repository. The goal is 
 ├── examples/
 ├── scripts/
 ├── src/
-│   ├── cdisc_data_symphony/
+│   ├── clinical_data_study_buddy/
 │   │   ├── __init__.py
 │   │   ├── api/
 │   │   ├── cli/
@@ -37,9 +37,9 @@ This document outlines a proposed new structure for the repository. The goal is 
 
 The `src` directory is the main container for all Python source code. This is a standard practice in Python projects and helps to keep the codebase organized.
 
-- **`cdisc_data_symphony/`**: The main application package has been renamed from `cdisc_generators_api` to `cdisc_data_symphony`. This new name is more descriptive and aligns with the project's name, "CDISC Data Symphony," as mentioned in the `README.md` file.
+- **`clinical_data_study_buddy/`**: The main application package has been renamed from `cdisc_generators_api` to `clinical_data_study_buddy`. This new name is more descriptive and aligns with the project's name, "Clinical Data Study Buddy," as mentioned in the `README.md` file.
 
-- **Internal Structure of `cdisc_data_symphony/`**: The package has been reorganized into the following sub-modules:
+- **Internal Structure of `clinical_data_study_buddy/`**: The package has been reorganized into the following sub-modules:
     - `api/`: Contains the FastAPI application for the REST API.
     - `cli/`: Contains the Typer application for the command-line interface.
     - `core/`: Contains the core services and business logic.
