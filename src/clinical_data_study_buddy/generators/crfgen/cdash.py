@@ -291,6 +291,8 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
                 client=client,
                 version=ig_version,
                 domain=domain_name,
+                page=page,
+                page_size=100,
             )
             if (
                 not fields_response
@@ -326,7 +328,7 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
                 }
                 all_variables.append(variable_data)
 
-            break
+            page += 1
 
     df = pd.DataFrame(all_variables)
     return df

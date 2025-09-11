@@ -7,16 +7,26 @@ from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.cdashig_domain_fields import CdashigDomainFields
 from ...models.default_error_response import DefaultErrorResponse
-from ...types import Response
+from ...types import Response, UNSET, Unset
 
 
 def _get_kwargs(
     version: str,
     domain: str,
+    *,
+    page: Union[Unset, int] = UNSET,
+    page_size: Union[Unset, int] = UNSET,
 ) -> dict[str, Any]:
+    params: dict[str, Any] = {}
+    if not isinstance(page, Unset):
+        params["page"] = page
+    if not isinstance(page_size, Unset):
+        params["pageSize"] = page_size
+
     _kwargs: dict[str, Any] = {
         "method": "get",
         "url": f"/mdr/cdashig/{version}/domains/{domain}/fields",
+        "params": params,
     }
 
     return _kwargs
@@ -87,15 +97,20 @@ def sync_detailed(
     domain: str,
     *,
     client: Union[AuthenticatedClient, Client],
+    page: Union[Unset, int] = UNSET,
+    page_size: Union[Unset, int] = UNSET,
 ) -> Response[Union[CdashigDomainFields, DefaultErrorResponse]]:
     """Get CDASHIG Domain Field List
 
     Args:
         version (str):  Example: 2-1.
         domain (str):  Example: VS.
+        page (Union[Unset, int]):
+        page_size (Union[Unset, int]):
 
     Raises:
-        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        errors.UnexpectedStatus: If the server returns an undocumented status code and
+            Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
@@ -105,6 +120,8 @@ def sync_detailed(
     kwargs = _get_kwargs(
         version=version,
         domain=domain,
+        page=page,
+        page_size=page_size,
     )
 
     response = client.get_httpx_client().request(
@@ -119,15 +136,20 @@ def sync(
     domain: str,
     *,
     client: Union[AuthenticatedClient, Client],
+    page: Union[Unset, int] = UNSET,
+    page_size: Union[Unset, int] = UNSET,
 ) -> Optional[Union[CdashigDomainFields, DefaultErrorResponse]]:
     """Get CDASHIG Domain Field List
 
     Args:
         version (str):  Example: 2-1.
         domain (str):  Example: VS.
+        page (Union[Unset, int]):
+        page_size (Union[Unset, int]):
 
     Raises:
-        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        errors.UnexpectedStatus: If the server returns an undocumented status code and
+            Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
@@ -138,6 +160,8 @@ def sync(
         version=version,
         domain=domain,
         client=client,
+        page=page,
+        page_size=page_size,
     ).parsed
 
 
@@ -146,15 +170,20 @@ async def asyncio_detailed(
     domain: str,
     *,
     client: Union[AuthenticatedClient, Client],
+    page: Union[Unset, int] = UNSET,
+    page_size: Union[Unset, int] = UNSET,
 ) -> Response[Union[CdashigDomainFields, DefaultErrorResponse]]:
     """Get CDASHIG Domain Field List
 
     Args:
         version (str):  Example: 2-1.
         domain (str):  Example: VS.
+        page (Union[Unset, int]):
+        page_size (Union[Unset, int]):
 
     Raises:
-        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        errors.UnexpectedStatus: If the server returns an undocumented status code and
+            Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
@@ -164,6 +193,8 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         version=version,
         domain=domain,
+        page=page,
+        page_size=page_size,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -176,15 +207,20 @@ async def asyncio(
     domain: str,
     *,
     client: Union[AuthenticatedClient, Client],
+    page: Union[Unset, int] = UNSET,
+    page_size: Union[Unset, int] = UNSET,
 ) -> Optional[Union[CdashigDomainFields, DefaultErrorResponse]]:
     """Get CDASHIG Domain Field List
 
     Args:
         version (str):  Example: 2-1.
         domain (str):  Example: VS.
+        page (Union[Unset, int]):
+        page_size (Union[Unset, int]):
 
     Raises:
-        errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+        errors.UnexpectedStatus: If the server returns an undocumented status code and
+            Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
@@ -196,5 +232,7 @@ async def asyncio(
             version=version,
             domain=domain,
             client=client,
+            page=page,
+            page_size=page_size,
         )
     ).parsed
