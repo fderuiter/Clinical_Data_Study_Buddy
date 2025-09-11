@@ -92,3 +92,23 @@ def test_generate_analysis_code_endpoint(client, mocker):
     mock_create_analysis_code.assert_called_once_with(
         "sas", "testing/test_data/DM.csv", "demographics", "ARM"
     )
+
+
+def test_generate_raw_dataset_package_endpoint_value_error(client, mocker):
+    mocker.patch(
+        "clinical_data_study_buddy.web.services.data_generation_service.create_raw_dataset_package",
+        side_effect=ValueError("Invalid domain"),
+    )
+
+    request_data = {
+        "num_subjects": 20,
+        "therapeutic_area": "Oncology",
+        "domains": ["INVALID_DOMAIN"],
+        "study_story": "none",
+        "output_format": "csv",
+    }
+
+    response = client.post("/api/generate-raw-dataset-package", json=request_data)
+
+    assert response.status_code == 400
+    assert "Invalid domain" in response.text

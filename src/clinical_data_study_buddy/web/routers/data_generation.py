@@ -106,5 +106,7 @@ async def generate_raw_dataset_package_endpoint(request: RawDatasetRequest):
             request.output_format,
         )
         return {"message": "Raw dataset package generated successfully", "file_path": file_path}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating raw dataset package: {e}")
