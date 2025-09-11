@@ -9,7 +9,7 @@ from typing import Sequence
 
 import pypandoc
 
-from cdisc_data_symphony.generators.crfgen.schema import Form
+from cdisc_data_symphony.core.models.schema import Form
 from .docx import export_docx
 from .registry import register
 

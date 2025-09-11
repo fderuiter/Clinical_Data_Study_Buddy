@@ -1,7 +1,7 @@
 import json
 from docx import Document
 from abc import ABC, abstractmethod
-from cdisc_data_symphony.models.config import StudyConfig
+from cdisc_data_symphony.core.models.config import StudyConfig
 
 class BaseDocumentGenerator(ABC):
     def __init__(self, study_config_path):

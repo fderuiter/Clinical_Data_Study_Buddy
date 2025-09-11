@@ -12,7 +12,6 @@ import pathlib
 from typing import List, Optional
 
 from cdisc_data_symphony.generators.crfgen.exporter.registry import get as get_exporter
-from cdisc_library_client.harvest import harvest
 from cdisc_data_symphony.generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
 from cdisc_data_symphony.generators.tfl.models import TFLSpec
 from cdisc_data_symphony.generators.tfl.migration import migrate_spec, TFLSpecMigrationError

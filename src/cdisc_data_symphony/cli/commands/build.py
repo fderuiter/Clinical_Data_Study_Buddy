@@ -16,7 +16,7 @@ import cdisc_data_symphony.generators.crfgen.exporter.markdown  # noqa
 import cdisc_data_symphony.generators.crfgen.exporter.odm  # noqa
 import cdisc_data_symphony.generators.crfgen.exporter.xlsx  # noqa
 from cdisc_data_symphony.generators.crfgen.exporter import registry as reg
-from cdisc_data_symphony.generators.crfgen.schema import Form
+from cdisc_data_symphony.core.models.schema import Form
 
 load_dotenv()
 console = Console()

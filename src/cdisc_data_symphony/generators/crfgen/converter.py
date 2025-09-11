@@ -5,7 +5,7 @@ from the CDISC Library client into the schema objects used by the crfgen module.
 
 from typing import Any
 
-from cdisc_data_symphony.generators.crfgen.schema import Codelist, FieldDef, Form
+from cdisc_data_symphony.core.models.schema import Codelist, FieldDef, Form
 
 
 def _get(obj: Any, key: str):
