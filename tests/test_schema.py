@@ -1,6 +1,6 @@
 import json
 
-from cdisc_data_symphony.builder.crfgen.schema import Form
+from cdisc_data_symphony.core.models.schema import Form
 
 
 def test_fixture_loads():

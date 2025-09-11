@@ -1,6 +1,6 @@
 import pathlib
 
-from cdisc_data_symphony.builder.crfgen.schema import FieldDef, Form, dump_forms, load_forms
+from cdisc_data_symphony.core.models.schema import FieldDef, Form, dump_forms, load_forms
 
 
 def test_roundtrip(tmp_path: pathlib.Path):

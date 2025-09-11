@@ -2,8 +2,8 @@ import typer
 from rich.console import Console
 import pathlib
 from dotenv import load_dotenv
-from cdisc_data_symphony.builder.documents.adrg_generator import ADRGGenerator
-from cdisc_data_symphony.builder.documents.sdrg_generator import SDRGGenerator
+from cdisc_data_symphony.generators.documents.adrg_generator import ADRGGenerator
+from cdisc_data_symphony.generators.documents.sdrg_generator import SDRGGenerator
 
 load_dotenv()
 console = Console()
