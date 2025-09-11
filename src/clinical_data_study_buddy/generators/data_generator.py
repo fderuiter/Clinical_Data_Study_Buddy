@@ -94,7 +94,7 @@ class DataGenerator:
         # This is a placeholder implementation.
         # In a real implementation, we would fetch the codelist from the CDISC Library.
         # For now, we will just return a dummy value.
-        return codelist.nci_code
+        return "MALE"
 
     def _generate_field_value(self, field):
         """
