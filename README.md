@@ -88,7 +88,7 @@ Then, open your web browser and navigate to `http://127.0.0.1:8000`.
 The CLI is organized into subcommands for different functionalities. You can get more information about each subcommand by using the `--help` flag.
 
 ```bash
-poetry run cdisc --help
+poetry run cdsb --help
 ```
 
 #### Examples
@@ -97,32 +97,32 @@ Here are some examples of how to use the CLI:
 
 *   **Generate a TFL shell document**:
     ```bash
-    poetry run cdisc generate tfl-shell --spec "My TFL Spec" --output-file my_tfl_shell.txt
+    poetry run cdsb generate tfl-shell --spec "My TFL Spec" --output-file my_tfl_shell.txt
     ```
 
 *   **Generate a raw dataset package**:
     ```bash
-    poetry run cdisc generate edc-raw-dataset-package --domains DM AE VS --num-subjects 20 --output-dir my_package
+    poetry run cdsb generate edc-raw-dataset-package --domains DM AE VS --num-subjects 20 --output-dir my_package
     ```
 
 *   **Generate synthetic data for the DM domain**:
     ```bash
-    poetry run cdisc generate synthetic-data --standard sdtmig --version 3-3 --domain DM --num-subjects 10
+    poetry run cdsb generate synthetic-data --standard sdtmig --version 3-3 --domain DM --num-subjects 10
     ```
 
 *   **Generate analysis code for a demographics table**:
     ```bash
-    poetry run cdisc generate analysis-code --language sas --dataset ADSL --output-type Demographics --treatment-var TRT01A --output-file demo.sas
+    poetry run cdsb generate analysis-code --language sas --dataset ADSL --output-type Demographics --treatment-var TRT01A --output-file demo.sas
     ```
 
 *   **Download the SDTMIG 3.3 standard**:
     ```bash
-    poetry run cdisc download standard --standard sdtmig --version 3-3 --output-dir standards
+    poetry run cdsb download standard --standard sdtmig --version 3-3 --output-dir standards
     ```
 
 *   **Generate a Study Data Reviewer's Guide (SDRG)**:
     ```bash
-    poetry run cdisc sdrg generate --config examples/study_config.json --out sdrg.docx
+    poetry run cdsb sdrg generate --config examples/study_config.json --out sdrg.docx
     ```
 
 ## Contributing
