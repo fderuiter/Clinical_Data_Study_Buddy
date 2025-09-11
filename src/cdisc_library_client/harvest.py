@@ -49,7 +49,7 @@ class CrfGen:
         and scenarios, fetching the data for each and converting them into Form objects.
         """
         products = get_mdr_products_data_collection.sync(client=self.client)
-        cdashig_links = products.additional_properties["_links"]["cdashig"]
+        cdashig_links = products.additional_properties.get("_links", {}).get("cdashig", [])
         forms: list[Form] = []
         for ver_link in cdashig_links:
             if self.ig_filter and self.ig_filter not in ver_link["title"]:

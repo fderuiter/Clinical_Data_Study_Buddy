@@ -13,7 +13,6 @@ except ValueError as e:
     reason = str(e)
 
 
-@pytest.mark.skip(reason="Skipping due to changes in the CDISC Library API response that cause a KeyError.")
 @pytest.mark.skipif(skip_test, reason=reason)
 def test_live_pull_small():
     forms = harvest(token, ig_filter="2-2")
