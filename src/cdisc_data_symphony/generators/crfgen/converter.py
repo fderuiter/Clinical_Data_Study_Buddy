@@ -49,3 +49,22 @@ def field_from_api(f: Any) -> FieldDef:
         cdash_var=_get(f, "cdash_variable"),
         codelist=cl,
     )
+
+
+def form_from_api(f: Any) -> Form:
+    """
+    Converts a form object from the CDISC Library API to a Form object.
+
+    Args:
+        f (Any): The form object from the API, can be a dict or an object.
+
+    Returns:
+        Form: The converted Form object.
+    """
+    fields_data = _get(f, "fields")
+    fields = [field_from_api(field) for field in fields_data] if fields_data else []
+    return Form(
+        title=_get(f, "domain_label"),
+        domain=_get(f, "domain"),
+        fields=fields,
+    )

@@ -1,3 +1,9 @@
+"""
+This module provides the 'build' command for the CDISC Data Symphony CLI.
+
+The build command is used to fetch canonical CRF data from the CDISC Library
+and to generate various CRF artifacts from a canonical JSON file.
+"""
 import typer
 from rich.console import Console
 import pathlib
@@ -29,7 +35,15 @@ def build_canonical(
     version: Optional[str] = typer.Option(None, "--version", "-v", help="IG version substring (optional)")
 ):
     """
-    Fetch the canonical CRF data from the CDISC Library and create a canonical crf.json file.
+    Fetches canonical CRF data from the CDISC Library and saves it as a JSON file.
+
+    This command connects to the CDISC Library API, harvests the CRF data for a
+    specified Implementation Guide (IG) version, and then saves the data in a
+    structured JSON format.
+
+    Args:
+        out (pathlib.Path): The path where the output JSON file will be saved.
+        version (Optional[str]): An optional version string to filter the IG.
     """
     try:
         api_key = get_api_key()
@@ -51,7 +65,18 @@ def build(
     formats: Optional[List[str]] = typer.Option(None, "--formats", "-f", help="Which formats to generate")
 ):
     """
-    Generate all CRF artifacts from a canonical crf.json file.
+    Generates various CRF artifacts from a canonical CRF JSON file.
+
+    This command reads a canonical JSON file containing CRF data and then uses
+    registered exporters to generate artifacts in various formats like DOCX,
+    PDF, CSV, etc.
+
+    Args:
+        source (pathlib.Path): The path to the source canonical JSON file.
+        outdir (pathlib.Path): The directory where the generated artifacts will be saved.
+        formats (Optional[List[str]]): A list of specific formats to generate.
+                                       If not provided, all registered formats
+                                       will be generated.
     """
     if not source.exists():
         console.print(f"ERROR: source file not found: {source}", style="bold red")

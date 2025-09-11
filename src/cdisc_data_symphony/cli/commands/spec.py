@@ -1,3 +1,9 @@
+"""
+This module provides the 'spec' command for the CDISC Data Symphony CLI.
+
+The spec command is used to generate and validate datasets against an
+Excel-based specification file.
+"""
 import typer
 from rich.console import Console
 import pathlib
@@ -15,9 +21,14 @@ def spec_generate_dataset(
     output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="The directory to save the generated dataset files.")
 ):
     """
-    Generate a synthetic dataset from an Excel specification file.
+    Generates a synthetic dataset from an Excel specification file.
+
+    Args:
+        spec_file (pathlib.Path): Path to the Excel specification file.
+        output_dir (pathlib.Path): The directory to save the generated dataset files.
     """
     generate_dataset(str(spec_file), str(output_dir))
+
 
 @spec_app.command("validate")
 def spec_validate(
@@ -25,6 +36,10 @@ def spec_validate(
     dataset_file: pathlib.Path = typer.Option(..., "--dataset-file", help="Path to the dataset file (e.g., a CSV).")
 ):
     """
-    Validate a dataset against an Excel specification file.
+    Validates a dataset against an Excel specification file.
+
+    Args:
+        spec_file (pathlib.Path): Path to the Excel specification file.
+        dataset_file (pathlib.Path): Path to the dataset file to be validated.
     """
     validate(str(spec_file), str(dataset_file))

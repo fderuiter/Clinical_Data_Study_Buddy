@@ -1,7 +1,6 @@
 """
-This module defines a command-line interface (CLI) for generating various
-clinical study artifacts, including CRFs, study protocols, and for validating
-TFL specification files.
+This module provides a 'legacy' command for the CDISC Data Symphony CLI,
+which houses older or deprecated commands for backward compatibility.
 """
 import typer
 import yaml
@@ -11,6 +10,7 @@ from pydantic import ValidationError
 import pathlib
 from typing import List, Optional
 
+from cdisc_library_client.harvest import harvest
 from cdisc_data_symphony.generators.crfgen.exporter.registry import get as get_exporter
 from cdisc_data_symphony.generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
 from cdisc_data_symphony.generators.tfl.models import TFLSpec
@@ -35,7 +35,19 @@ def generate(
     domains: List[str] = typer.Argument(..., help="Domains to include"),
 ):
     """
-    Generates a CRF from a specified CDISC standard.
+    Generates a CRF from a specified CDISC standard (Legacy command).
+
+    Args:
+        api_key (str): CDISC Library API key.
+        ig_filter (Optional[str]): Filter IG by name.
+        cache_path (Optional[pathlib.Path]): Cache path.
+        style_path (Optional[pathlib.Path]): Style path.
+        template_path (Optional[pathlib.Path]): Template path.
+        log_path (Optional[pathlib.Path]): Log file path.
+        output_path (pathlib.Path): Output path.
+        standard (str): CDISC standard.
+        version (str): Version of the standard.
+        domains (List[str]): Domains to include.
     """
     crf = harvest(api_key, ig_filter)
     exporter = get_exporter(str(output_path), str(style_path) if style_path else None, str(template_path) if template_path else None)
@@ -55,7 +67,14 @@ def protocol(
     output_dir: str = typer.Option("output", "--output-dir", help="Output directory for the protocol documents.")
 ):
     """
-    Generates a study protocol document.
+    Generates a study protocol document (Legacy command).
+
+    Args:
+        therapeutic_area (str): Therapeutic area of the study.
+        treatment_arm (List[str]): A treatment arm of the study.
+        duration_weeks (int): Duration of the study in weeks.
+        phase (int): Phase of the study.
+        output_dir (str): Output directory for the protocol documents.
     """
     console.log(f"Generating study protocol in {output_dir}...")
     os.makedirs(output_dir, exist_ok=True)
@@ -79,7 +98,10 @@ def spec(
     spec_path: pathlib.Path = typer.Argument(..., help="Path to the TFL specification file to validate.")
 ):
     """
-    Validates a TFL (Tables, Figures, and Listings) specification file.
+    Validates a TFL (Tables, Figures, and Listings) specification file (Legacy command).
+
+    Args:
+        spec_path (pathlib.Path): Path to the TFL specification file to validate.
     """
     console.log(f"Validating spec file: {spec_path}")
     try:

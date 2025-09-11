@@ -1,3 +1,8 @@
+"""
+This module serves as the main entry point for the CDISC Data Symphony command-line
+interface (CLI). It uses the Typer library to create a structured and user-friendly
+CLI application by composing subcommands from different modules.
+"""
 import typer
 import click
 from rich.console import Console

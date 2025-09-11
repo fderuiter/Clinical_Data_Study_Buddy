@@ -1,1 +1,3 @@
-# This file makes this a Python package.
+"""
+This package contains the subcommands for the CDISC Data Symphony CLI.
+"""

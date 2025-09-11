@@ -1,3 +1,8 @@
+"""
+This module provides the 'adrg' and 'sdrg' commands for the CDISC Data
+Symphony CLI. These commands are used to generate Analysis Data Reviewer's
+Guides (ADRG) and Study Data Reviewer's Guides (SDRG) respectively.
+"""
 import typer
 from rich.console import Console
 import pathlib
@@ -18,6 +23,13 @@ def adrg_generate(
 ):
     """
     Generates an Analysis Data Reviewer's Guide (ADRG) document.
+
+    This command uses the ADRGGenerator to create a Word document based on a
+    study-specific configuration file.
+
+    Args:
+        study_config_path (pathlib.Path): Path to the study-specific config file.
+        output_path (pathlib.Path): Path to the output Word document.
     """
     generator = ADRGGenerator(study_config_path)
     generator.generate(output_path)
@@ -32,6 +44,13 @@ def sdrg_generate(
 ):
     """
     Generates a Study Data Reviewer's Guide (SDRG) document.
+
+    This command uses the SDRGGenerator to create a Word document based on a
+    study-specific configuration file.
+
+    Args:
+        study_config_path (pathlib.Path): Path to the study-specific config file.
+        output_path (pathlib.Path): Path to the output Word document.
     """
     generator = SDRGGenerator(study_config_path)
     generator.generate(output_path)

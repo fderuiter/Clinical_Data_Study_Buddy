@@ -1,8 +1,25 @@
+"""
+This module contains the SDRGGenerator class, which is responsible for
+generating a Study Data Reviewer's Guide (SDRG) document.
+"""
 from cdisc_data_symphony.generators.documents.base_document_generator import BaseDocumentGenerator
 
+
 class SDRGGenerator(BaseDocumentGenerator):
+    """
+    A class for generating a Study Data Reviewer's Guide (SDRG) document.
+
+    This class inherits from the BaseDocumentGenerator and provides the specific
+    implementation for creating the title and sections of an SDRG.
+    """
     @property
     def document_type(self):
+        """
+        Returns the type of the document, which is "SDRG".
+
+        Returns:
+            str: The document type "SDRG".
+        """
         return "SDRG"
 
     def _add_title(self, document):

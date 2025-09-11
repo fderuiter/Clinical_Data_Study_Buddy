@@ -1,3 +1,9 @@
+"""
+This module provides the 'download' command for the CDISC Data Symphony CLI.
+
+The download command is used to fetch and save various CDISC standards from the
+CDISC Library.
+"""
 import typer
 from rich.console import Console
 import pathlib
@@ -17,7 +23,16 @@ def standard(
     output_dir: pathlib.Path = typer.Option(".", "--output-dir", "-o", help="The directory to save the downloaded files.")
 ):
     """
-    Download a CDISC data standard from the CDISC Library.
+    Downloads a specified CDISC data standard from the CDISC Library.
+
+    This command calls the download service to fetch the specified standard
+    and version, saving it to the designated output directory.
+
+    Args:
+        standard (str): The name of the standard to download (e.g., "sdtmig").
+        version (str): The version of the standard to download.
+        output_dir (pathlib.Path): The directory where the downloaded standard
+                                   will be saved.
     """
     console.print(f"Downloading {standard} version {version} to {output_dir}...")
     try:

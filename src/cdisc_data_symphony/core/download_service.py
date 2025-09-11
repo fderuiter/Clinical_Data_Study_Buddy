@@ -10,31 +10,7 @@ from cdisc_library_client.api.sdtm_implementation_guide_sdtmig import (
     get_mdr_sdtmig_version_classes,
     get_mdr_sdtmig_version_datasets,
 )
-from cdisc_data_symphony.generators.crfgen.utils import get_api_key
-
-
-def _get_client() -> AuthenticatedClient:
-    """
-    Get an authenticated client for the CDISC Library API.
-
-    This function retrieves the API key and creates an AuthenticatedClient
-    instance with appropriate settings for connecting to the CDISC Library API.
-
-    Returns:
-        AuthenticatedClient: An authenticated client for the CDISC Library API.
-    """
-    api_key = get_api_key()
-    transport = httpx.HTTPTransport(retries=5)
-    client = AuthenticatedClient(
-        base_url="https://library.cdisc.org/api",
-        token=api_key,
-        headers={"Accept": "application/json", "Cache-Control": "no-cache"},
-        auth_header_name="api-key",
-        prefix="",
-        timeout=30.0,
-        httpx_args={"transport": transport},
-    )
-    return client
+from cdisc_data_symphony.services.cdisc_library_service import get_client
 
 
 def download_standard(standard: str, version: str, output_dir: Path):
@@ -56,7 +32,7 @@ def download_standard(standard: str, version: str, output_dir: Path):
     if standard.lower() != "sdtmig":
         raise ValueError("Only sdtmig is supported at this time.")
 
-    client = _get_client()
+    client = get_client()
     data = get_mdr_sdtmig_version.sync(client=client, version=version)
 
     classes = []

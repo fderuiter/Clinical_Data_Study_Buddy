@@ -1,8 +1,25 @@
+"""
+This module contains the ADRGGenerator class, which is responsible for
+generating an Analysis Data Reviewer's Guide (ADRG) document.
+"""
 from cdisc_data_symphony.generators.documents.base_document_generator import BaseDocumentGenerator
 
+
 class ADRGGenerator(BaseDocumentGenerator):
+    """
+    A class for generating an Analysis Data Reviewer's Guide (ADRG) document.
+
+    This class inherits from the BaseDocumentGenerator and provides the specific
+    implementation for creating the title and sections of an ADRG.
+    """
     @property
     def document_type(self):
+        """
+        Returns the type of the document, which is "ADRG".
+
+        Returns:
+            str: The document type "ADRG".
+        """
         return "ADRG"
 
     def _add_title(self, document):

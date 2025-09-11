@@ -34,7 +34,8 @@ def generate_tfl_shell(spec: str, output_file: pathlib.Path):
 
     Args:
         spec (str): The TFL specification.
-        output_file (pathlib.Path): The path to the output file where the shell document will be saved.
+        output_file (pathlib.Path): The path to the output file where the shell
+                                    document will be saved.
     """
     generator = TFLShellGenerator(spec)
     shell = generator.generate()
@@ -47,12 +48,12 @@ def generate_edc_raw_dataset_package(num_subjects: int, therapeutic_area: str, d
     Generates an EDC (Electronic Data Capture) Raw Dataset Package.
 
     Args:
-        num_subjects (int): The number of subjects for the study (between 10 and 200).
+        num_subjects (int): The number of subjects for the study.
         therapeutic_area (str): The therapeutic area for the study.
-        domains (List[str]): A list of domains to include (e.g., ["DM", "AE", "VS", "LB"]).
-        study_story (str): The study story to simulate (e.g., "none", "high_dropout").
+        domains (List[str]): A list of domains to include.
+        study_story (str): The study story to simulate.
         output_dir (pathlib.Path): The directory where the generated package will be saved.
-        output_format (str): The output format for the datasets (e.g., "csv", "json", "xpt").
+        output_format (str): The output format for the datasets.
     """
     generator = EDCRawDatasetPackageGenerator(
         num_subjects=num_subjects,
@@ -67,12 +68,12 @@ def generate_edc_raw_dataset_package(num_subjects: int, therapeutic_area: str, d
 
 def generate_synthetic_data(standard: str, version: str, domain: str, num_subjects: int, output_dir: pathlib.Path) -> str:
     """
-    Generates synthetic CDISC datasets.
+    Generates a synthetic CDISC dataset for a specific domain.
 
     Args:
-        standard (str): The standard to generate data for (e.g., "sdtmig").
-        version (str): The version of the standard (e.g., "3-3").
-        domain (str): The domain to generate data for (e.g., "DM").
+        standard (str): The standard to generate data for.
+        version (str): The version of the standard.
+        domain (str): The domain to generate data for.
         num_subjects (int): The number of subjects.
         output_dir (pathlib.Path): The directory where the generated file will be saved.
 
@@ -103,10 +104,10 @@ def generate_analysis_code(language: str, dataset: str, output_type: str, treatm
     Generates analysis code in SAS or R.
 
     Args:
-        language (str): The language for the generated code ("sas" or "r").
-        dataset (str): The source dataset (e.g., "ADSL").
-        output_type (str): The type of analysis output (e.g., "Demographics").
-        treatment_var (str): The treatment variable (e.g., "TRT01A").
+        language (str): The language for the generated code.
+        dataset (str): The source dataset.
+        output_type (str): The type of analysis output.
+        treatment_var (str): The treatment variable.
         output_file (pathlib.Path): The path to the output file where the code will be saved.
     """
     generator = AnalysisGenerator(language, dataset, output_type, treatment_var)
@@ -120,9 +121,9 @@ def generate_cdash_crf(ig_version: str, out_dir: pathlib.Path, domains: Optional
     Generates Word CRF (Case Report Form) shells from the CDISC Library API.
 
     Args:
-        ig_version (str): The CDASHIG version (e.g., "v2.3").
+        ig_version (str): The CDASHIG version.
         out_dir (pathlib.Path): The directory for the generated Word documents.
-        domains (Optional[List[str]]): An optional whitelist of domains (e.g., ["AE", "CM", "VS"]).
+        domains (Optional[List[str]]): An optional whitelist of domains.
         config_path (pathlib.Path): The path to the configuration file.
         openfda_drug_name (Optional[str]): The drug name to fetch adverse events from OpenFDA.
         openfda_max_results (int): The maximum number of adverse events to fetch from OpenFDA.
@@ -165,7 +166,8 @@ def generate_study_protocols(therapeutic_area: str, treatment_arms: List[str], d
         treatment_arms (List[str]): A list of treatment arms for the study.
         duration_weeks (int): The duration of the study in weeks.
         phase (int): The phase of the study.
-        output_dir (pathlib.Path): The directory where the generated protocol documents will be saved.
+        output_dir (pathlib.Path): The directory where the generated protocol
+                                   documents will be saved.
     """
     generator = StudyProtocolsGenerator(
         therapeutic_area=therapeutic_area,
@@ -182,10 +184,11 @@ def generate_specification_templates(product: str, version: str, domains: List[s
     Generates Excel-based specification templates for CDISC datasets.
 
     Args:
-        product (str): The CDISC product (e.g., "sdtmig", "adamig").
-        version (str): The version of the product (e.g., "3-3").
-        domains (List[str]): A list of domains to include in the specification (e.g., ["DM", "AE", "VS"]).
-        output_dir (pathlib.Path): The directory where the generated Excel file will be saved.
+        product (str): The CDISC product.
+        version (str): The version of the product.
+        domains (List[str]): A list of domains to include in the specification.
+        output_dir (pathlib.Path): The directory where the generated Excel file
+                                   will be saved.
     """
     generator = SpecificationTemplatesGenerator(product, version, domains, str(output_dir))
     generator.generate()

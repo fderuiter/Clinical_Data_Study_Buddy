@@ -10,7 +10,7 @@ runner = CliRunner()
 def test_help():
     result = runner.invoke(app, ["generate", "cdash-crf", "--help"])
     assert result.exit_code == 0
-    assert "Generate Word CRF shells" in result.stdout
+    assert "Generates Word CRF (Case Report Form) shells" in result.stdout
 
 
 @patch("cdisc_data_symphony.core.generation_service.load_ig")

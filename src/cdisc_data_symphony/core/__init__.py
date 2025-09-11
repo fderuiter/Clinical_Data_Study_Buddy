@@ -1,1 +1,4 @@
-# This file makes this a Python package.
+"""
+This package contains the core business logic and services for the CDISC Data
+Symphony application.
+"""

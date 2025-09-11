@@ -20,9 +20,16 @@ class AutoNumberer:
 
     def assign_numbers(self, prefix="T14") -> TFLSpec:
         """
-        Assigns sequential numbers to TFLs based on their order in the spec.
-        This is a simple implementation of the T14.x.y rule.
-        A more complex implementation could handle hierarchical numbering.
+        Assigns sequential numbers to all TFLs in the specification.
+
+        This method implements a simple version of the T14.x.y numbering rule,
+        renumbering all TFLs sequentially.
+
+        Args:
+            prefix (str): The prefix to use for the numbering (e.g., "T14").
+
+        Returns:
+            TFLSpec: The updated TFL specification with re-numbered TFLs.
         """
         major = 1
         minor = 1
@@ -33,20 +40,3 @@ class AutoNumberer:
             tfl.shell_id = f"{prefix}.{major}.{minor}"
             minor += 1
         return self.spec
-
-    @staticmethod
-    def generate_filename(tfl: TFL, extension: str = "docx") -> str:
-        """
-        Generates a filename for a TFL based on its shell_id.
-        e.g., "T14.1.1" -> "t14-1-1.docx"
-        """
-        filename_base = tfl.shell_id.lower().replace(".", "-")
-        return f"{filename_base}.{extension}"
-
-    @staticmethod
-    def generate_bookmark(tfl: TFL) -> str:
-        """
-        Generates a bookmark for a TFL based on its shell_id.
-        e.g., "T14.1.1" -> "T14_1_1"
-        """
-        return tfl.shell_id.replace(".", "_")

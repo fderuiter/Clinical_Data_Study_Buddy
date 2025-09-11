@@ -21,31 +21,8 @@ from cdisc_library_client.api.analysis_data_model_and_implementation_guide_a_da_
 from dotenv import load_dotenv
 from cdisc_data_symphony.generators.data_generator import DataGenerator
 from cdisc_data_symphony.core.models.schema import Form, FieldDef
+from cdisc_data_symphony.services.cdisc_library_service import get_client
 
-
-def get_client():
-    """
-    Creates and returns an authenticated client for the CDISC Library API.
-
-    This function loads environment variables, retrieves the API key, and
-    initializes an AuthenticatedClient.
-
-    Returns:
-        AuthenticatedClient: An authenticated client for the CDISC Library API.
-
-    Raises:
-        ValueError: If the CDISC Library API key is not found in the environment variables.
-    """
-    load_dotenv()
-    api_key = os.environ.get("CDISC_PRIMARY_KEY")
-    if not api_key:
-        raise ValueError(
-            "CDISC Library API key not found. Please set the CDISC_PRIMARY_KEY environment variable."
-        )
-    headers = {"api-key": api_key}
-    return AuthenticatedClient(
-        base_url="https://library.cdisc.org/api", headers=headers, token="dummy"
-    )
 
 def generate_template(
     product: str, version: str, domains: list[str], output_dir: str

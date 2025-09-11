@@ -1,3 +1,10 @@
+"""
+This module provides a client for interacting with the OpenFDA API.
+
+It includes functions for fetching adverse event and drug label data, with
+built-in support for retries with exponential backoff to handle transient
+network issues.
+"""
 import os
 import requests
 import logging
@@ -16,15 +23,36 @@ RETRY_WAIT = wait_exponential(multiplier=1, min=4, max=10)
 RETRY_STOP = stop_after_attempt(5)
 RETRY_ON_EXCEPTION = retry_if_exception_type(requests.exceptions.RequestException)
 
+
 def log_retry(retry_state):
+    """
+    Logs a warning message when a retryable API call is attempted.
+
+    Args:
+        retry_state: The state of the tenacity retry decorator.
+    """
     logger.warning(f"Retrying API call for {retry_state.fn.__name__}, attempt {retry_state.attempt_number}...")
+
 
 @retry(wait=RETRY_WAIT, stop=RETRY_STOP, retry=RETRY_ON_EXCEPTION, before_sleep=log_retry)
 def get_adverse_events(
     drug_name: str, max_results: int = 10, start_date: str = None, end_date: str = None
 ) -> List[Dict[str, Any]]:
     """
-    Fetches adverse events for a given drug from the openFDA API, handling pagination and date filtering.
+    Fetches adverse events for a given drug from the OpenFDA API.
+
+    This function handles pagination and date filtering, and automatically
+    retries on failure.
+
+    Args:
+        drug_name (str): The name of the drug to search for.
+        max_results (int): The maximum number of adverse events to return.
+        start_date (str, optional): The start date for the search (YYYY-MM-DD).
+        end_date (str, optional): The end date for the search (YYYY-MM-DD).
+
+    Returns:
+        List[Dict[str, Any]]: A list of dictionaries, where each dictionary
+                              represents an adverse event record.
     """
     all_results = []
     skip = 0
@@ -63,7 +91,17 @@ def get_adverse_events(
 @retry(wait=RETRY_WAIT, stop=RETRY_STOP, retry=RETRY_ON_EXCEPTION, before_sleep=log_retry)
 def get_drug_label(drug_name: str) -> Dict[str, Any]:
     """
-    Fetches the drug label for a given drug from the openFDA API.
+    Fetches the drug label for a given drug from the OpenFDA API.
+
+    This function searches for the drug by its brand or generic name and
+    returns the first matching label.
+
+    Args:
+        drug_name (str): The brand or generic name of the drug to search for.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the drug label information,
+                        or an empty dictionary if not found.
     """
     url = f"{BASE_URL}/drug/label.json"
     search_query = f'openfda.brand_name:"{drug_name}" OR openfda.generic_name:"{drug_name}"'

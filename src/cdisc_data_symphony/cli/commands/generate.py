@@ -1,3 +1,10 @@
+"""
+This module provides the 'generate' command for the CDISC Data Symphony CLI.
+
+The generate command is a subcommand that groups together various generation
+capabilities, such as creating TFL shells, synthetic data, analysis code,
+and more.
+"""
 import typer
 from rich.console import Console
 import pathlib
@@ -16,7 +23,15 @@ def tfl_shell(
     output_file: pathlib.Path = typer.Option(..., "--output-file", help="Path to the output file")
 ):
     """
-    Generates a TFL shell document.
+    Generates a TFL (Tables, Figures, and Listings) shell document.
+
+    This command calls the generation service to create a TFL shell document
+    based on a given specification.
+
+    Args:
+        spec (str): The TFL specification.
+        output_file (pathlib.Path): The path to the output file where the shell
+                                    document will be saved.
     """
     try:
         generation_service.generate_tfl_shell(spec, output_file)
@@ -35,7 +50,18 @@ def edc_raw_dataset_package(
     output_format: str = typer.Option("csv", "--output-format", help="Output format for datasets (csv, json, xpt)")
 ):
     """
-    Generate an EDC Raw Dataset Package.
+    Generates an EDC (Electronic Data Capture) Raw Dataset Package.
+
+    This command calls the generation service to create a complete package of
+    synthetic datasets for a simulated study.
+
+    Args:
+        num_subjects (int): The number of subjects for the study.
+        therapeutic_area (str): The therapeutic area for the study.
+        domains (List[str]): A list of domains to include.
+        study_story (str): The study story to simulate (e.g., "high_dropout").
+        output_dir (pathlib.Path): The directory to save the generated package.
+        output_format (str): The output format for the datasets (e.g., "csv").
     """
     try:
         generation_service.generate_edc_raw_dataset_package(
@@ -55,7 +81,17 @@ def synthetic_data(
     output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="Directory to save the file."),
 ):
     """
-    Generate synthetic CDISC datasets.
+    Generates synthetic CDISC datasets for a specific domain.
+
+    This command calls the generation service to create a synthetic dataset
+    based on a given CDISC standard, version, and domain.
+
+    Args:
+        standard (str): The standard to generate data for (e.g., "sdtmig").
+        version (str): The version of the standard.
+        domain (str): The domain to generate data for (e.g., "DM").
+        num_subjects (int): The number of subjects.
+        output_dir (pathlib.Path): The directory where the generated file will be saved.
     """
     try:
         file_path = generation_service.generate_synthetic_data(
@@ -75,7 +111,18 @@ def analysis_code(
     output_file: pathlib.Path = typer.Option(..., "--output-file", help="Path to the output file")
 ):
     """
-    Generates analysis code in SAS or R.
+    Generates analysis code in SAS or R for a specific analysis.
+
+    This command calls the generation service to create analysis code based on
+    the specified language, dataset, and analysis type.
+
+    Args:
+        language (str): The language for the generated code ("sas" or "r").
+        dataset (str): The source dataset (e.g., "ADSL").
+        output_type (str): The type of analysis output (e.g., "Demographics").
+        treatment_var (str): The treatment variable (e.g., "TRT01A").
+        output_file (pathlib.Path): The path to the output file where the code
+                                    will be saved.
     """
     try:
         generation_service.generate_analysis_code(language, dataset, output_type, treatment_var, output_file)
@@ -106,7 +153,19 @@ def cdash_crf(
     ),
 ):
     """
-    Generate Word CRF shells from CDISC Library API.
+    Generates Word CRF (Case Report Form) shells from the CDISC Library API.
+
+    This command calls the generation service to create Word documents for
+    CDASH-compliant CRFs, with an option to populate adverse event terms
+    from OpenFDA.
+
+    Args:
+        ig_version (str): The CDASHIG version (e.g., "v2.3").
+        out_dir (pathlib.Path): The directory for the generated Word documents.
+        domains (Optional[List[str]]): An optional whitelist of domains.
+        config_path (pathlib.Path): The path to the configuration file.
+        openfda_drug_name (Optional[str]): Drug name to fetch AEs from OpenFDA.
+        openfda_max_results (int): Max AEs to fetch from OpenFDA.
     """
     try:
         generation_service.generate_cdash_crf(
@@ -126,7 +185,17 @@ def study_protocols(
     output_dir: pathlib.Path = typer.Option("my_protocol", "--output-dir", help="The directory to save the generated protocol documents.")
 ):
     """
-    Generates a study protocol.
+    Generates study protocol documents.
+
+    This command calls the generation service to create study protocol
+    documents based on the provided study parameters.
+
+    Args:
+        therapeutic_area (str): The therapeutic area of the study.
+        treatment_arms (List[str]): A list of treatment arms for the study.
+        duration_weeks (int): The duration of the study in weeks.
+        phase (int): The phase of the study.
+        output_dir (pathlib.Path): The directory to save the generated documents.
     """
     try:
         generation_service.generate_study_protocols(
@@ -145,7 +214,16 @@ def specification_templates(
     output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="The directory to save the generated Excel file.")
 ):
     """
-    Generate Excel-based specification templates for CDISC datasets.
+    Generates Excel-based specification templates for CDISC datasets.
+
+    This command calls the generation service to create Excel specification
+    templates for a given CDISC product, version, and list of domains.
+
+    Args:
+        product (str): The CDISC product (e.g., "sdtmig", "adamig").
+        version (str): The version of the product.
+        domains (List[str]): A list of domains to include in the specification.
+        output_dir (pathlib.Path): The directory to save the generated Excel file.
     """
     try:
         generation_service.generate_specification_templates(product, version, domains, output_dir)
