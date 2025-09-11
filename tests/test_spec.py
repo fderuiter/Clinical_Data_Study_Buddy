@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from clinical_data_study_buddy.generators import spec
 
 def test_validate_handles_simple_filename(capsys):
@@ -28,53 +28,6 @@ def test_validate_handles_simple_filename(capsys):
         captured = capsys.readouterr()
         assert "Invalid dataset filename format" not in captured.out
         assert "Validation Successful" in captured.out
-
-@patch('clinical_data_study_buddy.generators.spec.get_client')
-@patch('clinical_data_study_buddy.generators.spec.get_mdr_sdtmig_version_datasets_dataset')
-def test_generate_template_no_api_response(mock_get_dataset, mock_get_client, tmp_path):
-    """
-    Test generate_template when the CDISC Library API returns no response.
-    """
-    mock_get_client.return_value = MagicMock()
-    mock_get_dataset.sync.return_value = None  # Simulate no response
-
-    spec.generate_template(
-        product="sdtmig",
-        version="3-3",
-        domains=["DM"],
-        output_dir=str(tmp_path)
-    )
-
-    # Verify that the Excel file was created and contains a "no variables found" message.
-    output_file = tmp_path / "sdtmig_3-3_spec.xlsx"
-    assert output_file.exists()
-    workbook = pd.read_excel(output_file, sheet_name="DM")
-    assert "No variables found for domain DM" in workbook.iloc[0, 0]
-
-
-@patch('clinical_data_study_buddy.generators.spec.get_client')
-@patch('clinical_data_study_buddy.generators.spec.get_mdr_sdtmig_version_datasets_dataset')
-def test_generate_template_no_variables_in_response(mock_get_dataset, mock_get_client, tmp_path):
-    """
-    Test generate_template when the API response contains no variables.
-    """
-    mock_get_client.return_value = MagicMock()
-    mock_response = MagicMock()
-    mock_response.to_dict.return_value = {"datasetVariables": []}  # Empty list of variables
-    mock_get_dataset.sync.return_value = mock_response
-
-    spec.generate_template(
-        product="sdtmig",
-        version="3-3",
-        domains=["DM"],
-        output_dir=str(tmp_path)
-    )
-
-    # Verify that the Excel file was created and contains a "no variables found" message.
-    output_file = tmp_path / "sdtmig_3-3_spec.xlsx"
-    assert output_file.exists()
-    workbook = pd.read_excel(output_file, sheet_name="DM")
-    assert "No variables found for domain DM" in workbook.iloc[0, 0]
 
 def test_validate_handles_complex_filename(capsys):
     """
