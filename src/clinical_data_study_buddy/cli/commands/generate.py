@@ -44,6 +44,7 @@ def tfl_shell(
         console.print(f"Successfully generated TFL shell in {output_file}")
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command()
@@ -78,6 +79,7 @@ def edc_raw_dataset_package(
         console.print(f"EDC Raw Dataset Package generated successfully in {output_dir}")
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command()
@@ -108,6 +110,7 @@ def synthetic_data(
         console.print(f"✅  Saved dataset -> {file_path}")
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command()
@@ -137,6 +140,7 @@ def analysis_code(
         console.print(f"Successfully generated {language.upper()} code in {output_file}")
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command()
@@ -182,6 +186,7 @@ def cdash_crf(
         console.print("CDASH CRF generated successfully.")
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command()
@@ -212,6 +217,7 @@ def study_protocols(
         console.print(f"Protocol documents generated in {output_dir}")
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command()
@@ -238,3 +244,4 @@ def specification_templates(
         console.print("Specification templates generated successfully.")
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
+        raise typer.Exit(code=1)

@@ -45,10 +45,9 @@ def render_odm(forms: Sequence[Form], out_dir: Path):
                 DataType=field.datatype,
             )
             if field.range_check:
-                range_check = ODM.RangeCheck(Comparator="EQ")
+                range_check = ODM.RangeCheck(Comparator="EQ", SoftHard="Soft")
                 for check_value in field.range_check:
-                    item = ODM.CheckValue()
-                    item.text = check_value
+                    item = ODM.CheckValue(_content=check_value)
                     range_check.CheckValue.append(item)
                 item_def.RangeCheck.append(range_check)
             mdv.ItemDef.append(item_def)
