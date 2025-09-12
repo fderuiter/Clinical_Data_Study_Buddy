@@ -130,12 +130,25 @@ def generate_dataset(spec_path: str, output_dir: str):
 
         spec_df = pd.read_excel(path, sheet_name=domain)
         fields = []
+
+        # Mapping from CDISC simpleDatatype to FieldDef datatype
+        datatype_mapping = {
+            "char": "text",
+            "num": "float",
+            "date": "date",
+            "datetime": "datetime",
+            "boolean": "boolean",
+            "integer": "integer",
+        }
+
         for _, row in spec_df.iterrows():
+            spec_datatype = str(row.get("Data Type", "")).lower()
+            field_datatype = datatype_mapping.get(spec_datatype, "text")
             fields.append(
                 FieldDef(
                     oid=row["Variable Name"],
                     prompt=row["Variable Label"],
-                    datatype=row["Data Type"],
+                    datatype=field_datatype,
                     cdash_var=row["Variable Name"],
                 )
             )
