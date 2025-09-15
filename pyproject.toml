@@ -12,7 +12,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"
-openapi-python-client = "^0.25"
+openapi-python-client = "^0.26"
 jinja2 = "^3.1"
 pydantic = "^2.7"
 pydantic-settings = "^2.3.4"
