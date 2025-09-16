@@ -16,9 +16,24 @@ from clinical_data_study_buddy.core.models.schema import Form, FieldDef
 
 
 class CrfGen:
-    """A class for harvesting CRF data from the CDISC Library API."""
+    """
+    A class for harvesting CRF data from the CDISC Library API.
+
+    This class provides methods to connect to the CDISC Library API, fetch data
+    for CDASH Implementation Guides, and convert the data into a list of
+    Form objects.
+    """
 
     def __init__(self, api_key: str, ig_filter: Optional[str] = None):
+        """
+        Initializes the CrfGen class.
+
+        Args:
+            api_key (str): The API key for the CDISC Library.
+            ig_filter (Optional[str]): A string to filter the CDASH IG versions.
+                                       Only versions containing this string will
+                                       be processed. Defaults to None.
+        """
         self.api_key = api_key
         self.ig_filter = ig_filter
         self.client = self._get_client()
@@ -27,7 +42,11 @@ class CrfGen:
         """
         Get an authenticated client for the CDISC Library API.
 
-        This method sets up an httpx client with appropriate headers, timeouts, and retries.
+        This method sets up an httpx client with appropriate headers, timeouts,
+        and retries to ensure reliable communication with the API.
+
+        Returns:
+            AuthenticatedClient: An authenticated client for the CDISC Library API.
         """
         transport = httpx.HTTPTransport(retries=5)
         client = AuthenticatedClient(
@@ -47,6 +66,9 @@ class CrfGen:
 
         This method iterates through the CDASH Implementation Guides, their domains,
         and scenarios, fetching the data for each and converting them into Form objects.
+
+        Returns:
+            List[Form]: A list of Form objects representing the harvested CRF data.
         """
         products = get_mdr_products_data_collection.sync(client=self.client)
         cdashig_links = products.additional_properties.get("_links", {}).get("cdashig", [])
@@ -72,6 +94,12 @@ class CrfGen:
 
         This method maps the fields from the API response to the attributes of the
         Form and FieldDef pydantic models.
+
+        Args:
+            data (dict): The API response data for a domain or scenario.
+
+        Returns:
+            Form: A Form object representing the domain or scenario.
         """
         fields = []
         for f in data.get("fields", []):
@@ -96,7 +124,17 @@ def harvest(api_key: str, ig_filter: str | None = None) -> List[Form]:
     """
     A high-level function to pull CDASH IG -> domains -> scenarios and convert to Form objects.
 
-    This function is a convenient wrapper around the CrfGen class.
+    This function is a convenient wrapper around the CrfGen class that simplifies
+    the process of harvesting CRF data from the CDISC Library.
+
+    Args:
+        api_key (str): The API key for the CDISC Library.
+        ig_filter (Optional[str]): A string to filter the CDASH IG versions.
+                                   Only versions containing this string will
+                                   be processed. Defaults to None.
+
+    Returns:
+        List[Form]: A list of Form objects representing the harvested CRF data.
     """
     crfgen = CrfGen(api_key, ig_filter)
     return crfgen.harvest()

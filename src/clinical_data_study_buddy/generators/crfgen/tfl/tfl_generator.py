@@ -10,7 +10,11 @@ from ..exporter.registry import get as get_exporter
 
 class TFLGenerator:
     """
-    Orchestrates the generation of Tables, Figures, and Listings (TFLs).
+    A class for orchestrating the generation of Tables, Figures, and Listings (TFLs).
+
+    This class reads a configuration file, loads the necessary data, creates
+    TFL objects, and then uses registered exporters to generate the final
+    documents in various formats.
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -18,14 +22,16 @@ class TFLGenerator:
         Initializes the TFLGenerator with a configuration dictionary.
 
         Args:
-            config: A dictionary containing the configuration for TFL generation.
-                    Expected keys:
-                    - 'tfls': A list of TFL definitions.
-                    - 'output_dir': The directory to save the generated files.
-                    - 'output_formats': A list of output formats (e.g., 'docx', 'pdf').
-                    - 'data_path': The path to the directory containing synthetic data.
-                    - 'style': Global style options.
+            config (Dict[str, Any]): A dictionary containing the configuration for
+                                     TFL generation. Expected keys include 'tfls',
+                                     'output_dir', 'output_formats', 'data_path',
+                                     and 'style'.
+
+        Raises:
+            ValueError: If the 'tfls' key is missing in the config.
         """
+        if "tfls" not in config:
+            raise ValueError("Configuration must contain a 'tfls' key.")
         self.tfls_config = config.get("tfls", [])
         self.output_dir = Path(config.get("output_dir", "artefacts/tfls"))
         self.output_formats = config.get("output_formats", ["docx"])
@@ -34,9 +40,12 @@ class TFLGenerator:
         self.tfls: List[TFL] = []
         self.data: Dict[str, pd.DataFrame] = {}
 
-    def _load_data(self):
+    def _load_data(self) -> None:
         """
-        Loads synthetic data from CSV files.
+        Loads synthetic data from CSV files into a dictionary of pandas DataFrames.
+
+        The data is loaded from the directory specified in the `data_path`
+        attribute of the configuration.
         """
         if self.data_path:
             data_dir = Path(self.data_path)
@@ -47,9 +56,13 @@ class TFLGenerator:
             else:
                 print(f"Warning: Data path '{self.data_path}' is not a directory.")
 
-    def _create_tfl_objects(self):
+    def _create_tfl_objects(self) -> None:
         """
-        Creates TFL objects from the configuration.
+        Creates TFL objects (Table, Figure, Listing) from the configuration.
+
+        This method iterates through the TFL definitions in the configuration,
+        instantiates the appropriate TFL objects, and populates them with
+        data and styles.
         """
         for tfl_config in self.tfls_config:
             tfl_type = tfl_config.get("type")
@@ -72,9 +85,12 @@ class TFLGenerator:
             else:
                 print(f"Warning: Unknown TFL type '{tfl_type}'. Skipping.")
 
-    def generate(self):
+    def generate(self) -> None:
         """
-        Generates the TFLs based on the configuration.
+        Generates the TFLs based on the loaded configuration.
+
+        This is the main method that orchestrates the entire TFL generation
+        process, from loading data to exporting the final documents.
         """
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self._load_data()

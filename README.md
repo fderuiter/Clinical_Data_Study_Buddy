@@ -6,23 +6,36 @@ Clinical Data Study Buddy is a comprehensive suite of tools designed to streamli
 
 ## Features
 
-*   **CRF Generation**: Generate Case Report Forms (CRFs) in various formats (e.g., PDF, DOCX, CSV) from a specification.
-*   **Synthetic Data Generation**: Create synthetic datasets for testing and validation purposes.
-*   **Analysis Code Generation**: Generate analysis code (e.g., SAS, R) for statistical analysis.
-*   **Study Protocol Generation**: Create study protocols from a template.
-*   **Reviewer's Guides**: Generate Study Data Reviewer's Guides (SDRG) and Analysis Data Reviewer's Guides (ADRG).
-*   **OpenFDA Integration**: Integrate with the OpenFDA API to fetch data and generate reports.
-*   **CLI and Web UI**: A command-line interface (CLI) for power users and a web-based user interface (UI) for ease of use.
+*   **Standards-Based Artifact Generation**:
+    *   **CRF Generation**: Generate Case Report Forms (CRFs) in various formats (e.g., PDF, DOCX, CSV, RTF, XML) from CDISC standards.
+    *   **Specification Templates**: Create Excel-based specification templates for CDISC datasets.
+    *   **Reviewer's Guides**: Generate Study Data Reviewer's Guides (SDRG) and Analysis Data Reviewer's Guides (ADRG).
+    *   **Study Protocols**: Create comprehensive study protocols from a template, including Gantt charts for timelines.
+*   **Data Generation and Integration**:
+    *   **Synthetic Data Generation**: Create synthetic datasets for testing and validation purposes based on CDISC standards or specification files.
+    *   **EDC Raw Dataset Packages**: Generate complete packages of synthetic datasets for simulated studies, including `define.xml`.
+    *   **OpenFDA Integration**: Integrate with the OpenFDA API to fetch adverse event and drug label data to enrich generated artifacts.
+*   **Analysis and Reporting**:
+    *   **Analysis Code Generation**: Generate analysis code in SAS or R for common clinical trial analyses like demographic tables, vital signs, and TEAE summaries.
+    *   **TFL Shell Generation**: Create shell documents for Tables, Figures, and Listings (TFLs).
+*   **User Interfaces**:
+    *   **Command-Line Interface (CLI)**: A powerful and scriptable CLI for all functionalities, built with Typer.
+    *   **Web User Interface (UI)**: An intuitive web-based UI for key features, built with FastAPI.
 
 ## Architecture Overview
 
-The project is organized into several key modules:
+The project is architected to be modular and extensible, with a clear separation of concerns. The main components are:
 
-*   `src/clinical_data_study_buddy/core`: Contains the core business logic and services, such as the `GenerationService` and `DownloadService`.
-*   `src/clinical_data_study_buddy/generators`: Contains the logic for generating the various artifacts. Each generator is responsible for a specific type of output (e.g., `CRFGenerator`, `DataGenerator`).
-*   `src/clinical_data_study_buddy/cli`: Implements the command-line interface using Typer. Each command is organized into its own subcommand.
-*   `src/clinical_data_study_buddy/api`: Contains the REST API, built with FastAPI. This is currently used for the OpenFDA integration.
-*   `src/clinical_data_study_buddy/web`: Contains the web-based user interface, also built with FastAPI and Jinja2 templates.
+*   `src/clinical_data_study_buddy/`: The main application package.
+    *   `core/`: Contains the core business logic and high-level services that orchestrate the generation and download processes.
+    *   `generators/`: Houses the specific logic for generating the various artifacts. Each generator is responsible for a specific type of output (e.g., `CRFGenerator`, `DataGenerator`, `TFLShellGenerator`). This is where the main "work" of the application happens.
+    *   `services/`: Provides a layer of services that abstract away lower-level details, such as interacting with the CDISC Library API or the local file system.
+    *   `cli/`: Implements the command-line interface using Typer. Each command is organized into its own subcommand, making the CLI easy to use and extend.
+    *   `web/`: Contains the web-based user interface, built with FastAPI and Jinja2 templates. It provides a user-friendly way to access the application's features.
+    *   `api/`: Contains a REST API, also built with FastAPI, which is currently used for the OpenFDA integration.
+*   `src/cdisc_library_client/`: A generated Python client for the CDISC Library API. See the section below for more details.
+*   `templates/`: Contains Jinja2 templates used for generating documents like CRFs and study protocols.
+*   `scripts/`: Includes utility scripts for development tasks, such as regenerating the CDISC Library client.
 
 ## Installation
 
@@ -124,6 +137,20 @@ Here are some examples of how to use the CLI:
     ```bash
     poetry run cdsb sdrg generate --config examples/study_config.json --out sdrg.docx
     ```
+
+## CDISC Library Client
+
+The `src/cdisc_library_client` directory contains a Python client for the CDISC Library API. This client is auto-generated from the OpenAPI specification file located at `docs/openapi/cdisc-library.json` using the `openapi-python-client` tool.
+
+### Regenerating the Client
+
+If you make changes to the OpenAPI specification, you will need to regenerate the client. You can do this by running the following script from the root of the repository:
+
+```bash
+poetry run python scripts/generate_client.py
+```
+
+This script will update the client code in `src/cdisc_library_client` to reflect the changes in the OpenAPI specification.
 
 ## Contributing
 

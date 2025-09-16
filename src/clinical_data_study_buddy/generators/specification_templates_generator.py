@@ -14,9 +14,11 @@ class SpecificationTemplatesGenerator:
 
     This class fetches metadata from the CDISC Library for a given product and version,
     and then generates an Excel spreadsheet that outlines the specification for the
-    selected domains.
+    selected domains. The templates are useful for defining study-specific
+    requirements and for validating datasets.
     """
-    def __init__(self, product, version, domains, output_dir):
+
+    def __init__(self, product: str, version: str, domains: list, output_dir: str):
         """
         Initializes the SpecificationTemplatesGenerator.
 
@@ -31,13 +33,16 @@ class SpecificationTemplatesGenerator:
         self.domains = domains
         self.output_dir = output_dir
 
-    def generate(self):
+    def generate(self) -> None:
         """
         Generates the Excel-based specification template.
 
         This method fetches the necessary data from the CDISC Library and creates
         an Excel workbook with a separate sheet for each specified domain,
         detailing the variables and their properties.
+
+        Raises:
+            ValueError: If the CDISC Library API key is not set.
         """
         print(f"Generating Excel specification for {self.product} {self.version}...")
         api_key = get_api_key()

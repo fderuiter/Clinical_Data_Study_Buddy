@@ -1,1 +1,3 @@
-# This file makes the openfda_client directory a Python package.
+"""
+This package provides a client for interacting with the OpenFDA API.
+"""

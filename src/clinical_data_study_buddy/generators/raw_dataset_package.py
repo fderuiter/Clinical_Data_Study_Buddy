@@ -1,3 +1,7 @@
+"""
+This module provides a function for generating a raw dataset package in the
+form of a zip file.
+"""
 import zipfile
 from pathlib import Path
 import pandas as pd
@@ -7,6 +11,10 @@ import tempfile
 def generate_raw_dataset_package(domains: dict[str, pd.DataFrame], output_dir: Path):
     """
     Generates a raw dataset package as a zip file.
+
+    This function takes a dictionary of pandas DataFrames, saves each DataFrame
+    as a CSV file in a temporary directory, and then packages all the CSV files
+    into a single zip archive.
 
     Args:
         domains (dict[str, pd.DataFrame]): A dictionary where keys are domain names

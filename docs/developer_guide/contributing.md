@@ -1,6 +1,6 @@
 # Contributing
 
-We welcome contributions to the CDISC Generators project. This guide will help you get your development environment set up.
+We welcome contributions to the Clinical Data Study Buddy project. This guide will help you get your development environment set up.
 
 ## Development Setup
 
@@ -15,7 +15,7 @@ Run the setup script from your shell:
 ```
 
 The script will:
-1.  Check for `python3` (3.11+) and `poetry`.
+1.  Check for `python3` (3.12+) and `poetry`.
 2.  If they are not found, it will attempt to install them using the system's package manager (`apt`, `yum`, or `brew`).
 3.  Install all project dependencies.
 4.  Set up pre-commit hooks.
@@ -30,7 +30,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 ```
 
 The script will:
-1.  Check for Python 3.11+ and Poetry.
+1.  Check for Python 3.12+ and Poetry.
 2.  If they are not found, it will download and install them. This may require administrator privileges.
 3.  Install all project dependencies.
 4.  Set up pre-commit hooks.
@@ -51,19 +51,3 @@ For the most consistent and reliable setup, you can use the provided development
 3.  VS Code will build the Docker image and start the development container. This may take a few minutes on the first run.
 
 Once inside the dev container, you'll have a fully configured environment with all tools and dependencies ready to go. You can use the integrated terminal in VS Code to run tests, scripts, etc.
-
-## Updating the CDISC Library API Client
-
-This project includes a generated Python client for the CDISC Library API located in `src/cdisc_library_client`. This client is generated from the official CDISC Library OpenAPI specification.
-
-To update the client to the latest version, you can use the following command:
-
-```bash
-make update-sdk
-```
-
-This command will:
-1.  Download the latest OpenAPI specification from the official CDISC website.
-2.  Regenerate the Python client in `src/cdisc_library_client`.
-
-It is recommended to run this command periodically to ensure the client is up-to-date with any changes to the CDISC Library API.

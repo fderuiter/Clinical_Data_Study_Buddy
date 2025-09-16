@@ -1,4 +1,7 @@
-# This file will contain the logic for generating figures.
+"""
+This module defines the Figure class for representing figures in a
+clinical study report.
+"""
 from .TFL import TFL
 
 class Figure(TFL):

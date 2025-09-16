@@ -1,4 +1,7 @@
-# This file will contain the logic for generating listings.
+"""
+This module defines the Listing class for representing listings in a
+clinical study report.
+"""
 from .TFL import TFL
 
 class Listing(TFL):

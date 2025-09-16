@@ -1,4 +1,7 @@
-# This file will contain the logic for generating tables.
+"""
+This module defines the Table class for representing tables in a
+clinical study report.
+"""
 from .TFL import TFL
 
 class Table(TFL):

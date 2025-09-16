@@ -6,29 +6,32 @@ This project includes a generated Python client for the CDISC Library API, locat
 
 To use the client, you will need a CDISC Library API key. You can get one from the [CDISC Library website](https://library.cdisc.org/).
 
-Once you have your API key, you can create an authenticated client like this:
+The recommended way to configure the API key is to set the `CDISC_PRIMARY_KEY` environment variable. You can do this by creating a `.env` file in the root of the project:
+
+```
+CDISC_PRIMARY_KEY="your-api-key-here"
+```
+
+The application provides a utility function, `get_client`, which automatically creates an authenticated client with the necessary settings.
 
 ```python
-from cdisc_library_client.client import AuthenticatedClient
+from clinical_data_study_buddy.services.cdisc_library_service import get_client
 
-api_key = "your-api-key-here"
-client = AuthenticatedClient(
-    base_url="https://library.cdisc.org/api",
-    token=api_key,
-)
+client = get_client()
 ```
 
 ## Making API Calls
 
-The client is organized into different modules based on the API endpoints. For example, to get a list of CDASHIG versions, you can use the `get_mdr_cdashig_version` function from the `cdash_implementation_guide_cdashig` module:
+The client is organized into different modules based on the tags in the OpenAPI specification. For example, to get a list of CDASHIG versions, you can use the `get_mdr_cdashig_version` function from the `cdash_implementation_guide_cdashig` module:
 
 ```python
 from cdisc_library_client.api.cdash_implementation_guide_cdashig import get_mdr_cdashig_version
+from clinical_data_study_buddy.services.cdisc_library_service import get_client
 
-# Assuming you have an authenticated client
+client = get_client()
 response = get_mdr_cdashig_version.sync(client=client, version="v2.3")
 
-# The response is a dictionary containing the API response
+# The response is a Pydantic model representing the API response
 print(response)
 ```
 
@@ -45,8 +48,8 @@ Here's how you can use it:
 ```python
 from cdisc_library_client.harvest import harvest
 
-api_key = "your-api-key-here"
-forms = harvest(api_key, ig_filter="2.3")
+# The API key is read from the environment variable
+forms = harvest(ig_filter="2.3")
 ```
 
 This is the recommended way to get CRF data from the CDISC Library, as it handles all the details of pagination and data parsing for you.

@@ -1,1 +1,3 @@
-# This file makes the 'tfl' directory a Python package.
+"""
+This package contains modules for generating Tables, Figures, and Listings (TFLs).
+"""

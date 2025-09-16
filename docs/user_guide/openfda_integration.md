@@ -4,10 +4,10 @@ This project includes features to integrate data from [open.fda.gov](https://ope
 
 ## Populating CRFs with Adverse Event Data
 
-You can automatically populate the Adverse Events (AE) CRF with suggested terms for a specific drug. The `generate-cdash-crf` command has a new option to support this:
+You can automatically populate the Adverse Events (AE) CRF with suggested terms for a specific drug. The `generate cdash-crf` command has a new option to support this:
 
 ```bash
-poetry run cdisc generate-cdash-crf \
+poetry run cdsb generate cdash-crf \
     --ig-version v2.3 \
     --domains AE \
     --openfda-drug-name "Aspirin" \
@@ -24,7 +24,7 @@ For more advanced queries, you can use the `openfda populate-crf` command. This 
 
 Fetch adverse events for a drug and save as JSON:
 ```bash
-poetry run cdisc openfda populate-crf \
+poetry run cdsb openfda populate-crf \
     --drug-name "Ibuprofen" \
     --domain AE \
     --max-results 100 \
@@ -33,7 +33,7 @@ poetry run cdisc openfda populate-crf \
 
 Fetch drug label information for a drug:
 ```bash
-poetry run cdisc openfda populate-crf \
+poetry run cdsb openfda populate-crf \
     --drug-name "Tylenol" \
     --domain LABEL
 ```

@@ -4,10 +4,10 @@ This project can also generate study protocol documents. This feature is useful 
 
 ## Quickstart
 
-To generate a study protocol, use the `protocol generate` command:
+To generate a study protocol, use the `generate study-protocols` command:
 
 ```bash
-poetry run cdisc protocol generate \
+poetry run cdsb generate study-protocols \
     --therapeutic-area "Oncology" \
     --treatment-arm "Drug A + Placebo" \
     --treatment-arm "Drug B + Placebo" \

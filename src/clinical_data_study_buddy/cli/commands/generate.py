@@ -18,6 +18,21 @@ generate_app = typer.Typer()
 
 
 def validate_num_subjects(value: int):
+    """
+    A callback function for Typer to validate the number of subjects.
+
+    This function ensures that the provided number of subjects is within the
+    allowed range of 10 to 200.
+
+    Args:
+        value (int): The number of subjects to validate.
+
+    Returns:
+        int: The validated number of subjects.
+
+    Raises:
+        typer.BadParameter: If the number of subjects is outside the allowed range.
+    """
     if value < 10 or value > 200:
         raise typer.BadParameter("Number of subjects must be between 10 and 200")
     return value

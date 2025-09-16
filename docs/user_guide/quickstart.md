@@ -4,36 +4,30 @@ Follow these steps to set up the project and generate your first set of CRF arti
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/fderuiter/cdisc_generators.git
-    cd cdisc_generators
+    git clone https://github.com/fderuiter/Clinical_Data_Study_Buddy.git
+    cd Clinical_Data_Study_Buddy
     ```
 
 2.  **Set up the environment:**
-    This project uses Poetry for dependency management. Make sure you have Python 3.11+ and Poetry installed.
+    This project uses Poetry for dependency management. Make sure you have Python 3.12+ and Poetry installed.
     ```bash
-    poetry install
+    ./setup.sh
     ```
 
 3.  **Configure your CDISC Library API Key:**
-    You will need a primary subscription key from the CDISC Library. Once you have it, export it as an environment variable:
-    ```bash
-    export CDISC_PRIMARY_KEY="your-api-key-here"
+    You will need a primary subscription key from the CDISC Library. Once you have it, create a `.env` file in the root of the project with the following content:
+    ```
+    CDISC_PRIMARY_KEY="your-api-key-here"
     ```
 
-4.  **Fetch the canonical CRF data:**
-    This command crawls the CDISC Library and creates a canonical `crf.json` file.
+4.  **Generate CDASH CRF documents:**
+    This command generates Word CRF shells from the CDISC Library API for a specified CDASH-IG version.
     ```bash
-    poetry run cdisc build-canonical -o crf.json
+    poetry run cdsb generate cdash-crf --ig-version "v2.3"
     ```
 
-5.  **Generate all CRF artifacts:**
-    This command reads the `crf.json` file and generates the CRF documents in multiple formats (Markdown, DOCX, CSV, etc.) inside the `artefacts/` directory.
+5.  **View the generated files:**
+    The generated artifacts are now in the `crfs/` directory. You can open them to see the results. For example, on macOS, you could run:
     ```bash
-    poetry run cdisc build --source crf.json --outdir artefacts
-    ```
-
-6.  **View the generated files:**
-    The generated artifacts are now in the `artefacts/` directory. You can open them to see the results. For example, on macOS, you could run:
-    ```bash
-    open artefacts/VS.docx
+    open crfs/AE.docx
     ```

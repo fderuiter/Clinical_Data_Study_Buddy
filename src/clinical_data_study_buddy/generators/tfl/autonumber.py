@@ -3,16 +3,34 @@ from .models import TFL, TFLSpec
 
 class AutoNumberer:
     """
-    Handles automatic numbering of TFLs, filenames, and bookmarks.
+    A class for handling the automatic numbering of TFLs, filenames, and bookmarks.
+
+    This class takes a TFL specification and provides methods for renumbering
+    TFLs according to a specified prefix and grouping logic.
     """
 
     def __init__(self, spec: TFLSpec):
+        """
+        Initializes the AutoNumberer.
+
+        Args:
+            spec (TFLSpec): The TFL specification object to be processed.
+        """
         self.spec = spec
         self.tfl_map: Dict[str, TFL] = {tfl.shell_id: tfl for tfl in spec.tfls}
 
     def get_tfl_by_id(self, shell_id: str) -> TFL:
         """
         Retrieves a TFL by its shell ID.
+
+        Args:
+            shell_id (str): The shell ID of the TFL to retrieve.
+
+        Returns:
+            TFL: The TFL object with the specified shell ID.
+
+        Raises:
+            ValueError: If no TFL with the given shell ID is found.
         """
         if shell_id not in self.tfl_map:
             raise ValueError(f"TFL with shell_id '{shell_id}' not found in the spec.")
@@ -23,7 +41,8 @@ class AutoNumberer:
         Assigns sequential numbers to all TFLs in the specification.
 
         This method implements a simple version of the T14.x.y numbering rule,
-        renumbering all TFLs sequentially.
+        grouping TFLs by their major number and renumbering them sequentially
+        within each group.
 
         Args:
             prefix (str): The prefix to use for the numbering (e.g., "T14").
