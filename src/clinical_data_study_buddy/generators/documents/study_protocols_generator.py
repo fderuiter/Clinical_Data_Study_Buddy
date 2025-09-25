@@ -2,8 +2,13 @@
 This module contains the StudyProtocolsGenerator class, which is responsible for
 generating study protocol documents in Markdown format.
 """
+
 import os
-from clinical_data_study_buddy.generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
+
+from clinical_data_study_buddy.generators.protogen.protocol import (
+    StudyProtocol,
+    generate_protocol_markdown,
+)
 
 
 class StudyProtocolsGenerator:
@@ -14,7 +19,10 @@ class StudyProtocolsGenerator:
     uses the `generate_protocol_markdown` function to generate the final
     document.
     """
-    def __init__(self, therapeutic_area, treatment_arms, duration_weeks, phase, output_dir):
+
+    def __init__(
+        self, therapeutic_area, treatment_arms, duration_weeks, phase, output_dir
+    ):
         """
         Initializes the StudyProtocolsGenerator.
 

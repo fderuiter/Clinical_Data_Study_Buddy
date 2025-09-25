@@ -2,6 +2,7 @@
 This module provides the functionality to export CRF (Case Report Form) data
 to a PDF file. It leverages the DOCX exporter and pandoc for the conversion.
 """
+
 import tempfile
 from pathlib import Path
 from typing import Sequence
@@ -9,6 +10,7 @@ from typing import Sequence
 import pypandoc
 
 from clinical_data_study_buddy.core.models.schema import Form
+
 from .docx import export_docx
 from .registry import register
 
@@ -29,6 +31,8 @@ def export_pdf(forms: Sequence[Form], outdir: Path, style: dict = None) -> None:
     """
     with tempfile.NamedTemporaryFile(suffix=".docx") as tmp:
         docx_path = tmp.name
-        export_docx(forms, Path(docx_path).parent, style, output_filename=Path(docx_path).name)
+        export_docx(
+            forms, Path(docx_path).parent, style, output_filename=Path(docx_path).name
+        )
         pdf_path = outdir / f"{forms[0].id}.pdf"
         pypandoc.convert_file(str(docx_path), "pdf", outputfile=str(pdf_path))

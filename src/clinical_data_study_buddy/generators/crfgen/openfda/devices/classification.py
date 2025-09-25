@@ -1,11 +1,13 @@
 """
 This module provides access to the OpenFDA device classification endpoint.
 """
+
 from typing import List, Optional
 
 from ..client import OpenFDAClient
 from ..models import Classification
 from ..query import paging_query
+
 
 class ClassificationAccessor:
     """
@@ -24,7 +26,12 @@ class ClassificationAccessor:
         """
         self.client = client
 
-    async def fetch(self, search: Optional[str] = None, limit: Optional[int] = None, skip: Optional[int] = None) -> List[Classification]:
+    async def fetch(
+        self,
+        search: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+    ) -> List[Classification]:
         """
         Fetches device classification records from the openFDA API.
 

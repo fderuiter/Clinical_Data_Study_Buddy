@@ -2,6 +2,7 @@
 This module provides the functionality to export CRF (Case Report Form) data
 to a CSV file.
 """
+
 import csv
 from pathlib import Path
 from typing import Sequence

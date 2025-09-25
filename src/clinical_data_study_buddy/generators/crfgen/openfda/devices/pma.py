@@ -1,11 +1,13 @@
 """
 This module provides access to the OpenFDA Premarket Approval (PMA) endpoint.
 """
+
 from typing import List, Optional
 
 from ..client import OpenFDAClient
 from ..models import PMA
 from ..query import paging_query
+
 
 class PMAAccessor:
     """
@@ -24,7 +26,12 @@ class PMAAccessor:
         """
         self.client = client
 
-    async def fetch(self, search: Optional[str] = None, limit: Optional[int] = None, skip: Optional[int] = None) -> List[PMA]:
+    async def fetch(
+        self,
+        search: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+    ) -> List[PMA]:
         """
         Fetches PMA records from the openFDA API.
 

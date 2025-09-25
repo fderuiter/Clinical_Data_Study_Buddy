@@ -1,6 +1,7 @@
 """
 This module provides services for generating standardized filenames and bookmarks.
 """
+
 from clinical_data_study_buddy.generators.tfl.models import TFL
 
 

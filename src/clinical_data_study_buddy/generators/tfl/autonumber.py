@@ -1,5 +1,7 @@
-from typing import List, Dict
+from typing import Dict
+
 from .models import TFL, TFLSpec
+
 
 class AutoNumberer:
     """
@@ -34,13 +36,13 @@ class AutoNumberer:
         tfl_groups = {}
         # Group TFLs by major number
         for tfl in self.spec.tfls:
-            major = -1 # Default group for invalid shell_ids
+            major = -1  # Default group for invalid shell_ids
             try:
-                parts = tfl.shell_id.split('.')
+                parts = tfl.shell_id.split(".")
                 if len(parts) == 3:
                     major = int(parts[1])
             except (ValueError, IndexError):
-                pass # Keep major = -1
+                pass  # Keep major = -1
 
             if major not in tfl_groups:
                 tfl_groups[major] = []

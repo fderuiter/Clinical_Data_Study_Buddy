@@ -4,11 +4,14 @@ This module provides the 'download' command for the Clinical Data Study Buddy CL
 The download command is used to fetch and save various CDISC standards from the
 CDISC Library.
 """
-import typer
-from rich.console import Console
+
 import pathlib
-from dotenv import load_dotenv
 import sys
+
+import typer
+from dotenv import load_dotenv
+from rich.console import Console
+
 from clinical_data_study_buddy.core import download_service
 
 load_dotenv()
@@ -18,9 +21,15 @@ download_app = typer.Typer()
 
 @download_app.command()
 def standard(
-    standard: str = typer.Option(..., "--standard", "-s", help="The standard to download (e.g., sdtmig, adamig)."),
-    version: str = typer.Option(..., "--version", "-v", help="The version of the standard (e.g., 3-3)."),
-    output_dir: pathlib.Path = typer.Option(".", "--output-dir", "-o", help="The directory to save the downloaded files.")
+    standard: str = typer.Option(
+        ..., "--standard", "-s", help="The standard to download (e.g., sdtmig, adamig)."
+    ),
+    version: str = typer.Option(
+        ..., "--version", "-v", help="The version of the standard (e.g., 3-3)."
+    ),
+    output_dir: pathlib.Path = typer.Option(
+        ".", "--output-dir", "-o", help="The directory to save the downloaded files."
+    ),
 ):
     """
     Downloads a specified CDISC data standard from the CDISC Library.

@@ -1,16 +1,19 @@
 import json
 from pathlib import Path
+
 from typer.testing import CliRunner
+
 from clinical_data_study_buddy.cli.main import app
 
 runner = CliRunner()
+
 
 def test_download_standard(mocker):
     """
     Tests that the download-standard command runs successfully
     and creates the expected output file.
     """
-    mock_get_client = mocker.patch(
+    mocker.patch(
         "clinical_data_study_buddy.core.download_service.get_client"
     )
     mock_sdtmig_version = {
@@ -19,15 +22,15 @@ def test_download_standard(mocker):
             "datasets": [{"title": "DM"}],
         }
     }
-    mock_get_sdtmig_version = mocker.patch(
+    mocker.patch(
         "cdisc_library_client.api.sdtm_implementation_guide_sdtmig.get_mdr_sdtmig_version.sync",
         return_value=mock_sdtmig_version,
     )
-    mock_get_sdtmig_version_classes = mocker.patch(
+    mocker.patch(
         "cdisc_library_client.api.sdtm_implementation_guide_sdtmig.get_mdr_sdtmig_version_classes.sync",
         return_value={"name": "Events"},
     )
-    mock_get_sdtmig_version_datasets = mocker.patch(
+    mocker.patch(
         "cdisc_library_client.api.sdtm_implementation_guide_sdtmig.get_mdr_sdtmig_version_datasets.sync",
         return_value={"name": "DM"},
     )

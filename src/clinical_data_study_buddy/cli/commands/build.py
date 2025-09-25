@@ -4,25 +4,28 @@ This module provides the 'build' command for the Clinical Data Study Buddy CLI.
 The build command is used to fetch canonical CRF data from the CDISC Library
 and to generate various CRF artifacts from a canonical JSON file.
 """
-import typer
-from rich.console import Console
-import pathlib
-from typing import List, Optional
-from dotenv import load_dotenv
+
 import json
+import pathlib
 import sys
-from cdisc_library_client.harvest import harvest
-from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
+from typing import List, Optional
+
+import typer
+from dotenv import load_dotenv
+from rich.console import Console
+
 import clinical_data_study_buddy.generators.crfgen.exporter.csv  # noqa
 import clinical_data_study_buddy.generators.crfgen.exporter.docx  # noqa
 import clinical_data_study_buddy.generators.crfgen.exporter.latex  # noqa
-import clinical_data_study_buddy.generators.crfgen.exporter.pdf  # noqa
-import clinical_data_study_buddy.generators.crfgen.exporter.rtf  # noqa
 import clinical_data_study_buddy.generators.crfgen.exporter.markdown  # noqa
 import clinical_data_study_buddy.generators.crfgen.exporter.odm  # noqa
+import clinical_data_study_buddy.generators.crfgen.exporter.pdf  # noqa
+import clinical_data_study_buddy.generators.crfgen.exporter.rtf  # noqa
 import clinical_data_study_buddy.generators.crfgen.exporter.xlsx  # noqa
-from clinical_data_study_buddy.generators.crfgen.exporter import registry as reg
+from cdisc_library_client.harvest import harvest
 from clinical_data_study_buddy.core.models.schema import Form
+from clinical_data_study_buddy.generators.crfgen.exporter import registry as reg
+from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
 
 load_dotenv()
 console = Console()
@@ -31,8 +34,12 @@ build_app = typer.Typer()
 
 @build_app.command()
 def build_canonical(
-    out: pathlib.Path = typer.Option("crf.json", "--out", "-o", help="Output file path"),
-    version: Optional[str] = typer.Option(None, "--version", "-v", help="IG version substring (optional)")
+    out: pathlib.Path = typer.Option(
+        "crf.json", "--out", "-o", help="Output file path"
+    ),
+    version: Optional[str] = typer.Option(
+        None, "--version", "-v", help="IG version substring (optional)"
+    ),
 ):
     """
     Fetches canonical CRF data from the CDISC Library and saves it as a JSON file.
@@ -60,9 +67,15 @@ def build_canonical(
 
 @build_app.command()
 def build(
-    source: pathlib.Path = typer.Option("crf.json", "--source", "-s", help="Path to the canonical JSON"),
-    outdir: pathlib.Path = typer.Option("artefacts", "--outdir", "-o", help="Directory to emit artifacts"),
-    formats: Optional[List[str]] = typer.Option(None, "--formats", "-f", help="Which formats to generate")
+    source: pathlib.Path = typer.Option(
+        "crf.json", "--source", "-s", help="Path to the canonical JSON"
+    ),
+    outdir: pathlib.Path = typer.Option(
+        "artefacts", "--outdir", "-o", help="Directory to emit artifacts"
+    ),
+    formats: Optional[List[str]] = typer.Option(
+        None, "--formats", "-f", help="Which formats to generate"
+    ),
 ):
     """
     Generates various CRF artifacts from a canonical CRF JSON file.

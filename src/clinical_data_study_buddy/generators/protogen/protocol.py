@@ -3,11 +3,13 @@ This module provides classes and functions for generating study protocol
 documents in Markdown format. It includes a Pydantic model for the study
 protocol and a function to render the protocol using a Jinja2 template.
 """
-from pydantic import BaseModel
-from typing import List
-from jinja2 import Environment, FileSystemLoader
+
 import os
 from datetime import date, timedelta
+from typing import List
+
+from jinja2 import Environment, FileSystemLoader
+from pydantic import BaseModel
 
 from clinical_data_study_buddy.generators.protogen.gantt import generate_gantt_chart
 
@@ -22,6 +24,7 @@ class StudyProtocol(BaseModel):
         duration_weeks (int): The duration of the study in weeks.
         phase (int): The phase of the clinical trial.
     """
+
     therapeutic_area: str
     treatment_arms: List[str]
     duration_weeks: int
@@ -50,9 +53,25 @@ def generate_protocol_markdown(protocol: StudyProtocol, output_dir: str):
     # Create some sample tasks for the Gantt chart
     start_date = date.today()
     tasks = [
-        {'name': 'Startup', 'start': start_date.isoformat(), 'end': (start_date + timedelta(weeks=4)).isoformat()},
-        {'name': 'Treatment', 'start': (start_date + timedelta(weeks=4)).isoformat(), 'end': (start_date + timedelta(weeks=protocol.duration_weeks)).isoformat()},
-        {'name': 'Follow-up', 'start': (start_date + timedelta(weeks=protocol.duration_weeks)).isoformat(), 'end': (start_date + timedelta(weeks=protocol.duration_weeks + 4)).isoformat()},
+        {
+            "name": "Startup",
+            "start": start_date.isoformat(),
+            "end": (start_date + timedelta(weeks=4)).isoformat(),
+        },
+        {
+            "name": "Treatment",
+            "start": (start_date + timedelta(weeks=4)).isoformat(),
+            "end": (start_date + timedelta(weeks=protocol.duration_weeks)).isoformat(),
+        },
+        {
+            "name": "Follow-up",
+            "start": (
+                start_date + timedelta(weeks=protocol.duration_weeks)
+            ).isoformat(),
+            "end": (
+                start_date + timedelta(weeks=protocol.duration_weeks + 4)
+            ).isoformat(),
+        },
     ]
     generate_gantt_chart(tasks, gantt_chart_path)
 

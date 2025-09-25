@@ -2,14 +2,21 @@
 This module contains the EDCRawDatasetPackageGenerator class, which is responsible for
 generating a complete raw dataset package for a clinical study.
 """
+
 import os
 import pathlib
 from typing import List
+
 import pandas as pd
+
 from cdisc_library_client.harvest import harvest
 from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
 from clinical_data_study_buddy.generators.data_generator import DataGenerator
-from clinical_data_study_buddy.generators.dataset_helpers import generate_define_xml, package_datasets, apply_study_story
+from clinical_data_study_buddy.generators.dataset_helpers import (
+    apply_study_story,
+    generate_define_xml,
+    package_datasets,
+)
 
 
 class EDCRawDatasetPackageGenerator:
@@ -20,6 +27,7 @@ class EDCRawDatasetPackageGenerator:
     applies a study story, generates a define.xml file, and packages everything
     into a zip archive.
     """
+
     def __init__(
         self,
         num_subjects: int,
@@ -87,7 +95,13 @@ class EDCRawDatasetPackageGenerator:
             print(f"{domain} dataset generated successfully.")
 
         if self.study_story != "none":
-            apply_study_story(self.study_story, temp_dir, self.num_subjects, self.domains, self.output_format)
+            apply_study_story(
+                self.study_story,
+                temp_dir,
+                self.num_subjects,
+                self.domains,
+                self.output_format,
+            )
 
         generate_define_xml(temp_dir, self.domains)
         package_datasets(temp_dir, self.output_dir)

@@ -1,10 +1,13 @@
 import pathlib
-from typer.testing import CliRunner
-import pytest
-from clinical_data_study_buddy.cli.main import app
 from unittest.mock import patch
 
+import pytest
+from typer.testing import CliRunner
+
+from clinical_data_study_buddy.cli.main import app
+
 runner = CliRunner()
+
 
 @pytest.mark.parametrize("fmt", [["md"], ["csv"], ["md", "csv"]])
 @patch("clinical_data_study_buddy.cli.commands.build.get_api_key")
@@ -19,7 +22,7 @@ def test_build_cli(mock_harvest, mock_get_api_key, tmp_path: pathlib.Path, fmt):
         "--source",
         "tests/.data/sample_crf.json",
         "--outdir",
-        str(tmp_path)
+        str(tmp_path),
     ]
     for f in fmt:
         cmd.extend(["--formats", f])

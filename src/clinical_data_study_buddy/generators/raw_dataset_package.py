@@ -1,7 +1,8 @@
+import tempfile
 import zipfile
 from pathlib import Path
+
 import pandas as pd
-import tempfile
 
 
 def generate_raw_dataset_package(domains: dict[str, pd.DataFrame], output_dir: Path):

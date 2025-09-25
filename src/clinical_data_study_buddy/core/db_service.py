@@ -4,10 +4,12 @@ database. As the application does not currently have a database, this file
 serves as a placeholder for future development.
 """
 
+
 class DBService:
     """
     A placeholder class for a database service.
     """
+
     def __init__(self, connection_string: str):
         """
         Initializes the DBService.

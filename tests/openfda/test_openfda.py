@@ -1,18 +1,28 @@
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
+
 from clinical_data_study_buddy.generators.crfgen.openfda.client import OpenFDAClient
-from clinical_data_study_buddy.generators.crfgen.openfda.query import term_query, range_query, count_query, paging_query
+from clinical_data_study_buddy.generators.crfgen.openfda.query import (
+    count_query,
+    paging_query,
+    range_query,
+    term_query,
+)
+
 
 def test_term_query():
     assert term_query("field", "term") == 'field:"term"'
 
+
 def test_range_query():
-    assert range_query("field", "start", "end") == 'field:[start+TO+end]'
+    assert range_query("field", "start", "end") == "field:[start+TO+end]"
+
 
 def test_count_query():
-    assert count_query("field") == 'field.exact'
-    assert count_query("field.exact") == 'field.exact'
+    assert count_query("field") == "field.exact"
+    assert count_query("field.exact") == "field.exact"
+
 
 def test_paging_query():
     assert paging_query(100, 50) == {"limit": 100, "skip": 50}
@@ -21,16 +31,33 @@ def test_paging_query():
     with pytest.raises(ValueError):
         paging_query(skip=25001)
 
-from clinical_data_study_buddy.generators.crfgen.openfda.devices.udi import UDIAccessor
-from clinical_data_study_buddy.generators.crfgen.openfda.devices.event import MAUDEAccessor
-from clinical_data_study_buddy.generators.crfgen.openfda.devices.recall import RecallAccessor
-from clinical_data_study_buddy.generators.crfgen.openfda.devices.enforcement import EnforcementAccessor
-from clinical_data_study_buddy.generators.crfgen.openfda.devices.classification import ClassificationAccessor
-from clinical_data_study_buddy.generators.crfgen.openfda.devices.k510 import K510Accessor
-from clinical_data_study_buddy.generators.crfgen.openfda.devices.pma import PMAAccessor
-from clinical_data_study_buddy.generators.crfgen.openfda.devices.reglist import RegListAccessor
 
-import httpx
+import httpx  # noqa: E402
+
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.classification import (  # noqa: E402
+    ClassificationAccessor,
+)
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.enforcement import (  # noqa: E402
+    EnforcementAccessor,
+)
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.event import (  # noqa: E402
+    MAUDEAccessor,
+)
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.k510 import (  # noqa: E402
+    K510Accessor,
+)
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.pma import (  # noqa: E402
+    PMAAccessor,
+)
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.recall import (  # noqa: E402
+    RecallAccessor,
+)
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.reglist import (  # noqa: E402
+    RegListAccessor,
+)
+from clinical_data_study_buddy.generators.crfgen.openfda.devices.udi import (  # noqa: E402
+    UDIAccessor,
+)
 
 
 @pytest.mark.asyncio
@@ -48,7 +75,6 @@ async def test_openfda_client_get():
     await client.close()
 
 
-from unittest.mock import patch
 
 
 @pytest.mark.asyncio
@@ -70,6 +96,7 @@ async def test_openfda_client_get_error():
     client.client.get.assert_called_once()
     await client.close()
 
+
 @pytest.mark.asyncio
 async def test_udi_accessor_fetch():
     client = OpenFDAClient()
@@ -79,7 +106,7 @@ async def test_udi_accessor_fetch():
             {
                 "di": "00812345678901",
                 "brand_name": "Test Device",
-                "company_name": "Test Company"
+                "company_name": "Test Company",
             }
         ]
     }
@@ -91,16 +118,14 @@ async def test_udi_accessor_fetch():
     assert results[0].di == "00812345678901"
     client.get.assert_called_once_with("/device/udi.json", params={"search": "test"})
 
+
 @pytest.mark.asyncio
 async def test_maude_accessor_fetch():
     client = OpenFDAClient()
     client.get = AsyncMock()
     client.get.return_value.json.return_value = {
         "results": [
-            {
-                "mdr_report_key": "12345",
-                "device": [{"brand_name": "Test Device"}]
-            }
+            {"mdr_report_key": "12345", "device": [{"brand_name": "Test Device"}]}
         ]
     }
 
@@ -111,17 +136,13 @@ async def test_maude_accessor_fetch():
     assert results[0].mdr_report_key == "12345"
     client.get.assert_called_once_with("/device/event.json", params={"search": "test"})
 
+
 @pytest.mark.asyncio
 async def test_recall_accessor_fetch():
     client = OpenFDAClient()
     client.get = AsyncMock()
     client.get.return_value.json.return_value = {
-        "results": [
-            {
-                "recall_number": "R12345",
-                "product_description": "Test Recall"
-            }
-        ]
+        "results": [{"recall_number": "R12345", "product_description": "Test Recall"}]
     }
 
     accessor = RecallAccessor(client)
@@ -131,16 +152,14 @@ async def test_recall_accessor_fetch():
     assert results[0].recall_number == "R12345"
     client.get.assert_called_once_with("/device/recall.json", params={"search": "test"})
 
+
 @pytest.mark.asyncio
 async def test_enforcement_accessor_fetch():
     client = OpenFDAClient()
     client.get = AsyncMock()
     client.get.return_value.json.return_value = {
         "results": [
-            {
-                "recall_number": "E12345",
-                "product_description": "Test Enforcement"
-            }
+            {"recall_number": "E12345", "product_description": "Test Enforcement"}
         ]
     }
 
@@ -149,19 +168,17 @@ async def test_enforcement_accessor_fetch():
 
     assert len(results) == 1
     assert results[0].recall_number == "E12345"
-    client.get.assert_called_once_with("/device/enforcement.json", params={"search": "test"})
+    client.get.assert_called_once_with(
+        "/device/enforcement.json", params={"search": "test"}
+    )
+
 
 @pytest.mark.asyncio
 async def test_classification_accessor_fetch():
     client = OpenFDAClient()
     client.get = AsyncMock()
     client.get.return_value.json.return_value = {
-        "results": [
-            {
-                "product_code": "ABC",
-                "device_name": "Test Classification"
-            }
-        ]
+        "results": [{"product_code": "ABC", "device_name": "Test Classification"}]
     }
 
     accessor = ClassificationAccessor(client)
@@ -169,19 +186,17 @@ async def test_classification_accessor_fetch():
 
     assert len(results) == 1
     assert results[0].product_code == "ABC"
-    client.get.assert_called_once_with("/device/classification.json", params={"search": "test"})
+    client.get.assert_called_once_with(
+        "/device/classification.json", params={"search": "test"}
+    )
+
 
 @pytest.mark.asyncio
 async def test_k510_accessor_fetch():
     client = OpenFDAClient()
     client.get = AsyncMock()
     client.get.return_value.json.return_value = {
-        "results": [
-            {
-                "k_number": "K123456",
-                "applicant": "Test Applicant"
-            }
-        ]
+        "results": [{"k_number": "K123456", "applicant": "Test Applicant"}]
     }
 
     accessor = K510Accessor(client)
@@ -191,17 +206,13 @@ async def test_k510_accessor_fetch():
     assert results[0].k_number == "K123456"
     client.get.assert_called_once_with("/device/510k.json", params={"search": "test"})
 
+
 @pytest.mark.asyncio
 async def test_pma_accessor_fetch():
     client = OpenFDAClient()
     client.get = AsyncMock()
     client.get.return_value.json.return_value = {
-        "results": [
-            {
-                "pma_number": "P123456",
-                "applicant": "Test Applicant"
-            }
-        ]
+        "results": [{"pma_number": "P123456", "applicant": "Test Applicant"}]
     }
 
     accessor = PMAAccessor(client)
@@ -211,17 +222,13 @@ async def test_pma_accessor_fetch():
     assert results[0].pma_number == "P123456"
     client.get.assert_called_once_with("/device/pma.json", params={"search": "test"})
 
+
 @pytest.mark.asyncio
 async def test_reglist_accessor_fetch():
     client = OpenFDAClient()
     client.get = AsyncMock()
     client.get.return_value.json.return_value = {
-        "results": [
-            {
-                "fei_number": "1234567890",
-                "owner_operator": "Test Owner"
-            }
-        ]
+        "results": [{"fei_number": "1234567890", "owner_operator": "Test Owner"}]
     }
 
     accessor = RegListAccessor(client)
@@ -229,4 +236,6 @@ async def test_reglist_accessor_fetch():
 
     assert len(results) == 1
     assert results[0].fei_number == "1234567890"
-    client.get.assert_called_once_with("/device/registrationlisting.json", params={"search": "test"})
+    client.get.assert_called_once_with(
+        "/device/registrationlisting.json", params={"search": "test"}
+    )

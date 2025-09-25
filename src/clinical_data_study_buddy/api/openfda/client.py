@@ -5,11 +5,18 @@ It includes functions for fetching adverse event and drug label data, with
 built-in support for retries with exponential backoff to handle transient
 network issues.
 """
-import os
-import requests
+
 import logging
-from typing import List, Dict, Any
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+import os
+from typing import Any, Dict, List
+
+import requests
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -31,10 +38,14 @@ def log_retry(retry_state):
     Args:
         retry_state: The state of the tenacity retry decorator.
     """
-    logger.warning(f"Retrying API call for {retry_state.fn.__name__}, attempt {retry_state.attempt_number}...")
+    logger.warning(
+        f"Retrying API call for {retry_state.fn.__name__}, attempt {retry_state.attempt_number}..."
+    )
 
 
-@retry(wait=RETRY_WAIT, stop=RETRY_STOP, retry=RETRY_ON_EXCEPTION, before_sleep=log_retry)
+@retry(
+    wait=RETRY_WAIT, stop=RETRY_STOP, retry=RETRY_ON_EXCEPTION, before_sleep=log_retry
+)
 def get_adverse_events(
     drug_name: str, max_results: int = 10, start_date: str = None, end_date: str = None
 ) -> List[Dict[str, Any]]:
@@ -60,7 +71,7 @@ def get_adverse_events(
 
     search_query = f'patient.drug.medicinalproduct:"{drug_name}"'
     if start_date and end_date:
-        search_query += f'+AND+receivedate:[{start_date}+TO+{end_date}]'
+        search_query += f"+AND+receivedate:[{start_date}+TO+{end_date}]"
 
     while len(all_results) < max_results:
         results_to_fetch = min(limit_per_page, max_results - len(all_results))
@@ -88,7 +99,10 @@ def get_adverse_events(
 
     return all_results
 
-@retry(wait=RETRY_WAIT, stop=RETRY_STOP, retry=RETRY_ON_EXCEPTION, before_sleep=log_retry)
+
+@retry(
+    wait=RETRY_WAIT, stop=RETRY_STOP, retry=RETRY_ON_EXCEPTION, before_sleep=log_retry
+)
 def get_drug_label(drug_name: str) -> Dict[str, Any]:
     """
     Fetches the drug label for a given drug from the OpenFDA API.
@@ -104,11 +118,10 @@ def get_drug_label(drug_name: str) -> Dict[str, Any]:
                         or an empty dictionary if not found.
     """
     url = f"{BASE_URL}/drug/label.json"
-    search_query = f'openfda.brand_name:"{drug_name}" OR openfda.generic_name:"{drug_name}"'
-    params = {
-        "search": search_query,
-        "limit": 1
-    }
+    search_query = (
+        f'openfda.brand_name:"{drug_name}" OR openfda.generic_name:"{drug_name}"'
+    )
+    params = {"search": search_query, "limit": 1}
     logger.info(f"Querying OpenFDA API: {url} with params: {params}")
     response = requests.get(url, params=params, timeout=REQUEST_TIMEOUT)
     response.raise_for_status()

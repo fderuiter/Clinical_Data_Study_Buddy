@@ -3,13 +3,15 @@ This module provides functionality for ingesting bulk data from the OpenFDA
 download portal. It can download and extract zip files for various
 OpenFDA endpoints.
 """
+
 import asyncio
-import httpx
 import os
 import zipfile
 from datetime import datetime
 from io import BytesIO
 from typing import Dict
+
+import httpx
 
 # Placeholder for the official download links
 DOWNLOAD_LINKS: Dict[str, str] = {
@@ -22,6 +24,7 @@ DOWNLOAD_LINKS: Dict[str, str] = {
     "device/pma": "https://download.open.fda.gov/device/pma/device-pma-0001-of-0001.json.zip",
     "device/registrationlisting": "https://download.open.fda.gov/device/registrationlisting/device-registrationlisting-0001-of-0001.json.zip",
 }
+
 
 async def download_and_extract(endpoint: str, output_dir: str):
     """
@@ -45,7 +48,7 @@ async def download_and_extract(endpoint: str, output_dir: str):
         response.raise_for_status()
 
     today = datetime.now().strftime("%Y%m%d")
-    endpoint_path = endpoint.replace('/', '_')
+    endpoint_path = endpoint.replace("/", "_")
     extract_path = os.path.join(output_dir, endpoint_path, today)
     os.makedirs(extract_path, exist_ok=True)
 
@@ -56,6 +59,7 @@ async def download_and_extract(endpoint: str, output_dir: str):
                 with open(output_filename, "wb") as f:
                     f.write(z.read(member.filename))
 
+
 async def main():
     """
     An example of how to use the download_and_extract function.
@@ -64,6 +68,7 @@ async def main():
     to the "examples/openfda" directory.
     """
     await download_and_extract("device/udi", "examples/openfda")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -2,6 +2,7 @@
 This module provides the functionality to export CRF (Case Report Form) data
 to a Microsoft Excel (.xlsx) file.
 """
+
 from pathlib import Path
 from typing import Sequence
 

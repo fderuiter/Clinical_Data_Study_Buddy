@@ -1,15 +1,14 @@
-import pytest
-from pathlib import Path
 import os
-import pandas as pd
 import zipfile
-import shutil
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import pandas as pd
+import pytest
 
 from clinical_data_study_buddy.generators.dataset_helpers import (
+    apply_study_story,
     generate_define_xml,
     package_datasets,
-    apply_study_story,
 )
 
 
@@ -130,7 +129,11 @@ def test_generate_define_xml_creates_file(mock_get, setup_test_data):
     """Test that generate_define_xml creates a define.xml file."""
     mock_response = MagicMock()
     mock_response.status_code = 200
-    mock_response.json.return_value = {"label": "Subject ID", "datatype": "text", "length": 10}
+    mock_response.json.return_value = {
+        "label": "Subject ID",
+        "datatype": "text",
+        "length": 10,
+    }
     mock_get.return_value = mock_response
     os.environ["CDISC_API_KEY"] = "test-key"
 
@@ -160,10 +163,14 @@ def test_generate_define_xml_with_mocked_api(mock_get, setup_test_data):
     """Test define.xml generation with a mocked CDISC Library API."""
     mock_responses = {
         "https://library.cdisc.org/products/sdtmig/3-3/datasets/DM/variables/USUBJID": {
-            "label": "Unique Subject Identifier", "datatype": "text", "length": 20
+            "label": "Unique Subject Identifier",
+            "datatype": "text",
+            "length": 20,
         },
         "https://library.cdisc.org/products/sdtmig/3-3/datasets/DM/variables/AGE": {
-            "label": "Age", "datatype": "integer", "length": 3
+            "label": "Age",
+            "datatype": "integer",
+            "length": 3,
         },
     }
 
@@ -186,5 +193,8 @@ def test_generate_define_xml_with_mocked_api(mock_get, setup_test_data):
         assert 'OID="IG.DM"' in content
         assert 'OID="IT.DM.USUBJID"' in content
         assert 'OID="IT.DM.AGE"' in content
-        assert "<TranslatedText xml:lang=\"en\">Unique Subject Identifier</TranslatedText>" in content
-        assert "<TranslatedText xml:lang=\"en\">Age</TranslatedText>" in content
+        assert (
+            '<TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>'
+            in content
+        )
+        assert '<TranslatedText xml:lang="en">Age</TranslatedText>' in content

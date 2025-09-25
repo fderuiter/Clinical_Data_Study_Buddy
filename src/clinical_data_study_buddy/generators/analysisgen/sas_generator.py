@@ -3,6 +3,7 @@ This module contains the SASGenerator class, which is responsible for
 generating SAS programs for analysis.
 """
 
+
 class SASGenerator:
     """
     A class for generating simple SAS programs.
@@ -10,6 +11,7 @@ class SASGenerator:
     This class creates a SAS program that imports a CSV file into a SAS dataset
     and then prints the contents of that dataset.
     """
+
     def __init__(self, dataset, output_type, treatment_var):
         """
         Initializes the SASGenerator.

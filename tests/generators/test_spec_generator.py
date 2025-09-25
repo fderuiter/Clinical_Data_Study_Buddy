@@ -1,25 +1,28 @@
-import pytest
-from unittest.mock import MagicMock, patch, call
-import openpyxl
-import pandas as pd
 from pathlib import Path
+from unittest.mock import MagicMock, call, patch
+
+import pandas as pd
+import pytest
 
 from clinical_data_study_buddy.generators.spec import (
-    generate_template,
     generate_dataset,
+    generate_template,
     validate,
 )
-from clinical_data_study_buddy.core.models.schema import Form, FieldDef
+
 
 @pytest.fixture
 def mock_cdisc_client():
     """Fixture for a mocked AuthenticatedClient."""
     return MagicMock()
 
+
 # Tests for generate_template
 @patch("clinical_data_study_buddy.generators.spec.get_client")
 @patch("clinical_data_study_buddy.generators.spec.openpyxl.Workbook")
-def test_generate_template_sdtmig(mock_workbook_class, mock_get_client, mock_cdisc_client):
+def test_generate_template_sdtmig(
+    mock_workbook_class, mock_get_client, mock_cdisc_client
+):
     # Arrange
     mock_get_client.return_value = mock_cdisc_client
     mock_workbook = MagicMock()
@@ -36,34 +39,63 @@ def test_generate_template_sdtmig(mock_workbook_class, mock_get_client, mock_cdi
     mock_response.to_dict.return_value = {
         "datasetVariables": [
             {
-                "name": "STUDYID", "label": "Study Identifier", "simpleDatatype": "Char",
-                "role": "Identifier", "core": "Req", "_links": {}, "description": "Unique identifier for a study."
+                "name": "STUDYID",
+                "label": "Study Identifier",
+                "simpleDatatype": "Char",
+                "role": "Identifier",
+                "core": "Req",
+                "_links": {},
+                "description": "Unique identifier for a study.",
             }
         ]
     }
 
-    with patch("clinical_data_study_buddy.generators.spec.get_mdr_sdtmig_version_datasets_dataset.sync", return_value=mock_response) as mock_api_call:
+    with patch(
+        "clinical_data_study_buddy.generators.spec.get_mdr_sdtmig_version_datasets_dataset.sync",
+        return_value=mock_response,
+    ) as mock_api_call:
         # Act
         generate_template(product, version, domains, output_dir)
 
         # Assert
         mock_get_client.assert_called_once()
         mock_workbook.create_sheet.assert_called_once_with(title="DM")
-        mock_api_call.assert_called_once_with(client=mock_cdisc_client, version=version, dataset="DM")
+        mock_api_call.assert_called_once_with(
+            client=mock_cdisc_client, version=version, dataset="DM"
+        )
 
-        header = ["Variable Name", "Variable Label", "Data Type", "Role", "Core", "Codelist", "Description"]
-        row = ["STUDYID", "Study Identifier", "Char", "Identifier", "Req", "", "Unique identifier for a study."]
+        header = [
+            "Variable Name",
+            "Variable Label",
+            "Data Type",
+            "Role",
+            "Core",
+            "Codelist",
+            "Description",
+        ]
+        row = [
+            "STUDYID",
+            "Study Identifier",
+            "Char",
+            "Identifier",
+            "Req",
+            "",
+            "Unique identifier for a study.",
+        ]
 
         mock_sheet.append.assert_has_calls([call(header), call(row)])
         output_path = Path(output_dir) / f"{product}_{version}_spec.xlsx"
         mock_workbook.save.assert_called_once_with(output_path)
+
 
 # Tests for generate_dataset
 @patch("clinical_data_study_buddy.generators.spec.openpyxl.load_workbook")
 @patch("clinical_data_study_buddy.generators.spec.pd.read_excel")
 @patch("clinical_data_study_buddy.generators.spec.DataGenerator")
 @patch("clinical_data_study_buddy.generators.spec.pd.DataFrame.to_csv")
-def test_generate_dataset(mock_to_csv, mock_data_generator_class, mock_read_excel, mock_load_workbook):
+def test_generate_dataset(
+    mock_to_csv, mock_data_generator_class, mock_read_excel, mock_load_workbook
+):
     # Arrange
     spec_path = "spec.xlsx"
     output_dir = "output"
@@ -72,11 +104,13 @@ def test_generate_dataset(mock_to_csv, mock_data_generator_class, mock_read_exce
     mock_workbook.sheetnames = ["DM", "AE"]
     mock_load_workbook.return_value = mock_workbook
 
-    spec_df = pd.DataFrame({
-        "Variable Name": ["STUDYID"],
-        "Variable Label": ["Study Identifier"],
-        "Data Type": ["Char"]
-    })
+    spec_df = pd.DataFrame(
+        {
+            "Variable Name": ["STUDYID"],
+            "Variable Label": ["Study Identifier"],
+            "Data Type": ["Char"],
+        }
+    )
     mock_read_excel.return_value = spec_df
 
     mock_data_generator = MagicMock()
@@ -106,10 +140,11 @@ def test_generate_dataset(mock_to_csv, mock_data_generator_class, mock_read_exce
     assert mock_to_csv.call_count == 2
     dm_output_path = Path(output_dir) / "DM.csv"
     ae_output_path = Path(output_dir) / "AE.csv"
-    mock_to_csv.assert_has_calls([
-        call(dm_output_path, index=False),
-        call(ae_output_path, index=False)
-    ], any_order=True)
+    mock_to_csv.assert_has_calls(
+        [call(dm_output_path, index=False), call(ae_output_path, index=False)],
+        any_order=True,
+    )
+
 
 # Tests for validate
 @patch("clinical_data_study_buddy.generators.spec.pd.read_csv")
@@ -120,7 +155,9 @@ def test_validate_success(mock_print, mock_read_excel, mock_read_csv):
     spec_path = "spec.xlsx"
     dataset_path = "DM.csv"
 
-    spec_df = pd.DataFrame({"Variable Name": ["STUDYID", "USUBJID"], "Data Type": ["Char", "Char"]})
+    spec_df = pd.DataFrame(
+        {"Variable Name": ["STUDYID", "USUBJID"], "Data Type": ["Char", "Char"]}
+    )
     dataset_df = pd.DataFrame({"STUDYID": ["TEST01"], "USUBJID": ["SUBJ-01"]})
     mock_read_excel.return_value = spec_df
     mock_read_csv.return_value = dataset_df
@@ -129,7 +166,10 @@ def test_validate_success(mock_print, mock_read_excel, mock_read_csv):
     validate(spec_path, dataset_path)
 
     # Assert
-    mock_print.assert_any_call("\nValidation Successful: Dataset conforms to the specification.")
+    mock_print.assert_any_call(
+        "\nValidation Successful: Dataset conforms to the specification."
+    )
+
 
 @patch("clinical_data_study_buddy.generators.spec.pd.read_csv")
 @patch("clinical_data_study_buddy.generators.spec.pd.read_excel")
@@ -139,7 +179,9 @@ def test_validate_missing_columns(mock_print, mock_read_excel, mock_read_csv):
     spec_path = "spec.xlsx"
     dataset_path = "DM.csv"
 
-    spec_df = pd.DataFrame({"Variable Name": ["STUDYID", "USUBJID"], "Data Type": ["Char", "Char"]})
+    spec_df = pd.DataFrame(
+        {"Variable Name": ["STUDYID", "USUBJID"], "Data Type": ["Char", "Char"]}
+    )
     dataset_df = pd.DataFrame({"STUDYID": ["TEST01"]})
     mock_read_excel.return_value = spec_df
     mock_read_csv.return_value = dataset_df
@@ -149,7 +191,10 @@ def test_validate_missing_columns(mock_print, mock_read_excel, mock_read_csv):
 
     # Assert
     mock_print.assert_any_call("\nValidation Warnings:")
-    mock_print.assert_any_call("- Missing columns in dataset that are in the spec: USUBJID")
+    mock_print.assert_any_call(
+        "- Missing columns in dataset that are in the spec: USUBJID"
+    )
+
 
 @patch("clinical_data_study_buddy.generators.spec.pd.read_csv")
 @patch("clinical_data_study_buddy.generators.spec.pd.read_excel")
@@ -169,7 +214,10 @@ def test_validate_extra_columns(mock_print, mock_read_excel, mock_read_csv):
 
     # Assert
     mock_print.assert_any_call("\nValidation Failed:")
-    mock_print.assert_any_call("- Extra columns in dataset that are not in the spec: EXTRACOL")
+    mock_print.assert_any_call(
+        "- Extra columns in dataset that are not in the spec: EXTRACOL"
+    )
+
 
 @patch("clinical_data_study_buddy.generators.spec.pd.read_csv")
 @patch("clinical_data_study_buddy.generators.spec.pd.read_excel")
@@ -189,12 +237,16 @@ def test_validate_dtype_error(mock_print, mock_read_excel, mock_read_csv):
 
     # Assert
     mock_print.assert_any_call("\nValidation Failed:")
-    mock_print.assert_any_call("- Data type error in column 'VSSTRESN': Expected a numeric type.")
+    mock_print.assert_any_call(
+        "- Data type error in column 'VSSTRESN': Expected a numeric type."
+    )
 
 
 @patch("clinical_data_study_buddy.generators.spec.get_client")
 @patch("clinical_data_study_buddy.generators.spec.openpyxl.Workbook")
-def test_generate_template_adamig(mock_workbook_class, mock_get_client, mock_cdisc_client):
+def test_generate_template_adamig(
+    mock_workbook_class, mock_get_client, mock_cdisc_client
+):
     # Arrange
     mock_get_client.return_value = mock_cdisc_client
     mock_workbook = MagicMock()
@@ -213,15 +265,23 @@ def test_generate_template_adamig(mock_workbook_class, mock_get_client, mock_cdi
             {
                 "analysisVariables": [
                     {
-                        "name": "TRT01P", "label": "Planned Treatment for Period 01", "simpleDatatype": "Char",
-                        "role": "Identifier", "core": "Exp", "_links": {}, "description": "Planned treatment for Period 01."
+                        "name": "TRT01P",
+                        "label": "Planned Treatment for Period 01",
+                        "simpleDatatype": "Char",
+                        "role": "Identifier",
+                        "core": "Exp",
+                        "_links": {},
+                        "description": "Planned treatment for Period 01.",
                     }
                 ]
             }
         ]
     }
 
-    with patch("clinical_data_study_buddy.generators.spec.get_mdr_adam_product_datastructures_structure.sync", return_value=mock_response) as mock_api_call:
+    with patch(
+        "clinical_data_study_buddy.generators.spec.get_mdr_adam_product_datastructures_structure.sync",
+        return_value=mock_response,
+    ) as mock_api_call:
         # Act
         generate_template(product, version, domains, output_dir)
 
@@ -229,10 +289,28 @@ def test_generate_template_adamig(mock_workbook_class, mock_get_client, mock_cdi
         mock_get_client.assert_called_once()
         mock_workbook.create_sheet.assert_called_once_with(title="ADSL")
         adam_product_id = f"adamig-{version}"
-        mock_api_call.assert_called_once_with(client=mock_cdisc_client, product=adam_product_id, structure="ADSL")
+        mock_api_call.assert_called_once_with(
+            client=mock_cdisc_client, product=adam_product_id, structure="ADSL"
+        )
 
-        header = ["Variable Name", "Variable Label", "Data Type", "Role", "Core", "Codelist", "Description"]
-        row = ["TRT01P", "Planned Treatment for Period 01", "Char", "Identifier", "Exp", "", "Planned treatment for Period 01."]
+        header = [
+            "Variable Name",
+            "Variable Label",
+            "Data Type",
+            "Role",
+            "Core",
+            "Codelist",
+            "Description",
+        ]
+        row = [
+            "TRT01P",
+            "Planned Treatment for Period 01",
+            "Char",
+            "Identifier",
+            "Exp",
+            "",
+            "Planned treatment for Period 01.",
+        ]
 
         mock_sheet.append.assert_has_calls([call(header), call(row)])
         output_path = Path(output_dir) / f"{product}_{version}_spec.xlsx"
@@ -241,7 +319,9 @@ def test_generate_template_adamig(mock_workbook_class, mock_get_client, mock_cdi
 
 @patch("clinical_data_study_buddy.generators.spec.get_client")
 @patch("clinical_data_study_buddy.generators.spec.openpyxl.Workbook")
-def test_generate_template_no_variables(mock_workbook_class, mock_get_client, mock_cdisc_client):
+def test_generate_template_no_variables(
+    mock_workbook_class, mock_get_client, mock_cdisc_client
+):
     # Arrange
     mock_get_client.return_value = mock_cdisc_client
     mock_workbook = MagicMock()
@@ -257,7 +337,10 @@ def test_generate_template_no_variables(mock_workbook_class, mock_get_client, mo
     mock_response = MagicMock()
     mock_response.to_dict.return_value = {"datasetVariables": []}
 
-    with patch("clinical_data_study_buddy.generators.spec.get_mdr_sdtmig_version_datasets_dataset.sync", return_value=mock_response):
+    with patch(
+        "clinical_data_study_buddy.generators.spec.get_mdr_sdtmig_version_datasets_dataset.sync",
+        return_value=mock_response,
+    ):
         # Act
         generate_template(product, version, domains, output_dir)
 
@@ -267,7 +350,9 @@ def test_generate_template_no_variables(mock_workbook_class, mock_get_client, mo
 
 @patch("clinical_data_study_buddy.generators.spec.get_client")
 @patch("clinical_data_study_buddy.generators.spec.openpyxl.Workbook")
-def test_generate_template_api_error(mock_workbook_class, mock_get_client, mock_cdisc_client):
+def test_generate_template_api_error(
+    mock_workbook_class, mock_get_client, mock_cdisc_client
+):
     # Arrange
     mock_get_client.return_value = mock_cdisc_client
     mock_workbook = MagicMock()
@@ -280,7 +365,10 @@ def test_generate_template_api_error(mock_workbook_class, mock_get_client, mock_
     domains = ["DM"]
     output_dir = "output"
 
-    with patch("clinical_data_study_buddy.generators.spec.get_mdr_sdtmig_version_datasets_dataset.sync", side_effect=Exception("API Error")):
+    with patch(
+        "clinical_data_study_buddy.generators.spec.get_mdr_sdtmig_version_datasets_dataset.sync",
+        side_effect=Exception("API Error"),
+    ):
         # Act
         generate_template(product, version, domains, output_dir)
 
@@ -294,10 +382,15 @@ def test_validate_invalid_filename(mock_print):
     validate("spec.xlsx", "a_b_c_d.csv")
 
     # Assert
-    mock_print.assert_any_call("Invalid dataset filename format: a_b_c_d.csv. Expected '<product>_<domain>_<timestamp>.csv' or '<domain>.csv'.")
+    mock_print.assert_any_call(
+        "Invalid dataset filename format: a_b_c_d.csv. Expected '<product>_<domain>_<timestamp>.csv' or '<domain>.csv'."
+    )
 
 
-@patch("clinical_data_study_buddy.generators.spec.pd.read_excel", side_effect=ValueError("Sheet not found"))
+@patch(
+    "clinical_data_study_buddy.generators.spec.pd.read_excel",
+    side_effect=ValueError("Sheet not found"),
+)
 @patch("builtins.print")
 def test_validate_sheet_not_found(mock_print, mock_read_excel):
     # Act

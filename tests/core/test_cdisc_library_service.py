@@ -1,9 +1,11 @@
-from unittest.mock import patch, MagicMock
-from clinical_data_study_buddy.services.cdisc_library_service import get_client
+from unittest.mock import MagicMock, patch
 
-@patch("clinical_data_study_buddy.services.cdisc_library_service.AuthenticatedClient")
-@patch("clinical_data_study_buddy.services.cdisc_library_service.httpx.HTTPTransport")
-@patch("clinical_data_study_buddy.services.cdisc_library_service.get_api_key")
+from clinical_data_study_buddy.core.cdisc_library_service import get_client
+
+
+@patch("clinical_data_study_buddy.core.cdisc_library_service.AuthenticatedClient")
+@patch("clinical_data_study_buddy.core.cdisc_library_service.httpx.HTTPTransport")
+@patch("clinical_data_study_buddy.core.cdisc_library_service.get_api_key")
 def test_get_client(mock_get_api_key, mock_http_transport, mock_auth_client):
     """
     Test that the get_client function configures and returns an AuthenticatedClient correctly.

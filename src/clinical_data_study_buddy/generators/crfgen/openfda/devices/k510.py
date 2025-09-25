@@ -1,11 +1,13 @@
 """
 This module provides access to the OpenFDA 510(k) premarket notification endpoint.
 """
+
 from typing import List, Optional
 
 from ..client import OpenFDAClient
 from ..models import K510
 from ..query import paging_query
+
 
 class K510Accessor:
     """
@@ -24,7 +26,12 @@ class K510Accessor:
         """
         self.client = client
 
-    async def fetch(self, search: Optional[str] = None, limit: Optional[int] = None, skip: Optional[int] = None) -> List[K510]:
+    async def fetch(
+        self,
+        search: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+    ) -> List[K510]:
         """
         Fetches 510(k) records from the openFDA API.
 

@@ -2,6 +2,7 @@
 This module contains the AnalysisGenerator class, which is the core component
 for generating analysis code in various languages like SAS and R.
 """
+
 from . import r_templates, sas_templates
 
 
@@ -13,6 +14,7 @@ class AnalysisGenerator:
     variable as input, and generates the corresponding analysis code based on
     pre-defined templates.
     """
+
     def __init__(self, language, dataset, output_type, treatment_var):
         """
         Initializes the AnalysisGenerator.
@@ -38,12 +40,26 @@ class AnalysisGenerator:
         Raises:
             ValueError: If the specified language is not supported.
         """
-        if self.language.lower() == 'sas':
+        if self.language.lower() == "sas":
             return self._generate_sas_code()
-        elif self.language.lower() == 'r':
+        elif self.language.lower() == "r":
             return self._generate_r_code()
         else:
             raise ValueError("Unsupported language. Please choose 'sas' or 'r'.")
+
+    _sas_templates = {
+        "demographics": sas_templates.DEMO_TABLE_TEMPLATE,
+        "disposition": sas_templates.DISPOSITION_TABLE_TEMPLATE,
+        "exposure": sas_templates.EXPOSURE_TABLE_TEMPLATE,
+        "teae_summary": sas_templates.TEAE_SUMMARY_TABLE_TEMPLATE,
+        "teae_by_soc_pt": sas_templates.TEAE_BY_SOC_PT_TABLE_TEMPLATE,
+        "lab_shift": sas_templates.LAB_SHIFT_TABLE_TEMPLATE,
+        "vs_change": sas_templates.VS_CHANGE_TABLE_TEMPLATE,
+    }
+
+    _r_templates = {
+        "demographics": r_templates.DEMO_TABLE_TEMPLATE,
+    }
 
     def _generate_sas_code(self):
         """
@@ -54,44 +70,18 @@ class AnalysisGenerator:
 
         Returns:
             str: The generated SAS code as a string.
+
+        Raises:
+            NotImplementedError: If the specified output type is not supported for SAS.
         """
-        if self.output_type.lower() == 'demographics':
-            return sas_templates.DEMO_TABLE_TEMPLATE.format(
-                dataset=self.dataset,
-                treatment_var=self.treatment_var
+        template = self._sas_templates.get(self.output_type.lower())
+        if template:
+            return template.format(
+                dataset=self.dataset, treatment_var=self.treatment_var
             )
-        elif self.output_type.lower() == 'disposition':
-            return sas_templates.DISPOSITION_TABLE_TEMPLATE.format(
-                dataset=self.dataset,
-                treatment_var=self.treatment_var
-            )
-        elif self.output_type.lower() == 'exposure':
-            return sas_templates.EXPOSURE_TABLE_TEMPLATE.format(
-                dataset=self.dataset,
-                treatment_var=self.treatment_var
-            )
-        elif self.output_type.lower() == 'teae_summary':
-            return sas_templates.TEAE_SUMMARY_TABLE_TEMPLATE.format(
-                dataset=self.dataset,
-                treatment_var=self.treatment_var
-            )
-        elif self.output_type.lower() == 'teae_by_soc_pt':
-            return sas_templates.TEAE_BY_SOC_PT_TABLE_TEMPLATE.format(
-                dataset=self.dataset,
-                treatment_var=self.treatment_var
-            )
-        elif self.output_type.lower() == 'lab_shift':
-            return sas_templates.LAB_SHIFT_TABLE_TEMPLATE.format(
-                dataset=self.dataset,
-                treatment_var=self.treatment_var
-            )
-        elif self.output_type.lower() == 'vs_change':
-            return sas_templates.VS_CHANGE_TABLE_TEMPLATE.format(
-                dataset=self.dataset,
-                treatment_var=self.treatment_var
-            )
-        else:
-            return "/* SAS code for this output type is not yet implemented. */"
+        raise NotImplementedError(
+            f"SAS code for output type '{self.output_type}' is not yet implemented."
+        )
 
     def _generate_r_code(self):
         """
@@ -102,11 +92,15 @@ class AnalysisGenerator:
 
         Returns:
             str: The generated R code as a string.
+
+        Raises:
+            NotImplementedError: If the specified output type is not supported for R.
         """
-        if self.output_type.lower() == 'demographics':
-            return r_templates.DEMO_TABLE_TEMPLATE.format(
-                dataset=self.dataset,
-                treatment_var=self.treatment_var
+        template = self._r_templates.get(self.output_type.lower())
+        if template:
+            return template.format(
+                dataset=self.dataset, treatment_var=self.treatment_var
             )
-        else:
-            return "# R code for this output type is not yet implemented."
+        raise NotImplementedError(
+            f"R code for output type '{self.output_type}' is not yet implemented."
+        )

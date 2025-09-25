@@ -5,6 +5,7 @@ The registry allows different exporter functions to be registered under a
 specific format name (e.g., "csv", "docx"), and then retrieved by that name.
 This makes it easy to add new export formats without modifying the core logic.
 """
+
 _registry = {}
 
 
@@ -18,6 +19,7 @@ def register(name: str):
     Returns:
         A decorator function that registers the decorated function.
     """
+
     def decorator(fn):
         _registry[name] = fn
         return fn

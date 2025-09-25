@@ -6,27 +6,24 @@ It includes functions to:
 - Generate a synthetic dataset from a specification template.
 - Validate a dataset against its corresponding specification template.
 """
-import os
+
 from pathlib import Path
-import json
+
 import openpyxl
 import pandas as pd
-from cdisc_library_client.client import AuthenticatedClient
-from cdisc_library_client.api.sdtm_implementation_guide_sdtmig import (
-    get_mdr_sdtmig_version_datasets_dataset,
-)
+
 from cdisc_library_client.api.analysis_data_model_and_implementation_guide_a_da_m_and_a_da_mig import (
     get_mdr_adam_product_datastructures_structure,
 )
-from dotenv import load_dotenv
+from cdisc_library_client.api.sdtm_implementation_guide_sdtmig import (
+    get_mdr_sdtmig_version_datasets_dataset,
+)
+from clinical_data_study_buddy.core.cdisc_library_service import get_client
+from clinical_data_study_buddy.core.models.schema import FieldDef, Form
 from clinical_data_study_buddy.generators.data_generator import DataGenerator
-from clinical_data_study_buddy.core.models.schema import Form, FieldDef
-from clinical_data_study_buddy.services.cdisc_library_service import get_client
 
 
-def generate_template(
-    product: str, version: str, domains: list[str], output_dir: str
-):
+def generate_template(product: str, version: str, domains: list[str], output_dir: str):
     """
     Generates an Excel-based specification template for CDISC datasets.
 
@@ -162,6 +159,7 @@ def generate_dataset(spec_path: str, output_dir: str):
         df.to_csv(output_path, index=False)
         print(f"Dataset for domain {domain} generated successfully at {output_path}")
 
+
 def validate(spec_path: str, dataset_path: str):
     """
     Validates a dataset against a specification template.
@@ -205,11 +203,15 @@ def validate(spec_path: str, dataset_path: str):
     dataset_columns = dataset_df.columns.tolist()
     missing_columns = set(spec_columns) - set(dataset_columns)
     if missing_columns:
-        validation_warnings.append(f"Missing columns in dataset that are in the spec: {', '.join(missing_columns)}")
+        validation_warnings.append(
+            f"Missing columns in dataset that are in the spec: {', '.join(missing_columns)}"
+        )
 
     extra_columns = set(dataset_columns) - set(spec_columns)
     if extra_columns:
-        validation_errors.append(f"Extra columns in dataset that are not in the spec: {', '.join(extra_columns)}")
+        validation_errors.append(
+            f"Extra columns in dataset that are not in the spec: {', '.join(extra_columns)}"
+        )
 
     for _, row in spec_df.iterrows():
         col_name = row["Variable Name"]
@@ -219,7 +221,9 @@ def validate(spec_path: str, dataset_path: str):
                 try:
                     pd.to_numeric(dataset_df[col_name].dropna())
                 except (ValueError, TypeError):
-                    validation_errors.append(f"Data type error in column '{col_name}': Expected a numeric type.")
+                    validation_errors.append(
+                        f"Data type error in column '{col_name}': Expected a numeric type."
+                    )
 
     if validation_errors:
         print("\nValidation Failed:")

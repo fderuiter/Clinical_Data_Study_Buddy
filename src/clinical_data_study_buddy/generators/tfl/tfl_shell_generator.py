@@ -11,6 +11,7 @@ class TFLShellGenerator:
     This class takes a TFL specification and generates a basic Markdown
     document that serves as a shell for the TFLs.
     """
+
     def __init__(self, spec):
         """
         Initializes the TFLShellGenerator.

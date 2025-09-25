@@ -10,22 +10,32 @@ The services offered include the generation of:
 - Study protocols.
 - Excel-based specification templates for CDISC datasets.
 """
+
+import logging
 import pathlib
 from typing import List, Optional
-import yaml
-from clinical_data_study_buddy.generators.data_generator import DataGenerator
-from cdisc_library_client.harvest import harvest
-from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
+
 import pandas as pd
-from clinical_data_study_buddy.generators.raw_dataset_package import generate_raw_dataset_package
+import yaml
+
+from cdisc_library_client.harvest import harvest
 from clinical_data_study_buddy.generators.analysisgen.generator import AnalysisGenerator
-from clinical_data_study_buddy.generators.tfl.tfl_shell_generator import TFLShellGenerator
-from clinical_data_study_buddy.generators.edc_raw_dataset_package_generator import EDCRawDatasetPackageGenerator
-from clinical_data_study_buddy.generators.documents.study_protocols_generator import StudyProtocolsGenerator
-from clinical_data_study_buddy.generators.specification_templates_generator import SpecificationTemplatesGenerator
 from clinical_data_study_buddy.generators.crfgen.cdash import build_domain_crf, load_ig
 from clinical_data_study_buddy.generators.crfgen.populators import populate_ae_from_fda
-import yaml
+from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
+from clinical_data_study_buddy.generators.data_generator import DataGenerator
+from clinical_data_study_buddy.generators.documents.study_protocols_generator import (
+    StudyProtocolsGenerator,
+)
+from clinical_data_study_buddy.generators.edc_raw_dataset_package_generator import (
+    EDCRawDatasetPackageGenerator,
+)
+from clinical_data_study_buddy.generators.specification_templates_generator import (
+    SpecificationTemplatesGenerator,
+)
+from clinical_data_study_buddy.generators.tfl.tfl_shell_generator import (
+    TFLShellGenerator,
+)
 
 
 def generate_tfl_shell(spec: str, output_file: pathlib.Path):
@@ -40,11 +50,18 @@ def generate_tfl_shell(spec: str, output_file: pathlib.Path):
     generator = TFLShellGenerator(spec)
     shell = generator.generate()
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_file, 'w') as f:
+    with open(output_file, "w") as f:
         f.write(shell)
 
 
-def generate_edc_raw_dataset_package(num_subjects: int, therapeutic_area: str, domains: List[str], study_story: str, output_dir: pathlib.Path, output_format: str):
+def generate_edc_raw_dataset_package(
+    num_subjects: int,
+    therapeutic_area: str,
+    domains: List[str],
+    study_story: str,
+    output_dir: pathlib.Path,
+    output_format: str,
+):
     """
     Generates an EDC (Electronic Data Capture) Raw Dataset Package.
 
@@ -67,7 +84,13 @@ def generate_edc_raw_dataset_package(num_subjects: int, therapeutic_area: str, d
     generator.generate()
 
 
-def generate_synthetic_data(standard: str, version: str, domain: str, num_subjects: int, output_dir: pathlib.Path) -> str:
+def generate_synthetic_data(
+    standard: str,
+    version: str,
+    domain: str,
+    num_subjects: int,
+    output_dir: pathlib.Path,
+) -> str:
     """
     Generates a synthetic CDISC dataset for a specific domain.
 
@@ -100,7 +123,13 @@ def generate_synthetic_data(standard: str, version: str, domain: str, num_subjec
     return str(output_file)
 
 
-def generate_analysis_code(language: str, dataset: str, output_type: str, treatment_var: str, output_file: pathlib.Path):
+def generate_analysis_code(
+    language: str,
+    dataset: str,
+    output_type: str,
+    treatment_var: str,
+    output_file: pathlib.Path,
+):
     """
     Generates analysis code in SAS or R.
 
@@ -114,11 +143,18 @@ def generate_analysis_code(language: str, dataset: str, output_type: str, treatm
     generator = AnalysisGenerator(language, dataset, output_type, treatment_var)
     code = generator.generate_code()
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_file, 'w') as f:
+    with open(output_file, "w") as f:
         f.write(code)
 
 
-def generate_cdash_crf(ig_version: str, out_dir: pathlib.Path, domains: Optional[List[str]], config_path: pathlib.Path, openfda_drug_name: Optional[str], openfda_max_results: int):
+def generate_cdash_crf(
+    ig_version: str,
+    out_dir: pathlib.Path,
+    domains: Optional[List[str]],
+    config_path: pathlib.Path,
+    openfda_drug_name: Optional[str],
+    openfda_max_results: int,
+):
     """
     Generates Word CRF (Case Report Form) shells from the CDISC Library API.
 
@@ -138,9 +174,13 @@ def generate_cdash_crf(ig_version: str, out_dir: pathlib.Path, domains: Optional
             config = yaml.safe_load(f)
     else:
         if config_path.exists():
-            print(f"Warning: Config path {config_path} is a directory, not a file. Using default values.")
+            logging.warning(
+                f"Config path {config_path} is a directory, not a file. Using default values."
+            )
         else:
-            print(f"Warning: Config file not found at {config_path}. Using default values.")
+            logging.warning(
+                f"Config file not found at {config_path}. Using default values."
+            )
 
     fda_adverse_events = None
     if openfda_drug_name:
@@ -154,12 +194,20 @@ def generate_cdash_crf(ig_version: str, out_dir: pathlib.Path, domains: Optional
     for dom in target_domains:
         dom_df = ig_df[ig_df["Domain"] == dom]
         if dom_df.empty:
-            print(f"Domain {dom} not found in IG – skipped")
+            logging.warning(f"Domain {dom} not found in IG – skipped")
             continue
-        build_domain_crf(dom_df, dom, out_dir, config, fda_adverse_events=fda_adverse_events)
+        build_domain_crf(
+            dom_df, dom, out_dir, config, fda_adverse_events=fda_adverse_events
+        )
 
 
-def generate_study_protocols(therapeutic_area: str, treatment_arms: List[str], duration_weeks: int, phase: int, output_dir: pathlib.Path):
+def generate_study_protocols(
+    therapeutic_area: str,
+    treatment_arms: List[str],
+    duration_weeks: int,
+    phase: int,
+    output_dir: pathlib.Path,
+):
     """
     Generates a study protocol.
 
@@ -176,12 +224,14 @@ def generate_study_protocols(therapeutic_area: str, treatment_arms: List[str], d
         treatment_arms=treatment_arms,
         duration_weeks=duration_weeks,
         phase=phase,
-        output_dir=str(output_dir)
+        output_dir=str(output_dir),
     )
     generator.generate()
 
 
-def generate_specification_templates(product: str, version: str, domains: List[str], output_dir: pathlib.Path):
+def generate_specification_templates(
+    product: str, version: str, domains: List[str], output_dir: pathlib.Path
+):
     """
     Generates Excel-based specification templates for CDISC datasets.
 
@@ -192,5 +242,7 @@ def generate_specification_templates(product: str, version: str, domains: List[s
         output_dir (pathlib.Path): The directory where the generated Excel file
                                    will be saved.
     """
-    generator = SpecificationTemplatesGenerator(product, version, domains, str(output_dir))
+    generator = SpecificationTemplatesGenerator(
+        product, version, domains, str(output_dir)
+    )
     generator.generate()
