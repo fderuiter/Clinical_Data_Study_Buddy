@@ -1,5 +1,5 @@
-import pytest
 from typer.testing import CliRunner
+
 from clinical_data_study_buddy.cli.main import app
 
 runner = CliRunner()

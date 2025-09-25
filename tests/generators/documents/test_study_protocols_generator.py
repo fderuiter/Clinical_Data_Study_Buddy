@@ -1,12 +1,24 @@
 import unittest
-from unittest.mock import patch, MagicMock
-from clinical_data_study_buddy.generators.documents.study_protocols_generator import StudyProtocolsGenerator
+from unittest.mock import patch
+
+from clinical_data_study_buddy.generators.documents.study_protocols_generator import (
+    StudyProtocolsGenerator,
+)
+
 
 class TestStudyProtocolsGenerator(unittest.TestCase):
-    @patch("clinical_data_study_buddy.generators.documents.study_protocols_generator.os.makedirs")
-    @patch("clinical_data_study_buddy.generators.documents.study_protocols_generator.generate_protocol_markdown")
-    @patch("clinical_data_study_buddy.generators.documents.study_protocols_generator.StudyProtocol")
-    def test_generate(self, mock_study_protocol, mock_generate_protocol_markdown, mock_makedirs):
+    @patch(
+        "clinical_data_study_buddy.generators.documents.study_protocols_generator.os.makedirs"
+    )
+    @patch(
+        "clinical_data_study_buddy.generators.documents.study_protocols_generator.generate_protocol_markdown"
+    )
+    @patch(
+        "clinical_data_study_buddy.generators.documents.study_protocols_generator.StudyProtocol"
+    )
+    def test_generate(
+        self, mock_study_protocol, mock_generate_protocol_markdown, mock_makedirs
+    ):
         # Arrange
         therapeutic_area = "Oncology"
         treatment_arms = ["Arm A", "Arm B"]
@@ -36,6 +48,7 @@ class TestStudyProtocolsGenerator(unittest.TestCase):
         mock_generate_protocol_markdown.assert_called_once_with(
             mock_study_protocol.return_value, output_dir
         )
+
 
 if __name__ == "__main__":
     unittest.main()

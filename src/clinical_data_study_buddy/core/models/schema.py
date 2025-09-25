@@ -2,6 +2,7 @@
 This module defines the data structures (schema) for representing Case Report Forms (CRFs)
 using Pydantic models. These models are based on the CDISC CDASH standard.
 """
+
 from __future__ import annotations
 
 import json
@@ -32,6 +33,7 @@ class DataType(str):
     This class is a custom string type that is validated against a set of
     allowed CDASH data types.
     """
+
     # Not using Enum to keep it open; we validate later
 
     @classmethod
@@ -60,6 +62,7 @@ class FieldDef(BaseModel):
         control (Optional[Literal["radio", "checkbox"]]): The type of input control.
         range_check (Optional[dict]): A dictionary defining a range check.
     """
+
     oid: str
     prompt: str
     datatype: DataType
@@ -105,6 +108,7 @@ class Form(BaseModel):
         scenario (Optional[str]): The scenario, if applicable.
         fields (list[FieldDef]): A list of field definitions for the form.
     """
+
     title: str
     domain: str
     scenario: Optional[str] = None

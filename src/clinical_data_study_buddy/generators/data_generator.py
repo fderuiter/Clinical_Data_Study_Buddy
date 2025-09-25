@@ -2,9 +2,11 @@
 This module contains the DataGenerator class, which is responsible for generating synthetic data
 based on a given CDISC standard form definition.
 """
+
 import random
 import string
 from datetime import datetime, timedelta
+
 
 class DataGenerator:
     """
@@ -13,6 +15,7 @@ class DataGenerator:
     This class takes a form data definition and generates synthetic data
     that conforms to the specified fields and their data types.
     """
+
     def __init__(self, form_data):
         """
         Initializes the DataGenerator.

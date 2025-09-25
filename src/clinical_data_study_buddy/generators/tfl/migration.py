@@ -2,13 +2,15 @@
 This module provides functionality for migrating TFL (Tables, Figures, and
 Listings) specifications from older versions to the latest version.
 """
-from typing import Dict, Any
+
+from typing import Any, Dict
 
 
 class TFLSpecMigrationError(Exception):
     """
     Custom exception for errors that occur during TFL spec migration.
     """
+
     pass
 
 
@@ -40,7 +42,9 @@ def migrate_spec(spec_data: Dict[str, Any]) -> Dict[str, Any]:
         return spec_data
     else:
         # In the future, migration logic for other versions would go here.
-        raise TFLSpecMigrationError(f"Unsupported spec version: {version}. No migration path available.")
+        raise TFLSpecMigrationError(
+            f"Unsupported spec version: {version}. No migration path available."
+        )
 
     # In a real implementation, you might have a chain of migration functions, e.g.:
     # migrations = {

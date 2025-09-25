@@ -2,6 +2,7 @@
 This module provides the functionality to export CRF (Case Report Form) data
 to a Microsoft Word (.docx) file.
 """
+
 from pathlib import Path
 from typing import Sequence
 
@@ -9,11 +10,14 @@ import docx
 
 from clinical_data_study_buddy.core.models.schema import Form
 from clinical_data_study_buddy.generators.crfgen.style.style import apply_styles
+
 from .registry import register
 
 
 @register("docx")
-def export_docx(forms: Sequence[Form], outdir: Path, style: dict = None, output_filename: str = None) -> None:
+def export_docx(
+    forms: Sequence[Form], outdir: Path, style: dict = None, output_filename: str = None
+) -> None:
     """
     Exports a sequence of Form objects to a .docx file.
 
@@ -35,7 +39,7 @@ def export_docx(forms: Sequence[Form], outdir: Path, style: dict = None, output_
 
     for form in forms:
         doc.add_heading(form.title, level=1)
-        if hasattr(form, 'data') and form.data:
+        if hasattr(form, "data") and form.data:
             if isinstance(form.data, list) and form.data:
                 table = doc.add_table(rows=1, cols=len(form.data[0]))
                 hdr_cells = table.rows[0].cells
@@ -48,7 +52,7 @@ def export_docx(forms: Sequence[Form], outdir: Path, style: dict = None, output_
             else:
                 doc.add_paragraph("No data available for this table.")
         else:
-            if hasattr(form, 'fields') and form.fields:
+            if hasattr(form, "fields") and form.fields:
                 for fld in form.fields:
                     doc.add_paragraph(f"{fld.prompt} ({fld.oid})")
 

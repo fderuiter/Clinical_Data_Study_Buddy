@@ -1,6 +1,7 @@
 import logging
-import pytest
-from clinical_data_study_buddy.services.logging_service import get_logger
+
+from clinical_data_study_buddy.core.logging_service import get_logger
+
 
 def test_get_logger_returns_logger_instance():
     """
@@ -8,6 +9,7 @@ def test_get_logger_returns_logger_instance():
     """
     logger = get_logger("test_logger")
     assert isinstance(logger, logging.Logger)
+
 
 def test_get_logger_sets_name():
     """
@@ -17,12 +19,14 @@ def test_get_logger_sets_name():
     logger = get_logger(logger_name)
     assert logger.name == logger_name
 
+
 def test_get_logger_sets_level():
     """
     Test that get_logger sets the correct logging level.
     """
     logger = get_logger("test_level_logger", level=logging.DEBUG)
     assert logger.level == logging.DEBUG
+
 
 def test_get_logger_adds_handler_if_none_exist():
     """
@@ -36,6 +40,7 @@ def test_get_logger_adds_handler_if_none_exist():
     logger = get_logger(logger_name)
     assert len(logger.handlers) == 1
     assert isinstance(logger.handlers[0], logging.StreamHandler)
+
 
 def test_get_logger_does_not_add_handler_if_one_exists():
     """

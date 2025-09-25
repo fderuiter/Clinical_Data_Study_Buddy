@@ -3,11 +3,14 @@ This module provides functions to populate CRF data by fetching information
 from the OpenFDA API. It includes functions for retrieving adverse event
 and drug label data.
 """
+
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from clinical_data_study_buddy.api.openfda import client
 
 logger = logging.getLogger(__name__)
+
 
 def populate_ae_from_fda(
     drug_name: str, max_results: int = 10, start_date: str = None, end_date: str = None
@@ -31,12 +34,16 @@ def populate_ae_from_fda(
                               contains a single key "reaction_term" with the
                               adverse event term.
     """
-    logger.info(f"Fetching adverse events for drug: {drug_name} with max_results: {max_results}")
+    logger.info(
+        f"Fetching adverse events for drug: {drug_name} with max_results: {max_results}"
+    )
     adverse_events = client.get_adverse_events(
         drug_name, max_results=max_results, start_date=start_date, end_date=end_date
     )
     if not adverse_events:
-        logger.warning(f"No adverse events found for '{drug_name}' with the given criteria.")
+        logger.warning(
+            f"No adverse events found for '{drug_name}' with the given criteria."
+        )
         return []
 
     # Extract reaction terms

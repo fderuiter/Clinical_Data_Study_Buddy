@@ -1,11 +1,13 @@
 """
 This module provides access to the OpenFDA MAUDE (device event) endpoint.
 """
+
 from typing import List, Optional
 
 from ..client import OpenFDAClient
 from ..models import MAUDEEvent
 from ..query import paging_query
+
 
 class MAUDEAccessor:
     """
@@ -24,7 +26,12 @@ class MAUDEAccessor:
         """
         self.client = client
 
-    async def fetch(self, search: Optional[str] = None, limit: Optional[int] = None, skip: Optional[int] = None) -> List[MAUDEEvent]:
+    async def fetch(
+        self,
+        search: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+    ) -> List[MAUDEEvent]:
         """
         Fetches MAUDE event records from the openFDA API.
 

@@ -1,8 +1,10 @@
 """
 This module provides functionality for applying custom styles to a .docx document.
 """
+
 from docx import Document
-from docx.shared import Pt, RGBColor
+from docx.shared import Pt
+
 
 def apply_styles(doc: Document, styles: dict):
     """

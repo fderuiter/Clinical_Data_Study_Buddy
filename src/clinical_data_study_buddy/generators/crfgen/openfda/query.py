@@ -3,7 +3,9 @@ This module provides helper functions for constructing query strings and
 parameters for the OpenFDA API. These functions simplify the process of
 creating term, range, count, and paging queries.
 """
+
 from typing import Optional
+
 
 def term_query(field: str, term: str) -> str:
     """
@@ -18,6 +20,7 @@ def term_query(field: str, term: str) -> str:
     """
     return f'{field}:"{term}"'
 
+
 def range_query(field: str, start: str, end: str) -> str:
     """
     Creates a range query string for the OpenFDA API.
@@ -30,7 +33,8 @@ def range_query(field: str, start: str, end: str) -> str:
     Returns:
         str: A formatted range query string.
     """
-    return f'{field}:[{start}+TO+{end}]'
+    return f"{field}:[{start}+TO+{end}]"
+
 
 def count_query(field: str) -> str:
     """
@@ -48,6 +52,7 @@ def count_query(field: str) -> str:
     if not field.endswith(".exact"):
         return f"{field}.exact"
     return field
+
 
 def paging_query(limit: Optional[int] = None, skip: Optional[int] = None) -> dict:
     """

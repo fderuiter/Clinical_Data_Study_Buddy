@@ -1,9 +1,11 @@
 import unittest
-from clinical_data_study_buddy.services.db_service import DBService
+
+from clinical_data_study_buddy.core.db_service import DBService
 
 # The tests for this service are basic because the implementation
 # is a placeholder. More meaningful tests will be added when the
 # database service is implemented.
+
 
 class TestDBService(unittest.TestCase):
     def test_init(self):
@@ -28,6 +30,7 @@ class TestDBService(unittest.TestCase):
             db_service.disconnect()
         except Exception as e:
             self.fail(f"DBService connect/disconnect raised an exception: {e}")
+
 
 if __name__ == "__main__":
     unittest.main()

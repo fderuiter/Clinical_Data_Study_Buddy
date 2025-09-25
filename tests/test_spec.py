@@ -1,8 +1,10 @@
-import pytest
-import pandas as pd
 from pathlib import Path
 from unittest.mock import patch
+
+import pandas as pd
+
 from clinical_data_study_buddy.generators import spec
+
 
 def test_validate_handles_simple_filename(capsys):
     """
@@ -13,21 +15,20 @@ def test_validate_handles_simple_filename(capsys):
     spec_df = pd.DataFrame({"Variable Name": ["USUBJID"], "Data Type": ["Char"]})
     dataset_df = pd.DataFrame({"USUBJID": ["CDISC-01-001"]})
 
-    with patch("pandas.read_excel", return_value=spec_df) as mock_read_excel, \
-         patch("pandas.read_csv", return_value=dataset_df) as mock_read_csv:
+    with patch("pandas.read_excel", return_value=spec_df) as mock_read_excel, patch(
+        "pandas.read_csv", return_value=dataset_df
+    ) as mock_read_csv:
 
-        spec.validate(
-            spec_path=Path("dummy_spec.xlsx"),
-            dataset_path=Path("DM.csv")
-        )
+        spec.validate(spec_path=Path("dummy_spec.xlsx"), dataset_path=Path("DM.csv"))
 
         mock_read_excel.assert_called_once()
-        assert mock_read_excel.call_args.kwargs['sheet_name'] == 'DM'
+        assert mock_read_excel.call_args.kwargs["sheet_name"] == "DM"
         mock_read_csv.assert_called_once_with(Path("DM.csv"), dtype=str)
 
         captured = capsys.readouterr()
         assert "Invalid dataset filename format" not in captured.out
         assert "Validation Successful" in captured.out
+
 
 def test_validate_handles_complex_filename(capsys):
     """
@@ -37,17 +38,20 @@ def test_validate_handles_complex_filename(capsys):
     spec_df = pd.DataFrame({"Variable Name": ["USUBJID"], "Data Type": ["Char"]})
     dataset_df = pd.DataFrame({"USUBJID": ["CDISC-01-001"]})
 
-    with patch("pandas.read_excel", return_value=spec_df) as mock_read_excel, \
-         patch("pandas.read_csv", return_value=dataset_df) as mock_read_csv:
+    with patch("pandas.read_excel", return_value=spec_df) as mock_read_excel, patch(
+        "pandas.read_csv", return_value=dataset_df
+    ) as mock_read_csv:
 
         spec.validate(
             spec_path=Path("dummy_spec.xlsx"),
-            dataset_path=Path("sdtmig_DM_2025-09-03.csv")
+            dataset_path=Path("sdtmig_DM_2025-09-03.csv"),
         )
 
         mock_read_excel.assert_called_once()
-        assert mock_read_excel.call_args.kwargs['sheet_name'] == 'DM'
-        mock_read_csv.assert_called_once_with(Path("sdtmig_DM_2025-09-03.csv"), dtype=str)
+        assert mock_read_excel.call_args.kwargs["sheet_name"] == "DM"
+        mock_read_csv.assert_called_once_with(
+            Path("sdtmig_DM_2025-09-03.csv"), dtype=str
+        )
 
         captured = capsys.readouterr()
         assert "Invalid dataset filename format" not in captured.out

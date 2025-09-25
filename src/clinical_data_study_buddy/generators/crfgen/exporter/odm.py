@@ -2,12 +2,14 @@
 This module provides the functionality to export CRF (Case Report Form) data
 to an ODM-XML (Operational Data Model) file.
 """
+
 from pathlib import Path
 from typing import Sequence
 
 import odmlib.odm_1_3_2.model as ODM
 
 from clinical_data_study_buddy.core.models.schema import Form
+
 from .registry import register
 
 
@@ -37,7 +39,9 @@ def render_odm(forms: Sequence[Form], out_dir: Path):
 
     for f in forms:
         formdef = ODM.FormDef(OID=f"F.{f.domain}", Name=f.title, Repeating="No")
-        item_group_def = ODM.ItemGroupDef(OID=f"IG.{f.domain}", Name=f.title, Repeating="No")
+        item_group_def = ODM.ItemGroupDef(
+            OID=f"IG.{f.domain}", Name=f.title, Repeating="No"
+        )
         for field in f.fields:
             item_def = ODM.ItemDef(
                 OID=f"IT.{field.oid}",
@@ -55,7 +59,9 @@ def render_odm(forms: Sequence[Form], out_dir: Path):
             item_group_def.ItemRef.append(item_ref)
 
         mdv.ItemGroupDef.append(item_group_def)
-        formdef.ItemGroupRef.append(ODM.ItemGroupRef(ItemGroupOID=f"IG.{f.domain}", Mandatory="No"))
+        formdef.ItemGroupRef.append(
+            ODM.ItemGroupRef(ItemGroupOID=f"IG.{f.domain}", Mandatory="No")
+        )
         mdv.FormDef.append(formdef)
 
     out_dir.mkdir(exist_ok=True, parents=True)

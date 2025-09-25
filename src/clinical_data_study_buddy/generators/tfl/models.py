@@ -2,8 +2,10 @@
 This module defines the Pydantic models used to represent the structure and
 metadata of TFL (Tables, Figures, and Listings) specifications.
 """
+
+from typing import List
+
 from pydantic import BaseModel, Field
-from typing import List, Optional
 
 
 class Layout(BaseModel):
@@ -14,6 +16,7 @@ class Layout(BaseModel):
         orientation (str): The page orientation (e.g., "portrait", "landscape").
         page_size (str): The page size (e.g., "A4", "Letter").
     """
+
     orientation: str
     page_size: str
 
@@ -30,6 +33,7 @@ class TFL(BaseModel):
         footnotes (List[str]): A list of footnotes for the TFL.
         layout (Layout): The layout properties for the TFL.
     """
+
     shell_id: str
     title: str
     population: str
@@ -46,5 +50,6 @@ class TFLSpec(BaseModel):
         version (float): The version number of the specification.
         tfls (List[TFL]): A list of all TFLs included in the specification.
     """
+
     version: float
     tfls: List[TFL]

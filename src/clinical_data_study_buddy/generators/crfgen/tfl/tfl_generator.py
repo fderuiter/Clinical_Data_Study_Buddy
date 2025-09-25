@@ -1,12 +1,14 @@
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
 import pandas as pd
 
-from .TFL import TFL
-from .tables import Table
+from ..exporter.registry import get as get_exporter
 from .figures import Figure
 from .listings import Listing
-from ..exporter.registry import get as get_exporter
+from .tables import Table
+from .TFL import TFL
+
 
 class TFLGenerator:
     """

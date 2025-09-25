@@ -1,9 +1,13 @@
+import tempfile
 import zipfile
 from pathlib import Path
-import pandas as pd
-import tempfile
 
-from clinical_data_study_buddy.generators.raw_dataset_package import generate_raw_dataset_package
+import pandas as pd
+
+from clinical_data_study_buddy.generators.raw_dataset_package import (
+    generate_raw_dataset_package,
+)
+
 
 def test_generate_raw_dataset_package():
     with tempfile.TemporaryDirectory() as tmpdir:

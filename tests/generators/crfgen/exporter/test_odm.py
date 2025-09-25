@@ -1,8 +1,10 @@
 import unittest
-from unittest.mock import patch, MagicMock
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+from clinical_data_study_buddy.core.models.schema import FieldDef, Form
 from clinical_data_study_buddy.generators.crfgen.exporter.odm import render_odm
-from clinical_data_study_buddy.core.models.schema import Form, FieldDef
+
 
 class TestOdmExporter(unittest.TestCase):
     @patch("clinical_data_study_buddy.generators.crfgen.exporter.odm.ODM.ODM")
@@ -30,7 +32,9 @@ class TestOdmExporter(unittest.TestCase):
 
         # Assert
         mock_odm_root.assert_called_once()
-        mock_root_instance.write_xml.assert_called_once_with(str(outdir / "forms.odm.xml"))
+        mock_root_instance.write_xml.assert_called_once_with(
+            str(outdir / "forms.odm.xml")
+        )
 
     @patch("clinical_data_study_buddy.generators.crfgen.exporter.odm.ODM.RangeCheck")
     @patch("clinical_data_study_buddy.generators.crfgen.exporter.odm.ODM.ODM")
@@ -58,6 +62,7 @@ class TestOdmExporter(unittest.TestCase):
 
         # Assert
         mock_range_check.assert_called_once_with(Comparator="EQ", SoftHard="Soft")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,12 +2,14 @@
 This module provides the functionality to export CRF (Case Report Form) data
 to Markdown (.md) files using Jinja2 templates.
 """
+
 from pathlib import Path
 from typing import Sequence
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from clinical_data_study_buddy.core.models.schema import Form
+
 from .registry import register
 
 env = Environment(

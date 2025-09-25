@@ -5,6 +5,7 @@ It includes features like rate limiting, automatic retries with exponential
 backoff, and response caching to ensure efficient and reliable communication
 with the API.
 """
+
 import asyncio
 import os
 from typing import Optional
@@ -12,6 +13,7 @@ from typing import Optional
 import httpx
 from httpx_cache import AsyncClient, FileCache
 from tenacity import retry, stop_after_attempt, wait_exponential
+
 
 class TokenBucket:
     """
@@ -21,6 +23,7 @@ class TokenBucket:
         capacity (float): The total capacity of the bucket.
         fill_rate (float): The rate at which tokens are added to the bucket per second.
     """
+
     def __init__(self, tokens, fill_rate):
         """
         Initializes the TokenBucket.
@@ -76,7 +79,13 @@ class OpenFDAClient:
     - Authentication using an API key from an environment variable.
     """
 
-    def __init__(self, api_key: Optional[str] = None, base_url: str = "https://api.fda.gov", rpm: int = 200, cache_ttl: Optional[dict] = None):
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        base_url: str = "https://api.fda.gov",
+        rpm: int = 200,
+        cache_ttl: Optional[dict] = None,
+    ):
         """
         Initializes the OpenFDAClient.
 
@@ -94,10 +103,12 @@ class OpenFDAClient:
 
         self.cache_ttl = cache_ttl or {}
 
-        self.client = AsyncClient(cache=FileCache('.cache/openfda'))
+        self.client = AsyncClient(cache=FileCache(".cache/openfda"))
         self.bucket = TokenBucket(rpm, rpm / 60)
 
-    @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5))
+    @retry(
+        wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5)
+    )
     async def get(self, endpoint: str, params: Optional[dict] = None) -> httpx.Response:
         """
         Performs a GET request to a specified openFDA endpoint.
@@ -123,7 +134,7 @@ class OpenFDAClient:
         url = f"{self.base_url}{endpoint}"
 
         headers = {}
-        ttl = self.cache_ttl.get(endpoint, 604800) # Default to 1 week
+        ttl = self.cache_ttl.get(endpoint, 604800)  # Default to 1 week
         headers["Cache-Control"] = f"max-age={ttl}"
 
         # Redact API key for logging

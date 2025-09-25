@@ -1,11 +1,13 @@
 """
 This module provides access to the OpenFDA Unique Device Identifier (UDI) endpoint.
 """
+
 from typing import List, Optional
 
 from ..client import OpenFDAClient
 from ..models import UDI
-from ..query import term_query, paging_query
+from ..query import paging_query, term_query
+
 
 class UDIAccessor:
     """
@@ -24,7 +26,12 @@ class UDIAccessor:
         """
         self.client = client
 
-    async def fetch(self, search: Optional[str] = None, limit: Optional[int] = None, skip: Optional[int] = None) -> List[UDI]:
+    async def fetch(
+        self,
+        search: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+    ) -> List[UDI]:
         """
         Fetches UDI records from the openFDA API.
 
