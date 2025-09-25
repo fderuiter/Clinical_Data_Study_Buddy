@@ -1,8 +1,10 @@
 """
 This module provides a centralized logging service for the application.
 """
+
 import logging
 import sys
+
 
 def get_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     """

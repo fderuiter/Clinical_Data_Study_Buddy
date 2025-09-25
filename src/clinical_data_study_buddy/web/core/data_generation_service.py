@@ -2,12 +2,20 @@
 This module provides a service layer for handling data generation business logic.
 It acts as an intermediary between the API routers and the core generation services.
 """
+
 import pathlib
 from typing import List
+
 from clinical_data_study_buddy.core import generation_service
 
 
-def create_synthetic_data(dataset_type: str, domain: str, num_subjects: int, therapeutic_area: str, data_format: str) -> str:
+def create_synthetic_data(
+    dataset_type: str,
+    domain: str,
+    num_subjects: int,
+    therapeutic_area: str,
+    data_format: str,
+) -> str:
     """
     Creates a single synthetic dataset by calling the core generation service.
 
@@ -30,7 +38,13 @@ def create_synthetic_data(dataset_type: str, domain: str, num_subjects: int, the
     )
 
 
-def create_raw_dataset_package(num_subjects: int, therapeutic_area: str, domains: List[str], study_story: str, output_format: str) -> str:
+def create_raw_dataset_package(
+    num_subjects: int,
+    therapeutic_area: str,
+    domains: List[str],
+    study_story: str,
+    output_format: str,
+) -> str:
     """
     Creates a raw dataset package by calling the core generation service.
 

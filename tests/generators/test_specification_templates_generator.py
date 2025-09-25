@@ -1,12 +1,24 @@
 import unittest
-from unittest.mock import patch, MagicMock
-from clinical_data_study_buddy.generators.specification_templates_generator import SpecificationTemplatesGenerator
+from unittest.mock import MagicMock, patch
+
+from clinical_data_study_buddy.generators.specification_templates_generator import (
+    SpecificationTemplatesGenerator,
+)
+
 
 class TestSpecificationTemplatesGenerator(unittest.TestCase):
-    @patch("clinical_data_study_buddy.generators.specification_templates_generator.Workbook")
-    @patch("clinical_data_study_buddy.generators.specification_templates_generator.harvest")
-    @patch("clinical_data_study_buddy.generators.specification_templates_generator.get_api_key")
-    def test_generate_single_domain(self, mock_get_api_key, mock_harvest, mock_workbook):
+    @patch(
+        "clinical_data_study_buddy.generators.specification_templates_generator.Workbook"
+    )
+    @patch(
+        "clinical_data_study_buddy.generators.specification_templates_generator.harvest"
+    )
+    @patch(
+        "clinical_data_study_buddy.generators.specification_templates_generator.get_api_key"
+    )
+    def test_generate_single_domain(
+        self, mock_get_api_key, mock_harvest, mock_workbook
+    ):
         # Arrange
         mock_wb_instance = MagicMock()
         mock_workbook.return_value = mock_wb_instance
@@ -39,10 +51,18 @@ class TestSpecificationTemplatesGenerator(unittest.TestCase):
         mock_wb_instance.create_sheet.assert_called_once_with(title="DM")
         mock_wb_instance.save.assert_called_once()
 
-    @patch("clinical_data_study_buddy.generators.specification_templates_generator.Workbook")
-    @patch("clinical_data_study_buddy.generators.specification_templates_generator.harvest")
-    @patch("clinical_data_study_buddy.generators.specification_templates_generator.get_api_key")
-    def test_generate_domain_not_found(self, mock_get_api_key, mock_harvest, mock_workbook):
+    @patch(
+        "clinical_data_study_buddy.generators.specification_templates_generator.Workbook"
+    )
+    @patch(
+        "clinical_data_study_buddy.generators.specification_templates_generator.harvest"
+    )
+    @patch(
+        "clinical_data_study_buddy.generators.specification_templates_generator.get_api_key"
+    )
+    def test_generate_domain_not_found(
+        self, mock_get_api_key, mock_harvest, mock_workbook
+    ):
         # Arrange
         mock_wb_instance = MagicMock()
         mock_workbook.return_value = mock_wb_instance
@@ -62,6 +82,7 @@ class TestSpecificationTemplatesGenerator(unittest.TestCase):
         # Assert
         mock_wb_instance.create_sheet.assert_not_called()
         mock_wb_instance.save.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()

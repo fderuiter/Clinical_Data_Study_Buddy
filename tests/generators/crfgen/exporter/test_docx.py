@@ -1,8 +1,10 @@
 import unittest
-from unittest.mock import patch, MagicMock
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+from clinical_data_study_buddy.core.models.schema import FieldDef, Form
 from clinical_data_study_buddy.generators.crfgen.exporter.docx import export_docx
-from clinical_data_study_buddy.core.models.schema import Form, FieldDef
+
 
 class TestDocxExporter(unittest.TestCase):
     @patch("clinical_data_study_buddy.generators.crfgen.exporter.docx.docx.Document")
@@ -103,6 +105,7 @@ class TestDocxExporter(unittest.TestCase):
 
         # Assert
         mock_doc_instance.save.assert_called_once_with(outdir / output_filename)
+
 
 if __name__ == "__main__":
     unittest.main()

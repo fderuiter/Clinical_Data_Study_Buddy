@@ -1,6 +1,5 @@
-import pytest
 from clinical_data_study_buddy.generators.tfl.autonumber import AutoNumberer
-from clinical_data_study_buddy.generators.tfl.models import TFL, TFLSpec, Layout
+from clinical_data_study_buddy.generators.tfl.models import TFL, Layout, TFLSpec
 
 
 class TestAutoNumberer:

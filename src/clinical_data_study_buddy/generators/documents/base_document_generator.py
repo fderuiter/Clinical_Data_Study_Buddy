@@ -2,9 +2,12 @@
 This module contains the BaseDocumentGenerator class, which serves as an
 abstract base class for all document generators in the system.
 """
+
 import json
-from docx import Document
 from abc import ABC, abstractmethod
+
+from docx import Document
+
 from clinical_data_study_buddy.core.models.config import StudyConfig
 
 
@@ -28,7 +31,7 @@ class BaseDocumentGenerator(ABC):
         Args:
             study_config_path (str): The path to the study configuration JSON file.
         """
-        with open(study_config_path, 'r') as f:
+        with open(study_config_path, "r") as f:
             config_dict = json.load(f)
         self.study_config = StudyConfig(**config_dict)
 

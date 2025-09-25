@@ -1,6 +1,10 @@
 import pytest
-import pathlib
-from clinical_data_study_buddy.core.generation_service import generate_analysis_code, generate_tfl_shell
+
+from clinical_data_study_buddy.core.generation_service import (
+    generate_analysis_code,
+    generate_tfl_shell,
+)
+
 
 def test_generate_analysis_code_creates_output_dir(tmp_path):
     """
@@ -22,6 +26,7 @@ def test_generate_analysis_code_creates_output_dir(tmp_path):
         pytest.fail("generate_analysis_code raised FileNotFoundError unexpectedly.")
 
     assert output_file.exists()
+
 
 def test_generate_tfl_shell_creates_output_dir(tmp_path):
     """

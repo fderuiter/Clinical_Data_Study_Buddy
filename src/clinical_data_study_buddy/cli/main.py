@@ -3,19 +3,18 @@ This module serves as the main entry point for the Clinical Data Study Buddy com
 interface (CLI). It uses the Typer library to create a structured and user-friendly
 CLI application by composing subcommands from different modules.
 """
-import typer
-import click
-from rich.console import Console
-from dotenv import load_dotenv
 
-from clinical_data_study_buddy.cli.commands.generate import generate_app
+import typer
+from dotenv import load_dotenv
+from rich.console import Console
+
 from clinical_data_study_buddy.cli.commands.build import build_app
 from clinical_data_study_buddy.cli.commands.download import download_app
-from clinical_data_study_buddy.cli.commands.spec import spec_app
-from clinical_data_study_buddy.cli.commands.openfda import openfda_app
+from clinical_data_study_buddy.cli.commands.generate import generate_app
 from clinical_data_study_buddy.cli.commands.guides import adrg_app, sdrg_app
 from clinical_data_study_buddy.cli.commands.legacy import legacy_app
-
+from clinical_data_study_buddy.cli.commands.openfda import openfda_app
+from clinical_data_study_buddy.cli.commands.spec import spec_app
 
 load_dotenv()
 
@@ -35,6 +34,7 @@ def main():
     # This callback will run before any command.
     # You can use it for common setup.
     pass
+
 
 app.add_typer(generate_app, name="generate")
 app.add_typer(build_app, name="build")

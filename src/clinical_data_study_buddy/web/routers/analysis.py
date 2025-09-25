@@ -1,9 +1,11 @@
 """
 This module provides the API router for analysis-related endpoints.
 """
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from clinical_data_study_buddy.web.services import analysis_service
+
+from clinical_data_study_buddy.web.core import analysis_service
 
 router = APIRouter()
 
@@ -18,6 +20,7 @@ class AnalysisCodeRequest(BaseModel):
         output_type (str): The type of analysis output to generate.
         treatment_var (str): The name of the treatment variable.
     """
+
     language: str
     dataset_path: str
     output_type: str
@@ -50,6 +53,11 @@ async def generate_analysis_code_endpoint(request: AnalysisCodeRequest):
             request.output_type,
             request.treatment_var,
         )
-        return {"message": "Analysis code generated successfully", "file_path": file_path}
+        return {
+            "message": "Analysis code generated successfully",
+            "file_path": file_path,
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating analysis code: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating analysis code: {e}"
+        )

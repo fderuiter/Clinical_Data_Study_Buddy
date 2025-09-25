@@ -1,11 +1,20 @@
 import unittest
-from unittest.mock import patch, MagicMock, mock_open
-from clinical_data_study_buddy.generators.protogen.protocol import StudyProtocol, generate_protocol_markdown
+from unittest.mock import MagicMock, mock_open, patch
+
+from clinical_data_study_buddy.generators.protogen.protocol import (
+    StudyProtocol,
+    generate_protocol_markdown,
+)
+
 
 class TestProtocol(unittest.TestCase):
-    @patch("clinical_data_study_buddy.generators.protogen.protocol.generate_gantt_chart")
+    @patch(
+        "clinical_data_study_buddy.generators.protogen.protocol.generate_gantt_chart"
+    )
     @patch("clinical_data_study_buddy.generators.protogen.protocol.Environment")
-    def test_generate_protocol_markdown(self, mock_environment, mock_generate_gantt_chart):
+    def test_generate_protocol_markdown(
+        self, mock_environment, mock_generate_gantt_chart
+    ):
         # Arrange
         protocol = StudyProtocol(
             therapeutic_area="Immunology",
@@ -28,6 +37,7 @@ class TestProtocol(unittest.TestCase):
         mock_template.render.assert_called_once_with(protocol=protocol)
         mock_file.assert_called_once_with(f"{output_dir}/protocol.md", "w")
         mock_file().write.assert_called_once_with(mock_template.render.return_value)
+
 
 if __name__ == "__main__":
     unittest.main()

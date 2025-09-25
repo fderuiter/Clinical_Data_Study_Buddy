@@ -2,8 +2,8 @@
 This module provides a simple client for searching studies on ClinicalTrials.gov
 using their V2 API.
 """
+
 import requests
-import json
 
 URL = "https://clinicaltrials.gov/api/v2/studies"
 HEADERS = {

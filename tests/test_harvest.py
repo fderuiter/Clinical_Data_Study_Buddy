@@ -1,7 +1,7 @@
 import pytest
 
-from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
 from cdisc_library_client.harvest import harvest
+from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
 
 reason = ""
 try:

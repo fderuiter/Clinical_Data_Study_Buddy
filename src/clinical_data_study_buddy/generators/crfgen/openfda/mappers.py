@@ -3,11 +3,13 @@ This module provides functions for mapping and enriching data from different
 OpenFDA endpoints. These functions are used to create a more complete and
 integrated view of the data.
 """
-from typing import List, Optional
+
 import hashlib
 import json
+from typing import List
 
-from .models import MAUDEEvent, UDI, Classification, Recall
+from .models import UDI, Classification, MAUDEEvent
+
 
 def crosswalk_events_to_udi(events: List[MAUDEEvent], udis: List[UDI]) -> List[dict]:
     """
@@ -39,13 +41,20 @@ def crosswalk_events_to_udi(events: List[MAUDEEvent], udis: List[UDI]) -> List[d
                         "source": "openfda",
                         "endpoints": ["/device/event.json", "/device/udi.json"],
                         "join_key": "udi_di",
-                        "hash": hashlib.sha256(json.dumps([event.dict(), udi.dict()], sort_keys=True).encode()).hexdigest()
-                    }
+                        "hash": hashlib.sha256(
+                            json.dumps(
+                                [event.dict(), udi.dict()], sort_keys=True
+                            ).encode()
+                        ).hexdigest(),
+                    },
                 }
                 results.append(joined_record)
     return results
 
-def enrich_with_classification(records: List[dict], classifications: List[Classification]) -> List[dict]:
+
+def enrich_with_classification(
+    records: List[dict], classifications: List[Classification]
+) -> List[dict]:
     """
     Enriches a list of records with device classification information.
 

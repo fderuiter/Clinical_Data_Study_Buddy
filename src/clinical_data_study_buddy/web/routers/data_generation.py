@@ -1,10 +1,13 @@
 """
 This module provides the API router for data generation endpoints.
 """
-from fastapi import APIRouter, HTTPException
+
 from typing import List
+
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from clinical_data_study_buddy.web.services import data_generation_service
+
+from clinical_data_study_buddy.web.core import data_generation_service
 
 router = APIRouter()
 
@@ -20,6 +23,7 @@ class SyntheticDataRequest(BaseModel):
         therapeutic_area (str): The therapeutic area.
         data_format (str): The desired data format (e.g., "csv").
     """
+
     dataset_type: str
     domain: str
     num_subjects: int
@@ -38,6 +42,7 @@ class RawDatasetRequest(BaseModel):
         study_story (str): The study story to simulate.
         output_format (str): The desired output format (e.g., "csv").
     """
+
     num_subjects: int
     therapeutic_area: str
     domains: List[str]
@@ -75,7 +80,9 @@ async def generate_synthetic_data_endpoint(request: SyntheticDataRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating synthetic data: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating synthetic data: {e}"
+        )
 
 
 @router.post("/api/generate-raw-dataset-package")
@@ -105,8 +112,13 @@ async def generate_raw_dataset_package_endpoint(request: RawDatasetRequest):
             request.study_story,
             request.output_format,
         )
-        return {"message": "Raw dataset package generated successfully", "file_path": file_path}
+        return {
+            "message": "Raw dataset package generated successfully",
+            "file_path": file_path,
+        }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating raw dataset package: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating raw dataset package: {e}"
+        )

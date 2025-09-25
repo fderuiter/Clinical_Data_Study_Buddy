@@ -134,3 +134,6 @@ Thumbs.db
 
 # Archives
 *.tar.gz
+
+# Generated client
+src/cdisc_library_client/

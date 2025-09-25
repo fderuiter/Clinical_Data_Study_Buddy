@@ -2,10 +2,16 @@
 This module provides functionality to interact with the OpenFDA API to populate
 Case Report Forms (CRFs) with adverse event and drug label information.
 """
+
 import csv
-import sys
 import json
-from clinical_data_study_buddy.generators.crfgen.populators import populate_ae_from_fda, populate_label_from_fda
+import sys
+
+from clinical_data_study_buddy.generators.crfgen.populators import (
+    populate_ae_from_fda,
+    populate_label_from_fda,
+)
+
 
 def output_csv(data, writer):
     """
@@ -22,7 +28,15 @@ def output_csv(data, writer):
     for item in data:
         writer.writerow(item.values())
 
-def populate_crf(drug_name: str, domain: str, max_results: int, start_date: str, end_date: str, output_format: str):
+
+def populate_crf(
+    drug_name: str,
+    domain: str,
+    max_results: int,
+    start_date: str,
+    end_date: str,
+    output_format: str,
+):
     """
     Populates a CRF with data from OpenFDA.
 
@@ -40,10 +54,7 @@ def populate_crf(drug_name: str, domain: str, max_results: int, start_date: str,
     results = None
     if domain == "AE":
         results = populate_ae_from_fda(
-            drug_name,
-            max_results=max_results,
-            start_date=start_date,
-            end_date=end_date
+            drug_name, max_results=max_results, start_date=start_date, end_date=end_date
         )
     elif domain == "LABEL":
         results = populate_label_from_fda(drug_name)
@@ -60,4 +71,6 @@ def populate_crf(drug_name: str, domain: str, max_results: int, start_date: str,
         elif isinstance(results, dict):
             csv_writer.writerow(["Field", "Value"])
             for key, value in results.items():
-                csv_writer.writerow([key, ", ".join(value) if isinstance(value, list) else value])
+                csv_writer.writerow(
+                    [key, ", ".join(value) if isinstance(value, list) else value]
+                )

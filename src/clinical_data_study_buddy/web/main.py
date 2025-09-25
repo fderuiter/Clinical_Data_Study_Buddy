@@ -3,23 +3,32 @@ This module serves as the main entry point for the Clinical Data Study Buddy web
 application. It initializes the FastAPI application, mounts static files, sets up
 Jinja2 templates, and includes the API routers for different functionalities.
 """
+
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import os
 
 app = FastAPI()
 
 # Get the absolute path to the project root
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+project_root = Path(__file__).resolve().parents[3]
 
 # Mount static files and templates using absolute paths
-app.mount("/static", StaticFiles(directory=os.path.join(project_root, "src/clinical_data_study_buddy/web/static")), name="static")
-templates = Jinja2Templates(directory=os.path.join(project_root, "templates/ui"))
+app.mount(
+    "/static",
+    StaticFiles(directory=project_root / "src/clinical_data_study_buddy/web/static"),
+    name="static",
+)
+templates = Jinja2Templates(directory=project_root / "templates/ui")
 
 
-from clinical_data_study_buddy.web.routers import data_generation, analysis
+from clinical_data_study_buddy.web.routers import (  # noqa: E402
+    analysis,
+    data_generation,
+)
 
 
 @app.get("/", response_class=HTMLResponse)

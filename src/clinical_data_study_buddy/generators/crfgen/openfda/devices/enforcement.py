@@ -1,11 +1,13 @@
 """
 This module provides access to the OpenFDA device enforcement endpoint.
 """
+
 from typing import List, Optional
 
 from ..client import OpenFDAClient
 from ..models import EnforcementReport
 from ..query import paging_query
+
 
 class EnforcementAccessor:
     """
@@ -24,7 +26,12 @@ class EnforcementAccessor:
         """
         self.client = client
 
-    async def fetch(self, search: Optional[str] = None, limit: Optional[int] = None, skip: Optional[int] = None) -> List[EnforcementReport]:
+    async def fetch(
+        self,
+        search: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+    ) -> List[EnforcementReport]:
         """
         Fetches device enforcement reports from the openFDA API.
 

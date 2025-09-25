@@ -1,6 +1,11 @@
 import pathlib
 
-from clinical_data_study_buddy.core.models.schema import FieldDef, Form, dump_forms, load_forms
+from clinical_data_study_buddy.core.models.schema import (
+    FieldDef,
+    Form,
+    dump_forms,
+    load_forms,
+)
 
 
 def test_roundtrip(tmp_path: pathlib.Path):

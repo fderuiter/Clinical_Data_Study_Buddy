@@ -8,24 +8,24 @@ It includes functions for:
   footers, tables, and form controls.
 - Assembling the complete CRF for a given domain.
 """
+
 import os
 import pathlib
-from typing import Dict, Tuple, List, Any
-import yaml
+from typing import Any, Dict, List, Tuple
 
 import pandas as pd
-from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
-    get_mdr_cdashig_version_domains,
-    get_mdr_cdashig_version_domains_domain_fields,
-)
-from cdisc_library_client.client import AuthenticatedClient
-from clinical_data_study_buddy.generators.crfgen.populators import populate_ae_from_fda
 from docx import Document
 from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
 from docx.shared import Pt, RGBColor
+
+from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
+    get_mdr_cdashig_version_domains,
+    get_mdr_cdashig_version_domains_domain_fields,
+)
+from cdisc_library_client.client import AuthenticatedClient
 
 ###############################################################################
 # Domain‑to‑category mapping
@@ -267,7 +267,9 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
     if not api_key:
         raise ValueError("CDISC_PRIMARY_KEY environment variable not set.")
 
-    client = AuthenticatedClient(base_url="https://library.cdisc.org/api", token=api_key)
+    client = AuthenticatedClient(
+        base_url="https://library.cdisc.org/api", token=api_key
+    )
 
     all_variables = []
 
@@ -275,7 +277,11 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
     domains_response = get_mdr_cdashig_version_domains.sync(
         client=client, version=ig_version
     )
-    if not domains_response or not domains_response.field_links or not domains_response.field_links.domains:
+    if (
+        not domains_response
+        or not domains_response.field_links
+        or not domains_response.field_links.domains
+    ):
         print(f"Warning: No domains found for CDASHIG version {ig_version}")
         return pd.DataFrame()
 
@@ -301,14 +307,19 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
             ):
                 break
 
-            from cdisc_library_client.api.cdash_implementation_guide_cdashig import get_mdr_cdashig_version_domains_domain_fields_field
+            from cdisc_library_client.api.cdash_implementation_guide_cdashig import (
+                get_mdr_cdashig_version_domains_domain_fields_field,
+            )
+
             for field_ref in fields_response.field_links.fields:
                 field_name = field_ref.href.split("/")[-1]
-                field_details = get_mdr_cdashig_version_domains_domain_fields_field.sync(
-                    client=client,
-                    version=ig_version,
-                    domain=domain_name,
-                    field=field_name,
+                field_details = (
+                    get_mdr_cdashig_version_domains_domain_fields_field.sync(
+                        client=client,
+                        version=ig_version,
+                        domain=domain_name,
+                        field=field_name,
+                    )
                 )
                 if not field_details:
                     continue
@@ -320,9 +331,18 @@ def get_cdashig_variables_from_api(ig_version: str) -> pd.DataFrame:
                     "Display Label": field_details.prompt or field_details.label,
                     "CRF Instructions": field_details.completion_instructions,
                     "Type": field_details.simple_datatype,
-                    "CT Values": "; ".join(field_details.additional_properties.get("codelistSubmissionValues", []))
-                    if field_details.additional_properties and field_details.additional_properties.get("codelistSubmissionValues")
-                    else None,
+                    "CT Values": (
+                        "; ".join(
+                            field_details.additional_properties.get(
+                                "codelistSubmissionValues", []
+                            )
+                        )
+                        if field_details.additional_properties
+                        and field_details.additional_properties.get(
+                            "codelistSubmissionValues"
+                        )
+                        else None
+                    ),
                     "CT Codes": None,  # Not available in this endpoint
                     "Implementation Notes": field_details.implementation_notes,
                 }
@@ -437,7 +457,9 @@ def _create_admin_section(document, full_title, config):
     hdr_cell = hdr_row.cells[0]
     hdr_cell.merge(hdr_row.cells[1])
     hdr_cell.text = "SECTION A  ADMINISTRATIVE"
-    section_header_color = config.get("styling", {}).get("section_header_color", "8064A2")
+    section_header_color = config.get("styling", {}).get(
+        "section_header_color", "8064A2"
+    )
     _set_cell_shading(hdr_cell, section_header_color)
     _style_header_cell(hdr_cell)
 
@@ -452,7 +474,14 @@ def _create_admin_section(document, full_title, config):
     secA_tbl.rows[2].cells[1].text = "__|__|____|____|    DD-MMM-YYYY"
 
 
-def _create_variables_table(document, section, domain_df, domain: str, config: dict, fda_adverse_events: List[Dict[str, Any]] = None):
+def _create_variables_table(
+    document,
+    section,
+    domain_df,
+    domain: str,
+    config: dict,
+    fda_adverse_events: List[Dict[str, Any]] = None,
+):
     """
     Creates Section B (Domain Variables) of the CRF.
 
@@ -478,8 +507,12 @@ def _create_variables_table(document, section, domain_df, domain: str, config: d
 
     hdr_cells = var_tbl.rows[0].cells
     col_titles = [
-        "Variable", "Label / Question", "Type",
-        "Controlled Terminology", "Data Entry", "Instructions",
+        "Variable",
+        "Label / Question",
+        "Type",
+        "Controlled Terminology",
+        "Data Entry",
+        "Instructions",
     ]
     table_header_color = config.get("styling", {}).get("table_header_color", "4F81BD")
     for idx, title in enumerate(col_titles):
@@ -569,7 +602,9 @@ def _create_variables_table(document, section, domain_df, domain: str, config: d
         instruction_cell.merge(instruction_row.cells[-1])
         p = instruction_cell.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        run = p.add_run("Right-click -> Insert -> Insert Rows Below to add more entries.")
+        run = p.add_run(
+            "Right-click -> Insert -> Insert Rows Below to add more entries."
+        )
         run.italic = True
         run.font.size = Pt(9)
 
@@ -605,7 +640,11 @@ def _create_variables_table(document, section, domain_df, domain: str, config: d
 
 
 def build_domain_crf(
-    domain_df: pd.DataFrame, domain: str, out_dir: pathlib.Path, config: dict, fda_adverse_events: List[Dict[str, Any]] = None
+    domain_df: pd.DataFrame,
+    domain: str,
+    out_dir: pathlib.Path,
+    config: dict,
+    fda_adverse_events: List[Dict[str, Any]] = None,
 ) -> None:
     """
     Builds a Word document for a single CDASH domain and saves it to disk.
@@ -644,7 +683,14 @@ def build_domain_crf(
     _create_header(section, config, full_title)
     _create_footer(section, config, full_title)
     _create_admin_section(document, full_title, config)
-    _create_variables_table(document, section, domain_df, domain, config, fda_adverse_events=fda_adverse_events)
+    _create_variables_table(
+        document,
+        section,
+        domain_df,
+        domain,
+        config,
+        fda_adverse_events=fda_adverse_events,
+    )
 
     # ---------------------------------------------------------------------
     #  Save document

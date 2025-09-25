@@ -1,5 +1,7 @@
-import toml
 import re
+
+import toml
+
 
 def test_readme_cli_command():
     """
@@ -19,7 +21,9 @@ def test_readme_cli_command():
     # Find the command in the README.md file's Command-Line Interface (CLI) section
     cli_section = readme_content.split("### Command-Line Interface (CLI)")[1]
     match = re.search(r"poetry run (\w+)", cli_section)
-    assert match is not None, "Could not find the CLI command in the README.md file's CLI section."
+    assert (
+        match is not None
+    ), "Could not find the CLI command in the README.md file's CLI section."
     readme_command = match.group(1)
 
     # Check if the command in the README.md file matches the one in pyproject.toml

@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+
 from clinical_data_study_buddy.web.main import app
 
 
@@ -16,7 +17,7 @@ def test_read_root(client):
 
 def test_generate_synthetic_data_endpoint(client, mocker):
     mock_create_synthetic_data = mocker.patch(
-        "clinical_data_study_buddy.web.services.data_generation_service.create_synthetic_data",
+        "clinical_data_study_buddy.web.core.data_generation_service.create_synthetic_data",
         return_value="output/ui_generated_data/DM.csv",
     )
 
@@ -43,7 +44,7 @@ def test_generate_synthetic_data_endpoint(client, mocker):
 
 def test_generate_raw_dataset_package_endpoint(client, mocker):
     mock_create_raw_dataset_package = mocker.patch(
-        "clinical_data_study_buddy.web.services.data_generation_service.create_raw_dataset_package",
+        "clinical_data_study_buddy.web.core.data_generation_service.create_raw_dataset_package",
         return_value="output/ui_generated_data/edc_raw_datasets.zip",
     )
 
@@ -70,7 +71,7 @@ def test_generate_raw_dataset_package_endpoint(client, mocker):
 
 def test_generate_analysis_code_endpoint(client, mocker):
     mock_create_analysis_code = mocker.patch(
-        "clinical_data_study_buddy.web.services.analysis_service.create_analysis_code",
+        "clinical_data_study_buddy.web.core.analysis_service.create_analysis_code",
         return_value="output/ui_generated_data/analysis.sas",
     )
 
@@ -96,7 +97,7 @@ def test_generate_analysis_code_endpoint(client, mocker):
 
 def test_generate_raw_dataset_package_endpoint_value_error(client, mocker):
     mocker.patch(
-        "clinical_data_study_buddy.web.services.data_generation_service.create_raw_dataset_package",
+        "clinical_data_study_buddy.web.core.data_generation_service.create_raw_dataset_package",
         side_effect=ValueError("Invalid domain"),
     )
 

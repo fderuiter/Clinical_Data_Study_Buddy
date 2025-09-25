@@ -2,11 +2,15 @@
 This module provides a service layer for handling analysis-related business logic.
 It acts as an intermediary between the API routers and the core generation services.
 """
+
 import pathlib
+
 from clinical_data_study_buddy.core import generation_service
 
 
-def create_analysis_code(language: str, dataset_path: str, output_type: str, treatment_var: str) -> str:
+def create_analysis_code(
+    language: str, dataset_path: str, output_type: str, treatment_var: str
+) -> str:
     """
     Creates analysis code by calling the core generation service.
 

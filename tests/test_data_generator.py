@@ -1,6 +1,8 @@
 import re
+
+from clinical_data_study_buddy.core.models.schema import Codelist, FieldDef, Form
 from clinical_data_study_buddy.generators.data_generator import DataGenerator
-from clinical_data_study_buddy.core.models.schema import Form, FieldDef, Codelist
+
 
 def test_generate():
     """
@@ -8,7 +10,9 @@ def test_generate():
     and uses the cdash_var as the column name.
     """
     fields = [
-        FieldDef(oid="SUBJECT_ID", prompt="Subject ID", datatype="text", cdash_var="USUBJID"),
+        FieldDef(
+            oid="SUBJECT_ID", prompt="Subject ID", datatype="text", cdash_var="USUBJID"
+        ),
         FieldDef(oid="AGE_IN_YEARS", prompt="Age", datatype="integer", cdash_var="AGE"),
     ]
     form_data = Form(title="DM", domain="DM", fields=fields)
@@ -22,13 +26,16 @@ def test_generate():
     assert "SUBJECT_ID" not in dataset[0]
     assert "AGE_IN_YEARS" not in dataset[0]
 
+
 def test_generate_from_codelist():
     """
     Tests that the DataGenerator uses the codelist for generation.
     """
     codelist = Codelist(nci_code="C123", href="/codelists/C123")
     fields = [
-        FieldDef(oid="SEX", prompt="Sex", datatype="text", cdash_var="SEX", codelist=codelist),
+        FieldDef(
+            oid="SEX", prompt="Sex", datatype="text", cdash_var="SEX", codelist=codelist
+        ),
     ]
     form_data = Form(title="DM", domain="DM", fields=fields)
     generator = DataGenerator(form_data)
@@ -42,7 +49,9 @@ def test_generate_date_format():
     Tests that the DataGenerator generates a date in the correct format.
     """
     fields = [
-        FieldDef(oid="BRTHDTC", prompt="Birth Date", datatype="date", cdash_var="BRTHDTC"),
+        FieldDef(
+            oid="BRTHDTC", prompt="Birth Date", datatype="date", cdash_var="BRTHDTC"
+        ),
     ]
     form_data = Form(title="DM", domain="DM", fields=fields)
     generator = DataGenerator(form_data)
@@ -58,7 +67,13 @@ def test_generate_text_with_length():
     Tests that the DataGenerator generates text with a specific length.
     """
     fields = [
-        FieldDef(oid="TEXT_FIELD", prompt="Text Field", datatype="text", cdash_var="TEXTVAR", length=20),
+        FieldDef(
+            oid="TEXT_FIELD",
+            prompt="Text Field",
+            datatype="text",
+            cdash_var="TEXTVAR",
+            length=20,
+        ),
     ]
     form_data = Form(title="TEST", domain="TS", fields=fields)
     generator = DataGenerator(form_data)

@@ -1,11 +1,13 @@
 """
 This module provides access to the OpenFDA device registration and listing endpoint.
 """
+
 from typing import List, Optional
 
 from ..client import OpenFDAClient
 from ..models import Registration
 from ..query import paging_query
+
 
 class RegListAccessor:
     """
@@ -24,7 +26,12 @@ class RegListAccessor:
         """
         self.client = client
 
-    async def fetch(self, search: Optional[str] = None, limit: Optional[int] = None, skip: Optional[int] = None) -> List[Registration]:
+    async def fetch(
+        self,
+        search: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+    ) -> List[Registration]:
         """
         Fetches registration and listing records from the openFDA API.
 
@@ -40,6 +47,8 @@ class RegListAccessor:
         if search:
             params["search"] = search
 
-        response = await self.client.get("/device/registrationlisting.json", params=params)
+        response = await self.client.get(
+            "/device/registrationlisting.json", params=params
+        )
         results = (await response.json()).get("results", [])
         return [Registration(**item) for item in results]

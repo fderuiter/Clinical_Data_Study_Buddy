@@ -1,5 +1,6 @@
+from typing import Dict, List, Optional
+
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
 
 
 class TFL(BaseModel):
@@ -18,6 +19,7 @@ class TFL(BaseModel):
         style (Optional[Dict]): The style options for the TFL.
         domain (Optional[str]): The domain of the TFL.
     """
+
     id: str = Field(..., description="The unique ID of the TFL.")
     title: str = Field(..., description="The title of the TFL.")
     description: Optional[str] = Field(None, description="A description of the TFL.")

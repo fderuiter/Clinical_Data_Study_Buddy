@@ -1,11 +1,13 @@
 """
 This module provides access to the OpenFDA device recall endpoint.
 """
+
 from typing import List, Optional
 
 from ..client import OpenFDAClient
 from ..models import Recall
 from ..query import paging_query
+
 
 class RecallAccessor:
     """
@@ -24,7 +26,12 @@ class RecallAccessor:
         """
         self.client = client
 
-    async def fetch(self, search: Optional[str] = None, limit: Optional[int] = None, skip: Optional[int] = None) -> List[Recall]:
+    async def fetch(
+        self,
+        search: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+    ) -> List[Recall]:
         """
         Fetches device recall records from the openFDA API.
 

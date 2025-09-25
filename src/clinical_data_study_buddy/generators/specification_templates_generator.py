@@ -2,8 +2,11 @@
 This module contains the SpecificationTemplatesGenerator class, which is responsible for
 generating Excel-based specification templates for CDISC datasets.
 """
+
 import os
+
 from openpyxl import Workbook
+
 from cdisc_library_client.harvest import harvest
 from clinical_data_study_buddy.generators.crfgen.utils import get_api_key
 
@@ -16,6 +19,7 @@ class SpecificationTemplatesGenerator:
     and then generates an Excel spreadsheet that outlines the specification for the
     selected domains.
     """
+
     def __init__(self, product, version, domains, output_dir):
         """
         Initializes the SpecificationTemplatesGenerator.
@@ -65,6 +69,8 @@ class SpecificationTemplatesGenerator:
                     ]
                 )
 
-        output_file = os.path.join(self.output_dir, f"{self.product}_{self.version}_spec.xlsx")
+        output_file = os.path.join(
+            self.output_dir, f"{self.product}_{self.version}_spec.xlsx"
+        )
         wb.save(output_file)
         print(f"Excel specification generated successfully: {output_file}")

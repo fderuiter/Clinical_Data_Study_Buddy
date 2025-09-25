@@ -5,11 +5,14 @@ The generate command is a subcommand that groups together various generation
 capabilities, such as creating TFL shells, synthetic data, analysis code,
 and more.
 """
-import typer
-from rich.console import Console
+
 import pathlib
 from typing import List, Optional
+
+import typer
 from dotenv import load_dotenv
+from rich.console import Console
+
 from clinical_data_study_buddy.core import generation_service
 
 load_dotenv()
@@ -26,7 +29,9 @@ def validate_num_subjects(value: int):
 @generate_app.command()
 def tfl_shell(
     spec: str = typer.Option(..., "--spec", help="TFL specification"),
-    output_file: pathlib.Path = typer.Option(..., "--output-file", help="Path to the output file")
+    output_file: pathlib.Path = typer.Option(
+        ..., "--output-file", help="Path to the output file"
+    ),
 ):
     """
     Generates a TFL (Tables, Figures, and Listings) shell document.
@@ -50,13 +55,26 @@ def tfl_shell(
 @generate_app.command()
 def edc_raw_dataset_package(
     num_subjects: int = typer.Option(
-        50, "--num-subjects", help="Number of subjects (10-200)", callback=validate_num_subjects
+        50,
+        "--num-subjects",
+        help="Number of subjects (10-200)",
+        callback=validate_num_subjects,
     ),
-    therapeutic_area: str = typer.Option("Oncology", "--therapeutic-area", help="Therapeutic area for the study"),
-    domains: List[str] = typer.Option(..., "--domains", help="List of domains to include (e.g., DM AE VS LB)"),
-    study_story: str = typer.Option("none", "--study-story", help="Study story to simulate (none, high_dropout)"),
-    output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="Directory to save the generated package"),
-    output_format: str = typer.Option("csv", "--output-format", help="Output format for datasets (csv, json, xpt)")
+    therapeutic_area: str = typer.Option(
+        "Oncology", "--therapeutic-area", help="Therapeutic area for the study"
+    ),
+    domains: List[str] = typer.Option(
+        ..., "--domains", help="List of domains to include (e.g., DM AE VS LB)"
+    ),
+    study_story: str = typer.Option(
+        "none", "--study-story", help="Study story to simulate (none, high_dropout)"
+    ),
+    output_dir: pathlib.Path = typer.Option(
+        ".", "--output-dir", help="Directory to save the generated package"
+    ),
+    output_format: str = typer.Option(
+        "csv", "--output-format", help="Output format for datasets (csv, json, xpt)"
+    ),
 ):
     """
     Generates an EDC (Electronic Data Capture) Raw Dataset Package.
@@ -74,7 +92,12 @@ def edc_raw_dataset_package(
     """
     try:
         generation_service.generate_edc_raw_dataset_package(
-            num_subjects, therapeutic_area, domains, study_story, output_dir, output_format
+            num_subjects,
+            therapeutic_area,
+            domains,
+            study_story,
+            output_dir,
+            output_format,
         )
         console.print(f"EDC Raw Dataset Package generated successfully in {output_dir}")
     except Exception as e:
@@ -84,11 +107,19 @@ def edc_raw_dataset_package(
 
 @generate_app.command()
 def synthetic_data(
-    standard: str = typer.Option(..., "--standard", help="The standard to generate data for (e.g., sdtmig)."),
-    version: str = typer.Option(..., "--version", help="The version of the standard (e.g., 3-3)."),
-    domain: str = typer.Option(..., "--domain", help="The domain to generate data for (e.g., DM)."),
+    standard: str = typer.Option(
+        ..., "--standard", help="The standard to generate data for (e.g., sdtmig)."
+    ),
+    version: str = typer.Option(
+        ..., "--version", help="The version of the standard (e.g., 3-3)."
+    ),
+    domain: str = typer.Option(
+        ..., "--domain", help="The domain to generate data for (e.g., DM)."
+    ),
     num_subjects: int = typer.Option(50, "--num-subjects", help="Number of subjects."),
-    output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="Directory to save the file."),
+    output_dir: pathlib.Path = typer.Option(
+        ".", "--output-dir", help="Directory to save the file."
+    ),
 ):
     """
     Generates synthetic CDISC datasets for a specific domain.
@@ -115,11 +146,19 @@ def synthetic_data(
 
 @generate_app.command()
 def analysis_code(
-    language: str = typer.Option(..., "--language", help="Language for the generated code (sas or r)"),
+    language: str = typer.Option(
+        ..., "--language", help="Language for the generated code (sas or r)"
+    ),
     dataset: str = typer.Option(..., "--dataset", help="Source dataset (e.g., ADSL)"),
-    output_type: str = typer.Option(..., "--output-type", help="Type of analysis output (e.g., Demographics)"),
-    treatment_var: str = typer.Option(..., "--treatment-var", help="Treatment variable (e.g., TRT01A)"),
-    output_file: pathlib.Path = typer.Option(..., "--output-file", help="Path to the output file")
+    output_type: str = typer.Option(
+        ..., "--output-type", help="Type of analysis output (e.g., Demographics)"
+    ),
+    treatment_var: str = typer.Option(
+        ..., "--treatment-var", help="Treatment variable (e.g., TRT01A)"
+    ),
+    output_file: pathlib.Path = typer.Option(
+        ..., "--output-file", help="Path to the output file"
+    ),
 ):
     """
     Generates analysis code in SAS or R for a specific analysis.
@@ -136,8 +175,12 @@ def analysis_code(
                                     will be saved.
     """
     try:
-        generation_service.generate_analysis_code(language, dataset, output_type, treatment_var, output_file)
-        console.print(f"Successfully generated {language.upper()} code in {output_file}")
+        generation_service.generate_analysis_code(
+            language, dataset, output_type, treatment_var, output_file
+        )
+        console.print(
+            f"Successfully generated {language.upper()} code in {output_file}"
+        )
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
         raise typer.Exit(code=1)
@@ -158,7 +201,9 @@ def cdash_crf(
         "crf_config.yaml", "--config", help="Path to the configuration file."
     ),
     openfda_drug_name: Optional[str] = typer.Option(
-        None, "--openfda-drug-name", help="Drug name to fetch adverse events from OpenFDA."
+        None,
+        "--openfda-drug-name",
+        help="Drug name to fetch adverse events from OpenFDA.",
     ),
     openfda_max_results: int = typer.Option(
         20, "--openfda-max-results", help="Max adverse events to fetch from OpenFDA."
@@ -181,7 +226,12 @@ def cdash_crf(
     """
     try:
         generation_service.generate_cdash_crf(
-            ig_version, out_dir, domains, config_path, openfda_drug_name, openfda_max_results
+            ig_version,
+            out_dir,
+            domains,
+            config_path,
+            openfda_drug_name,
+            openfda_max_results,
         )
         console.print("CDASH CRF generated successfully.")
     except Exception as e:
@@ -191,11 +241,23 @@ def cdash_crf(
 
 @generate_app.command()
 def study_protocols(
-    therapeutic_area: str = typer.Option(..., "--therapeutic-area", help="The therapeutic area of the study."),
-    treatment_arms: List[str] = typer.Option(..., "--treatment-arm", help="A treatment arm of the study. Can be specified multiple times."),
-    duration_weeks: int = typer.Option(..., "--duration-weeks", help="The duration of the study in weeks."),
+    therapeutic_area: str = typer.Option(
+        ..., "--therapeutic-area", help="The therapeutic area of the study."
+    ),
+    treatment_arms: List[str] = typer.Option(
+        ...,
+        "--treatment-arm",
+        help="A treatment arm of the study. Can be specified multiple times.",
+    ),
+    duration_weeks: int = typer.Option(
+        ..., "--duration-weeks", help="The duration of the study in weeks."
+    ),
     phase: int = typer.Option(..., "--phase", help="The phase of the study."),
-    output_dir: pathlib.Path = typer.Option("my_protocol", "--output-dir", help="The directory to save the generated protocol documents.")
+    output_dir: pathlib.Path = typer.Option(
+        "my_protocol",
+        "--output-dir",
+        help="The directory to save the generated protocol documents.",
+    ),
 ):
     """
     Generates study protocol documents.
@@ -222,10 +284,20 @@ def study_protocols(
 
 @generate_app.command()
 def specification_templates(
-    product: str = typer.Option(..., "--product", help="The CDISC product (e.g., sdtmig, adamig)."),
-    version: str = typer.Option(..., "--version", help="The version of the product (e.g., 3-3)."),
-    domains: List[str] = typer.Option(..., "--domains", help="A list of domains to include in the specification (e.g., DM AE VS)."),
-    output_dir: pathlib.Path = typer.Option(".", "--output-dir", help="The directory to save the generated Excel file.")
+    product: str = typer.Option(
+        ..., "--product", help="The CDISC product (e.g., sdtmig, adamig)."
+    ),
+    version: str = typer.Option(
+        ..., "--version", help="The version of the product (e.g., 3-3)."
+    ),
+    domains: List[str] = typer.Option(
+        ...,
+        "--domains",
+        help="A list of domains to include in the specification (e.g., DM AE VS).",
+    ),
+    output_dir: pathlib.Path = typer.Option(
+        ".", "--output-dir", help="The directory to save the generated Excel file."
+    ),
 ):
     """
     Generates Excel-based specification templates for CDISC datasets.
@@ -240,7 +312,9 @@ def specification_templates(
         output_dir (pathlib.Path): The directory to save the generated Excel file.
     """
     try:
-        generation_service.generate_specification_templates(product, version, domains, output_dir)
+        generation_service.generate_specification_templates(
+            product, version, domains, output_dir
+        )
         console.print("Specification templates generated successfully.")
     except Exception as e:
         console.print(f"Error: {e}", style="bold red")
